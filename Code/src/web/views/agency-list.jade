@@ -1,0 +1,31 @@
+extends ./layout.jade
+
+
+block jumbo
+    .jumbotron
+        .container
+            h1 Agency Directory
+            p Registerd System Agencies
+
+
+block content
+    - var route = '/agency'
+
+    table.table.table-striped
+        thead
+            tr
+                th Name
+                th.hidden-xs Address
+                th City
+                th.hidden-xs Zip
+                th State
+                th.hidden-xs Phone
+        tbody
+            for agency in agencies
+                tr
+                    td: a( href=route + '/' + agency.id ) #{agency.name}
+                    td.hidden-xs #{agency.address}
+                    td  #{agency.city}
+                    td.hidden-xs #{agency.zip}
+                    td  #{agency.state}
+                    td.hidden-xs #{agency.phone}

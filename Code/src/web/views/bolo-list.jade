@@ -1,0 +1,28 @@
+extends layout
+
+
+block jumbo
+    .jumbotron
+        .container
+            h1 Be On the Lookout
+            p Browse Active BOLOs
+
+
+block content
+    include ./partials/global-alerts.jade
+
+    if bolos && 0 === bolos.length
+        p.lead No active BOLOs at this time.
+
+    .row
+        for bolo in bolos
+            div.col-sm-6.col-md-4
+                include ./partials/bolo-thumbnail.jade
+                    .actions
+                        a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
+                        a.btn.btn-default( href="/bolo/details/" + bolo.id role="button" ) Details
+                        a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
+
+    .row.text-center
+        - var route = '/bolo'
+        include ./partials/paging.jade

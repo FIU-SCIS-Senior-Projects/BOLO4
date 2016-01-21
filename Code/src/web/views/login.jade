@@ -1,0 +1,25 @@
+extends ./layout.jade
+include ./includes/mixins.jade
+
+block jumbo
+    .jumbotron
+        .container
+            h1 Login
+            p Bolo Flier Creator Version 3.0
+
+block content
+    include ./partials/global-alerts.jade
+
+    //- Temporary fix for missing alerts after migrating to global-alerts
+    if ( error.length )
+        +alert_error_array( error )
+
+    if ( messages.length )
+        +alert_message_array( messages )
+
+    form#login(action="/login" method="post")
+        input(type="hidden" name="_csrf" value=loginToken)
+        +input_text("username", "Username", "", true, "", "text")
+        +input_text("password", "Password", "", true, "", "password")
+        .form-group
+             button.btn.btn-primary(type="submit" value="login") Login

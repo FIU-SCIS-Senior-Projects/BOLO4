@@ -1,0 +1,17 @@
+
+applications:
+- services:
+    - bolo-cloudant-dev
+  disk_quota: 1024M
+  host: name-bolo-dev
+  name: name-bolo-dev
+  path: .
+  domain: mybluemix.net
+  instances: 1
+  memory: 1024M
+  env:
+    SENDGRID_API_KEY: key
+    SESSION_SECRET: secret
+    PASSWORD_SALT: salt
+    NODE_ENV: production
+    APP_URL: http://name-bolo-dev.mybluemix.net

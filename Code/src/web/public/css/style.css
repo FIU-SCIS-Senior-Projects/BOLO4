@@ -1,0 +1,49 @@
+
+/** Bootstrap Overrides **/
+.navbar {
+    border-radius: 0;
+    margin-bottom: 0;
+}
+.nav-stacked {
+    margin-bottom: 2em;
+}
+
+/** Sticky footer with fixed navbar **/
+/** http://getbootstrap.com/2.3.2/examples/sticky-footer-navbar.html# **/
+html, body {
+    height: 100%;
+}
+#wrap {
+    min-height: 100%;
+    margin: 0 auto -155px; /* the bottom margin is the negative value of the footer's height */
+}
+#footer, .push {
+    height: 155px; /* .push must be the same height as .footer */
+}
+
+
+/** Custom Styles **/
+#wrap > .container {
+    margin-bottom: 48px;
+}
+
+.details-image img {
+    max-width: 90%;
+}
+
+input[type="file"] {
+    line-height: 2.5em;
+}
+
+
+.account-details > tbody > tr > td {
+    border-top: none;
+}
+
+.account-details > tbody > tr > td:first-child {
+    font-weight: bold;
+}
+
+.table tr.no-border td {
+    border-top: none;
+}

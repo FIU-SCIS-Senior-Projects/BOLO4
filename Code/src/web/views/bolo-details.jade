@@ -1,0 +1,128 @@
+extends ./layout.jade
+
+
+block jumbo
+    .jumbotron
+        .container
+            h1 Be On the Lookout
+            p Detailed BOLO Information
+
+
+block content
+
+    - var img_src = '/bolo/asset' + bolo.id
+
+    .row
+        include ./partials/global-alerts.jade
+
+    .row
+        .col-md-7
+            h3 #{bolo.category} 
+                if bolo.status
+                    small.text-danger #{bolo.status}
+
+            table.table
+                tr: td( colspan="2" ): h4 Suspect
+
+                tr.no-border
+                    td First Name
+                    td #{bolo.firstName|| "N/A"}
+
+                tr.no-border
+                    td Last Name
+                    td #{bolo.lastName || "N/A"}
+
+                tr.no-border
+                    td Sex
+                    td #{bolo.sex || "N/A"}
+
+                tr.no-border
+                    td Race
+                    td #{bolo.race || "N/A"}
+
+                tr.no-border
+                    td Height
+                    td #{bolo.height || "N/A"}
+
+                tr.no-border
+                    td Weight
+                    td #{bolo.weight || "N/A"}
+
+                tr.no-border
+                    td Hair Color
+                    td #{bolo.hairColor || "N/A"}
+
+                tr.no-border
+                    td Address
+                    td #{bolo.address || "N/A"}
+
+                tr.no-border
+                    td Tattoos
+                    td #{bolo.tattoos || "N/A"}
+
+                tr.no-border
+                    td Drivers License
+                    td #{bolo.dlNumber || "N/A"}
+
+                tr.no-border
+                    td Date Of Birth
+                    td #{bolo.dob || "N/A"}
+
+
+            table.table
+                tr: td( colspan="2"): h4 Summary
+                tr.no-border: td( colspan="2" ) #{bolo.summary || "N/A"}
+
+
+            table.table
+                tr: td( colspan="2"): h4 Additional Information
+                tr.no-border: td( colspan="2" ) #{bolo.additional || "N/A"}
+
+
+            table.table
+                tr: td( colspan="2"): h4 Media
+
+                tr.no-border
+                    td Video URL
+                    td #{bolo.video_url || "N/A"}
+
+                tr.no-border
+                    td Images
+                    td
+                        each name, uuid in bolo.images
+                            a( href="/bolo/asset/" + bolo.id + "/" + uuid target="_blank" ) #{name}
+                            br
+
+        .col-md-5
+            h3 General
+            table.table
+                tr
+                    td Agency
+                    td: a( href="/agency/" + agency.id ) #{agency.name}
+
+                tr.no-border
+                    td Author
+                    td #{bolo.authorFName} #{bolo.authorLName}
+                tr.no-border
+                    td Created
+                    td #{bolo.createdOn}
+
+                tr.no-border
+                    td Updated
+                    td #{bolo.lastUpdatedOn}
+
+                tr.no-border
+                    td UUID
+                    td #{bolo.id}
+
+                tr
+                    td
+                    td
+
+
+            if ( bolo.images.featured )
+                - var f_src = "/bolo/asset/" + bolo.id + "/featured";
+                h3 FEATURE IMAGE
+                .details-image
+                    a( href=f_src target="_blank" )
+                        img( src=f_src alt=bolo.images.featured )

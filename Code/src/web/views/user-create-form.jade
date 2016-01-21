@@ -1,0 +1,49 @@
+extends ./admin-layout.jade
+include ./includes/mixins.jade
+
+
+block jumbo-desc
+    p New User Registration
+
+
+block admin-content
+    div
+        - var ferrs = ( form_errors.length ) ? form_errors[0] : {};
+        if ferrs.password
+            +alert_error_array( ferrs.password )
+        if ferrs.confirmation
+            +alert_error_array( ferrs.confirmation )
+
+    form( action="/admin/users/create" enctype="multipart/form-data" method="post" )
+        +input_text( "username", "Username (required)", "", true, "" )
+        +input_text( "email", "Email (required)", "", true, "" )
+        +input_text( "fname", "First Name", "", false, "" )
+        +input_text( "lname", "Last Name", "", false,  "" )
+        +input_text( "password", "Password (required)", "", true,  "", "password" )
+        +input_text( "confirm", "Repeat Password (required)", "", true,  "", "password" )
+
+        if ( roles )
+            .form-group
+                label.control-label( for="role") Role
+                select.form-control( name="role" )
+                    each role in roles
+                        - var formattedRole = _.startCase( role.toLowerCase() );
+                        option( value=role, selected ) #{formattedRole}
+
+        if ( agencies )
+            .form-group
+                label.control-label( for="agency" ) Agency
+                select.form-control( name="agency" )
+                    each agency in agencies
+                        if ( agency.id === user.agency )
+                            option( value=agency.id selected ) #{agency.name}
+                        else
+                            option( value=agency.id ) #{agency.name}
+
+
+        +input_text( "badge", "Badge No.", "", false,  "" )
+        +input_text( "sectunit", "Section / Unit", "", false,  "" )
+        +input_text( "ranktitle", "Rank / Title", "", false,  "" )
+
+        .form-group
+            button.btn.btn-primary( type="submit" value="save" ) Submit

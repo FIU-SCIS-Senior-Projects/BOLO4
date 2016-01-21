@@ -1,0 +1,27 @@
+extends layout
+
+
+block jumbo
+    .jumbotron
+        .container
+            h1 Be On the Lookout
+            p Browse Archived BOLOs
+
+
+block content
+    include ./partials/global-alerts.jade
+
+    if bolos && 0 === bolos.length
+        p.lead No archived BOLOs.
+
+    .row
+        for bolo in bolos
+            div.col-sm-6.col-md-4
+                include ./partials/bolo-thumbnail.jade
+                    .action
+                        a.btn.btn-default( href="/bolo/restore/" + bolo.id role="button" type="submit" ) Restore
+                        a.btn.btn-danger( href="/bolo/delete/" + bolo.id role="button" type="submit" ) Delete
+
+    .row.text-center
+        - var route = '/bolo/archive'
+        include ./partials/paging.jade
