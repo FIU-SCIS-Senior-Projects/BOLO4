@@ -1,7 +1,7 @@
 /* jshint node: true */
 'use strict';
-/*cacafuate*/
-var _               = require('lodash');
+
+const 	            = require('lodash');
 var http            = require('http');
 var path            = require('path');
 
