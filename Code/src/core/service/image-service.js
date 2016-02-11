@@ -67,10 +67,23 @@ var compress = function(file) {
 
         var img_buffer = file.data;
         var img_name = file.name;
-console.log("original image length is " + img_buffer.length);
-         gm(img_buffer, img_name + '.' + img_type).quality(5).compress(compression)
+console.log("original image length is " + img_buffer.length + " for image: " +img_name);
+         gm(img_buffer, img_name + '.' + img_type).quality(50).compress(compression)
          .toBuffer(function (err, buffer) {
 
+             if (err) {
+                 console.log(err);
+                 reject(new Error(err));
+             }
+
+             else
+             {
+             console.log("length after compression is " + buffer.length);
+             resolve(buffer);
+             }
+         });
+
+             /*console.log(buffer);
          if(buffer.length) {
          console.log("length after compression is " + buffer.length);
              resolve(buffer);
@@ -78,7 +91,7 @@ console.log("original image length is " + img_buffer.length);
          }
          else reject(err);
 
-         });
+         });*/
 
 
 

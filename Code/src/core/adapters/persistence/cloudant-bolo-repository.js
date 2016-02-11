@@ -137,26 +137,29 @@ CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
     var atts = _.map(attachments, attachmentsToCloudant);
     console.log(atts);
     return Promise.all(atts).then(function (attDTOs) {
+        console.log('length of attdtos orig: ' + attDTOs.length);
         if (attDTOs.length) {
             var need_comp_attDTOs = [];
             for (var i = 0; i < attDTOs.length; i++) {
-
+                console.log('Original image length: '+ attDTOs[i].data.length);
                 if (attDTOs[i].data.length > config.const.MAX_IMG_SIZE) {
                     console.log('image needs compression: ' + attDTOs[i].name + " with length: " + attDTOs[i].data.length);
-                    need_comp_attDTOs.push(attDTOs.pop(i));
+                    Array.prototype.push.apply(need_comp_attDTOs,attDTOs.splice(i));
+
                 }
 
             }
             console.log('need to compress: ' + need_comp_attDTOs.length + ' images');
+            console.log("wont need to compress: " + attDTOs.length + " images");
             if (need_comp_attDTOs.length) {
 
             var comp_atts = _.map(need_comp_attDTOs, imageService.compressImageFromBuffer);
             console.log(comp_atts.length);
             return Promise.all(comp_atts).then(function (comp_attDTOs) {
                 console.log("merging arrays: " + attDTOs.length + " and: " + comp_attDTOs.length);
-                Array.prototype.push.apply(attDTOs, comp_attDTOs);
-                console.log("result of merge: " + attDTOs.length);
-                return db.insertMultipart(newdoc, attDTOs, newdoc._id);
+                Array.prototype.push.apply(comp_attDTOs,attDTOs);
+                console.log("result of merge: " + comp_attDTOs.length);
+                return db.insertMultipart(newdoc, comp_attDTOs, newdoc._id);
             })
         }
             else  return db.insertMultipart(newdoc, attDTOs, newdoc._id);
