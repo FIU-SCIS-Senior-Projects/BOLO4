@@ -48,7 +48,14 @@ config.const = config.constants = {
     /* http://momentjs.com/docs/#/displaying/ */
     'DATE_FORMAT'       : 'MM-DD-YY HH:mm:ss',
 
-    'MAX_IMG_SIZE'      : 500000
+    'MAX_IMG_SIZE'      : 512000,
+
+    'HIGH_COMPRESSION' : 10,
+
+    'MEDIUM_COMPRESSION' : 40,
+
+    'LOW_COMPRESSION' : 70
+
 };
 
 /**
