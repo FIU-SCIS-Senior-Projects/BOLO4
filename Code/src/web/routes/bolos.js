@@ -9,6 +9,9 @@ var Promise         = require('promise');
 var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
+var PDFDocument     = require ('pdfkit');
+var fs              = require('fs');
+
 
 var config          = require('../config');
 var userService     = new config.UserService( new config.UserRepository() );
@@ -168,6 +171,9 @@ router.get( '/bolo/search/results', function ( req, res ) {
     });
 
 });
+
+
+
 
 router.get( '/bolo/search', function ( req, res ) {
     var data = {
@@ -445,10 +451,13 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
         return agencyService.getAgency( bolo.agency );
     }).then( function ( agency ) {
         data.agency = agency;
+        generatePDF(data.bolo.data);
         res.render( 'bolo-details', data );
     }).catch( function ( error ) {
         next( error );
     });
+
+
 });
 
 
@@ -460,6 +469,74 @@ function getAttachment ( req, res ) {
             res.send(attDTO.data);
         });
 }
+
+
+function generatePDF(data){
+  var doc = new PDFDocument();
+  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.id + ".pdf"));  //creating a write stream
+        //to write the content on the file system
+
+  // console.log(Object.keys(data.bolo.data));
+  var x, y = 100;
+
+  for( var key in data){
+    if(data.hasOwnProperty(key)){
+        // console.log(data.bolo[key]);
+        doc.font('Times-Roman')
+           .text(data[key], x, y)
+           .moveDown(0.5);
+    }
+    y+=15;
+  }
+               //adding the text to be written,
+  doc.end();
+}
+
+
+
+
+router.get( '/bolo/viewPDF/:id', function ( req, res, next ) {
+   var data = {};
+  // instead of running the services again...an object should kept in session
+   boloService.getBolo( req.params.id ).then( function ( bolo ) {
+       data.bolo = bolo;
+       return agencyService.getAgency( bolo.agency );
+   }).then( function ( agency ) {
+       data.agency = agency;
+      //  res.render( 'bolo-pdf', data );
+
+      var text = 'ANY_TEXT_YOU_WANT_TO_WRITE_IN_PDF_DOC';
+      var doc = new PDFDocument();                        //creating a new PDF object
+      doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.bolo.id + ".pdf"));  //creating a write stream
+
+            //to write the content on the file system
+
+      // console.log(Object.keys(data.bolo.data));
+      var x, y = 100;
+
+      for( var key in data.bolo.data){
+        if(data.bolo.data.hasOwnProperty(key)){
+            // console.log(data.bolo[key]);
+            doc.font('Times-Roman')
+               .text(data.bolo.data[key], x, y)
+               .moveDown(0.5);
+        }
+        y+=15;
+      }
+                   //adding the text to be written,
+      doc.end(); //we end the document writing.
+      //res.render( "bolo-pdf" ,data );
+       //res.header(type=)
+      // res.send(data.doc);
+   }).catch( function ( error ) {
+       next( error );
+   });
+
+//res.render('bolo-pdf');
+    // res.send('ALERT');
+});// end of /bolo/viewPDF/id router
+
+
 router.get( '/bolo/asset/:boloid/:attname', getAttachment );
 router.getAttachment = getAttachment;
 

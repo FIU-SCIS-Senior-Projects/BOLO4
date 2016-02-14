@@ -9,7 +9,7 @@ var util        = require('util');
 require('dotenv').config({ 'path': path.resolve( __dirname, '../.env' ) });
 var cloudant = require('./cloudant-connection.js');
 
-var BOLO_DB = 'bolo';
+var BOLO_DB = 'bolo_dev_db';
 var CHUNK_SIZE = 10;
 
 function deleteByView ( dbname, designname, viewname ) {

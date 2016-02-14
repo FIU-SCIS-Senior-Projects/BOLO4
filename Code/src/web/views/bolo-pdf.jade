@@ -1,0 +1,16 @@
+extends layout
+
+
+block jumbo
+    .jumbotron
+        .container
+            h1 Be On the Lookout
+            p Browse Active BOLOs
+
+
+block content
+  p PDF PAGE for BOLO ID:  #{bolo.id}
+  embed(src="/pdf/" + bolo.id +  ".pdf" , type="application/pdf")/
+
+   
+      
