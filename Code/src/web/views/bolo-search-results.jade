@@ -1,3 +1,6 @@
+//
+   Created by Ed on 1/24/2016.
+
 extends layout
 
 
@@ -5,14 +8,14 @@ block jumbo
     .jumbotron
         .container
             h1 Be On the Lookout
-            p Browse Active BOLOs
+            p Search Results
 
 
 block content
     include ./partials/global-alerts.jade
 
     if bolos && 0 === bolos.length
-        p.lead No active BOLOs at this time.
+        p.lead No bolos were found matching the specified criteria.
 
     .row
         for bolo in bolos
@@ -24,5 +27,5 @@ block content
                         a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
 
     .row.text-center
-        - var route = '/bolo'
-        include ./partials/paging.jade
+        - var route = '/bolo/search/results'
+        include ./partials/search-paging.jade

@@ -9,6 +9,9 @@ var Promise         = require('promise');
 var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
+var PDFDocument     = require ('pdfkit');
+var fs              = require('fs');
+
 
 var config          = require('../config');
 var userService     = new config.UserService( new config.UserRepository() );
@@ -67,7 +70,7 @@ function sendBoloNotificationEmail ( bolo, template ) {
  */
 function getAllBoloData ( id ) {
     var data = {};
-
+console.log("called get all bolo data");
     return boloService.getBolo( id ).then( function ( bolo ) {
         data.bolo = bolo;
 
@@ -76,8 +79,10 @@ function getAllBoloData ( id ) {
             userService.getUser( bolo.author )
         ]);
     }).then( function ( responses ) {
+        console.log(responses);
         data.agency = responses[0];
         data.author = responses[1];
+        console.log("finishing get all bolo data");
 
         return data;
     });
@@ -135,8 +140,98 @@ router.get( '/bolo/archive', function ( req, res, next ) {
     });
 });
 
+
+router.get( '/bolo/search/results', function ( req, res ) {
+
+    console.log(req.query.bookmark );
+    var query_string = req.query.valid;
+    console.log(query_string);
+    var data = {bookmark: req.query.bookmark || {} ,more:true ,query:query_string};
+    // Do something with variable
+    var limit = config.const.BOLOS_PER_PAGE;
+
+    boloService.searchBolos(limit,query_string,data.bookmark).then( function ( results ) {
+        data.paging = results.total > limit;
+
+        if (results.returned < limit)
+        {
+            console.log('theres no more!!');
+            data.more = false; //indicate that another page exists
+        }
+
+
+            data.previous_bookmark = data.bookmark || {};
+            data.bookmark = results.bookmark;
+
+        data.bolos = results.bolos;
+        res.render( 'bolo-search-results', data );
+    })
+        .catch( function ( error ) {
+        next( error );
+    });
+
+});
+
+
+
+
+router.get( '/bolo/search', function ( req, res ) {
+    var data = {
+        'form_errors': req.flash( 'form-errors' )
+    };
+
+    res.render( 'bolo-search-form', data );
+});
+// process bolo search user form input
+router.post( '/bolo/search', function ( req, res, next ) {
+    parseFormData( req, attachmentFilter ).then( function ( formDTO )
+    {
+
+        var query_obj = formDTO.fields;
+        var query_string = '';
+        var key = '';
+        var value = '';
+        var MATCH_EXPR = ' OR ';
+        var expression = false;
+
+        if (query_obj['matchFields'] === "on")
+        {
+            MATCH_EXPR = ' AND ';
+        }
+
+        for (var i = 0; i < Object.keys(query_obj).length; i++) {
+            key = Object.keys(query_obj)[i];
+            value = query_obj[Object.keys(query_obj)[i]];
+        console.log(key+':'+value);
+            if (key !== "status" && key !== 'matchFields' && value !== "" ) {
+                if(expression === true) {
+                    query_string += MATCH_EXPR;
+                    expression = false;
+                }
+                query_string += key + ':' + value;
+                expression = true;
+            }
+
+        }
+
+        //form was empty, return empty object
+        if(query_string === '')
+        {
+            query_string = {};
+        }
+        return query_string;
+
+    }).then( function ( query_string) {
+        var string = encodeURIComponent(query_string);
+        res.redirect('/bolo/search/results?valid=' + string);
+    }).catch(function(error) {
+        next( error );
+    });
+});
+
 // render the bolo create form
 router.get( '/bolo/create', function ( req, res ) {
+
     var data = {
         'form_errors': req.flash( 'form-errors' )
     };
@@ -150,7 +245,9 @@ router.post( '/bolo/create', function ( req, res, next ) {
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
-        boloDTO.createdOn = moment().format( config.const.DATE_FORMAT );
+        boloDTO.createdOn = moment().format( config.const.DATE_FORMAT);
+        boloDTO.createdOn = boloDTO.createdOn.toString();
+        console.log(boloDTO.createdOn);
         boloDTO.lastUpdatedOn = boloDTO.createdOn;
 
         boloDTO.agency = req.user.agency;
@@ -195,8 +292,10 @@ router.get( '/bolo/edit/:id', function ( req, res, next ) {
 
     /** @todo car we trust that this is really an id? **/
 
-    getAllBoloData( req.params.id ).then( function ( _data ) {
-        _.extend( data, _data );
+    getAllBoloData( req.params.id ).then( function(boloData)   {
+
+        _.extend(data, boloData);
+
         var auth = new BoloAuthorize( data.bolo, data.author, req.user );
 
         if ( auth.authorizedToEdit() ) {
@@ -229,7 +328,7 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
-            attDTOs.push( renameFile( fi, 'featured' ) );
+            attDTOs.push( renameFile( fi, 'featured' ));
         }
 
         if ( formDTO.fields['image_upload[]'] ) {
@@ -346,16 +445,19 @@ router.get( '/bolo/delete/:id', function ( req, res, next ) {
 // handle requests to view the details of a bolo
 router.get( '/bolo/details/:id', function ( req, res, next ) {
     var data = {};
-
+    console.log(req.params.id);
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
         data.bolo = bolo;
         return agencyService.getAgency( bolo.agency );
     }).then( function ( agency ) {
         data.agency = agency;
+        generatePDF(data.bolo.data);
         res.render( 'bolo-details', data );
     }).catch( function ( error ) {
         next( error );
     });
+
+
 });
 
 
@@ -367,6 +469,74 @@ function getAttachment ( req, res ) {
             res.send(attDTO.data);
         });
 }
+
+
+function generatePDF(data){
+  var doc = new PDFDocument();
+  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.id + ".pdf"));  //creating a write stream
+        //to write the content on the file system
+
+  // console.log(Object.keys(data.bolo.data));
+  var x, y = 100;
+
+  for( var key in data){
+    if(data.hasOwnProperty(key)){
+        // console.log(data.bolo[key]);
+        doc.font('Times-Roman')
+           .text(data[key], x, y)
+           .moveDown(0.5);
+    }
+    y+=15;
+  }
+               //adding the text to be written,
+  doc.end();
+}
+
+
+
+
+router.get( '/bolo/viewPDF/:id', function ( req, res, next ) {
+   var data = {};
+  // instead of running the services again...an object should kept in session
+   boloService.getBolo( req.params.id ).then( function ( bolo ) {
+       data.bolo = bolo;
+       return agencyService.getAgency( bolo.agency );
+   }).then( function ( agency ) {
+       data.agency = agency;
+      //  res.render( 'bolo-pdf', data );
+
+      var text = 'ANY_TEXT_YOU_WANT_TO_WRITE_IN_PDF_DOC';
+      var doc = new PDFDocument();                        //creating a new PDF object
+      doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.bolo.id + ".pdf"));  //creating a write stream
+
+            //to write the content on the file system
+
+      // console.log(Object.keys(data.bolo.data));
+      var x, y = 100;
+
+      for( var key in data.bolo.data){
+        if(data.bolo.data.hasOwnProperty(key)){
+            // console.log(data.bolo[key]);
+            doc.font('Times-Roman')
+               .text(data.bolo.data[key], x, y)
+               .moveDown(0.5);
+        }
+        y+=15;
+      }
+                   //adding the text to be written,
+      doc.end(); //we end the document writing.
+      //res.render( "bolo-pdf" ,data );
+       //res.header(type=)
+      // res.send(data.doc);
+   }).catch( function ( error ) {
+       next( error );
+   });
+
+//res.render('bolo-pdf');
+    // res.send('ALERT');
+});// end of /bolo/viewPDF/id router
+
+
 router.get( '/bolo/asset/:boloid/:attname', getAttachment );
 router.getAttachment = getAttachment;
 

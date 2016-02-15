@@ -5,6 +5,12 @@ mixin option( value, selected )
     else
         option( value=value ) #{value}
 
+mixin check_box(name,label,required)
+    .form-group
+        label#active-me.checkbox #{label}
+        input(type="hidden", name=name, value=0)
+        input(type="checkbox", name=name, id="active",checked='checked')
+
 
 mixin input_text( name, label, placeholder, required, value, type )
     .form-group

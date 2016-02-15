@@ -18,12 +18,14 @@ mixin dropdown_menu ( label )
 +nav( "BOLO Version 4.0", "bolo-nav" )
     if userLoggedIn
         ul.nav.navbar-nav
+            li: a( href="/bolo" ) Home
             +dropdown_menu( 'BOLO Menu' )
                 li: a( href="/bolo/create" ) New BOLO
-                li: a( href="/bolo" ) Active BOLOs
                 li: a( href="/bolo/archive" ) Archived BOLOs
             li: a( href="/agency" ) Agency Directory
-
+            li: a( href="/bolo/search" ) Search
+            if (tier === 'ADMINISTRATOR')
+                li: a( href="/admin" ) Admin
         ul.nav.navbar-nav.navbar-right
             li: a( href="/account" ) Logged in as <b>#{username}</b>
             li: a( href="/logout" ) Logout

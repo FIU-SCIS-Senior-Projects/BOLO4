@@ -91,6 +91,7 @@ app.use( function ( req, res, next ) {
     if ( req.user ) {
         res.locals.userLoggedIn = true;
         res.locals.username = req.user.username;
+        res.locals.tier = req.user.roleName();
     }
     next();
 });

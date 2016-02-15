@@ -223,6 +223,27 @@ CloudantAgencyRepository.prototype.getAttachment = function ( id, attname ) {
     });
 };
 
+CloudantAgencyRepository.prototype.searchAgencies = function (query_string) {
+
+    var query_obj =
+    {
+        q : query_string,
+        include_docs: true
+    };
+
+    return db.search( 'agency', 'agencies', query_obj).then( function (result ) {
+
+            console.log('Showing %d out of a total %d agencies found', result.rows.length, result.total_rows);
+            for (var i = 0; i < result.rows.length; i++) {
+                console.log('Document id: %s', result.rows[i].id);
+            }
+        var agencies = _.map( result.rows, function ( row ) {
+
+            return agencyFromCloudant( row.doc );
+        });
+        return { 'agencies': agencies, total: result.total_rows };
+        });
+};
 CloudantAgencyRepository.prototype.delete = function ( id ) {
     // **UNDOCUMENTED BEHAVIOR**
     // cloudant/nano library destroys the database if a null/undefined argument

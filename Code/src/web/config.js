@@ -43,7 +43,7 @@ config.const = config.constants = {
     'GFMSG'             : 'Flash Subject - Global Message',
 
     /* BOLO Page Settings */
-    'BOLOS_PER_PAGE'    : 6,
+    'BOLOS_PER_PAGE'    : 8,
 
     /* http://momentjs.com/docs/#/displaying/ */
     'DATE_FORMAT'       : 'MM-DD-YY HH:mm:ss'

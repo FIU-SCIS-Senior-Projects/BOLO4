@@ -91,6 +91,12 @@ AgencyService.prototype.getAgency = function ( id ) {
     return context.AgencyRepository.getAgency( id );
 };
 
+AgencyService.prototype.searchAgencies = function(query_string){
+
+    var result = this.AgencyRepository.searchAgencies(query_string);
+    return result;
+
+};
 /**
  * Get an attachment for a specified Agency.
  */

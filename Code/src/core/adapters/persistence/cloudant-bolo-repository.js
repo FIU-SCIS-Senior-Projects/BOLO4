@@ -245,6 +245,55 @@ CloudantBoloRepository.prototype.getBolos = function ( limit, skip ) {
     });
 };
 
+CloudantBoloRepository.prototype.searchBolos = function (limit,query_string,bookmark) {
+
+
+    var query_obj =
+    {
+        q      : query_string,
+        limit   : limit,
+        bookmark: bookmark,
+        include_docs:true
+
+    };
+
+    console.log(JSON.stringify(query_obj));
+
+    return db.search( 'bolo', 'bolos', query_obj).then( function (result ) {
+
+        console.log('Showing %d out of a total %d bolos found', result.rows.length, result.total_rows);
+        for (var i = 0; i < result.rows.length; i++) {
+            console.log('Document id: %s', result.rows[i].id);
+        }
+        var bolos = _.map( result.rows, function ( row ) {
+
+            return boloFromCloudant( row.doc );
+        });
+        var flag = true;
+        while(flag ===true) {
+            flag = false;
+            for (var i = 0; i < bolos.length-1; i++) {
+
+                var date_one = bolos[i].createdOn;
+                var date_two = bolos[i + 1].createdOn;
+                var order = date_one > date_two ? 1 : date_one < date_two ? -1 : 0;
+                if (order === -1) {
+                    var swap = bolos[i + 1];
+                    bolos[i + 1] = bolos[i];
+                    bolos[i] = swap;
+                    flag = true;
+                }
+            }
+        }
+        return { 'bolos': bolos, total: result.total_rows, returned: result.rows.length, bookmark: result.bookmark };
+
+    })
+    .catch(function (error) {
+        return new Error(
+            'Failed to find bolo : ' + error.error + ' / ' + error.reason
+        );
+    });
+};
 
 CloudantBoloRepository.prototype.getArchiveBolos = function ( limit, skip ) {
     var opts = {

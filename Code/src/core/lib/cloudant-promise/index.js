@@ -88,5 +88,19 @@ db_wrapper.view = function ( designname, viewname, params ) {
     });
 };
 
+db_wrapper.search = function ( designname, searchname, params ) {
+    var context = this;
+    if ( !params ) params = null;
+    return new Promise( function ( resolve, reject ) {
+        context.db.search( designname, searchname, params, function ( err, body ) {
+
+            if ( !err ) {
+                resolve( body )};
+            reject( err );
+        });
+    });
+};
+
+
 
 module.exports.db = config_wrapper;
