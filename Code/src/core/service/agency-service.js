@@ -16,7 +16,7 @@ module.exports = AgencyService;
  * @classdesc Provides an API for client adapters to interact with user facing
  * functionality.
  *
- * @param {AgencyRepository} 
+ * @param {AgencyRepository}
  */
 function AgencyService ( AgencyRepository ) {
     this.AgencyRepository = AgencyRepository;
@@ -33,14 +33,17 @@ AgencyService.prototype.createAgency = function ( agencyData, attachments) {
     var agency = new Agency(agencyData);
     var context = this;
     if (!agency.isValid()) {
-        Promise.reject(new Error("invalid agency data"));
+        //TODO: promise should be returned but it is awaiting correct implemenation of isValid() function
+        // return Promise.reject(new Error("ERROR: Invalid agency data."));
+        Promise.reject(new Error("ERROR: Invalid agency data."));
+
     }
 
     console.log('agency id is ' + agency.agency_id);
-     return context.findAgencyId(agency.agency_id).then(function (results) {
+     return context.findAgencyById(agency.agency_id, agency.name).then(function (results) {
         console.log("num of results are " + results);
         if (results > 0) {
-            Promise.reject(new Error("Agency id already registered"));
+            return Promise.reject(new Error("ERROR: Agency ID already registered"));
         }
 
         else {
@@ -55,7 +58,7 @@ AgencyService.prototype.createAgency = function ( agencyData, attachments) {
                     throw new Error('Unable to create Agency.');
                 });
         }
-    })
+    });
 
 };
 
@@ -113,13 +116,14 @@ AgencyService.prototype.searchAgencies = function(query_string){
 
 };
 
-AgencyService.prototype.findAgencyId = function(id){
+AgencyService.prototype.findAgencyById = function(id){
 
-    console.log("find id service call");
-    var result = this.AgencyRepository.findAgencyId(id);
+    console.log("find by id service call");
+    var result = this.AgencyRepository.findAgencyById(id);
     return result;
 
 };
+
 /**
  * Get an attachment for a specified Agency.
  */

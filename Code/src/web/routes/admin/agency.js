@@ -80,6 +80,10 @@ module.exports.postCreateForm = function ( req, res, next ) {
         if (pData[1].files.length) cleanTemporaryFiles(pData[1].files);
         req.flash( GFMSG, 'Agency registration successful.' );
         res.redirect('/admin/agency');
+    }, function (reason){
+        console.log(reason);
+        req.flash( GFERR, reason);
+        res.redirect('back');
     }).catch( function ( error ) {
         next( error );
     });

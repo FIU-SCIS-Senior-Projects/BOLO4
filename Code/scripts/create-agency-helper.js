@@ -40,16 +40,8 @@ console.log(
 );
 
 /** Try to register the user **/
-agencyService.createAgency( agencyDTO,[] ).then( function (response,error ) {
-    if(error) {
-        console.log( "Created Agency -- Cloudant Response is: \n", response );
-
-    }
-    else
-       throw error;
-
-
-    console.log("error creating agency " + error);
-}).catch( function ( error ) {
-    console.error( "An error occurred -- Cloudant Response Error: \n", error );
+agencyService.createAgency(agencyDTO, []).then(function(response){
+  console.log("Created Agency -- Cloudant Response is: \n", response);
+}, function(reason){
+  console.log("An error occurred -- Cloudant Response Error: \n", reason );
 });
