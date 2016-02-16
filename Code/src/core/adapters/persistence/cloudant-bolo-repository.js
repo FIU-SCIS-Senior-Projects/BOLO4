@@ -156,9 +156,9 @@ CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
             var comp_atts = _.map(need_comp_attDTOs, imageService.compressImageFromBuffer);
             console.log(comp_atts.length);
             return Promise.all(comp_atts).then(function (comp_attDTOs) {
-                console.log("merging arrays: " + attDTOs.length + " and: " + comp_attDTOs.length);
+
                 Array.prototype.push.apply(comp_attDTOs,attDTOs);
-                console.log("result of merge: " + comp_attDTOs.length);
+              
                 return db.insertMultipart(newdoc, comp_attDTOs, newdoc._id);
             })
         }
