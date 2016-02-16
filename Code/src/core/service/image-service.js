@@ -68,7 +68,7 @@ var compress = function(file) {
         var img_buffer = file.data;
         var img_name = file.name;
 console.log("original image length is " + img_buffer.length + " for image: " +img_name);
-         gm(img_buffer, img_name + '.' + img_type).quality(50).compress(compression)
+         gm(img_buffer, img_name + '.' + img_type).quality(1).compress(compression)
          .toBuffer(function (err, buffer) {
 
              if (err) {
