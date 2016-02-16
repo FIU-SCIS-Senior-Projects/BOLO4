@@ -101,6 +101,32 @@ db_wrapper.search = function ( designname, searchname, params ) {
     });
 };
 
+db_wrapper.index = function (index_name) {
+    var context = this;
+    return new Promise( function ( resolve, reject ) {
+        context.db.index( index_name, function ( err, body ) {
+            if ( !err ) {
+                resolve( body )
+            }
+                reject( err );
+        });
+    });
+};
+
+
+db_wrapper.find = function (selector) {
+    var context = this;
+    console.log(selector);
+    return new Promise( function ( resolve, reject ) {
+        context.db.find( selector, function ( err, body ) {
+            if ( !err ) {
+                console.log(body);
+                resolve( body )
+            }
+            reject( err );
+        });
+    });
+};
 
 
 module.exports.db = config_wrapper;

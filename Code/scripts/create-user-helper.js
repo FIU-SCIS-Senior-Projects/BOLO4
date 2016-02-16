@@ -28,7 +28,7 @@ if ( process.argv.length != 4 ) {
     return;
 }
 
-agencyService.searchAgencies("name:PineCrest").then( function ( results ) {
+agencyService.searchAgencies("name:Pinecrest").then( function ( results ) {
         var agencies = results.agencies;
         var userDTO = userService.formatDTO({
             "username": process.argv[2],

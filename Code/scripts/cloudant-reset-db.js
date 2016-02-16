@@ -229,6 +229,20 @@ function createDoc(dbname, doc) {
     });
 }
 
+function createIndex(dbname){
+    return new Promise(function (resolve, reject) {
+
+        var agency_id = {name:'agency_id_indexer', type:'json', index:{fields:['agency_id']}}
+
+        var db = cloudant.db.use(dbname);
+
+    db.index(agency_id, function (err, body) {
+        if (err) reject(err);
+        resolve(body);
+    });
+    });
+}
+
 function resetDB() {
     return destroyDB(BOLO_DB)
         .then(function (response) {
@@ -246,11 +260,20 @@ function resetDB() {
             var ad = createDesign(BOLO_DB, 'agency', AGENCY_DESIGN_DOC);
             var bd = createDesign(BOLO_DB, 'bolo', BOLO_DESIGN_DOC);
             var ud = createDesign(BOLO_DB, 'users', USERS_DESIGN_DOC);
+
             return Promise.all([ad, bd, ud]);
         })
         .then(function (responses) {
             console.log('> Design documents created. ');
+
+            return createIndex(BOLO_DB);
+
         })
+        .then(function(response){
+            console.log('agency id index created with response: ' + response.result);
+
+        })
+
         .catch(function (error) {
             console.error('Error: ', error.message);
         });
