@@ -19,32 +19,58 @@ var userService = new UserService( new UserRepository() );
 var agencyService = new AgencyService( new AgencyRepository() );
 
 
-/** Light sanity check **/
-if ( process.argv.length != 4 ) {
-    console.error(
-        "Invalid number of arguments:\nUsage: node",
-        path.basename( process.argv[1] ), "<username> <password>"
-    );
-    return;
-}
+// /** Light sanity check **/
+// if ( process.argv.length != 4 ) {
+//     console.error(
+//         "Invalid number of arguments:\nUsage: node",
+//         path.basename( process.argv[1] ), "<username> <password>"
+//     );
+//     return;
+// }
 
 agencyService.searchAgencies("name:Pinecrest").then( function ( results ) {
         var agencies = results.agencies;
-        var userDTO = userService.formatDTO({
-            "username": process.argv[2],
-            "password": process.argv[3],
-            "email": process.argv[2] + "@example.com",
+        var adminDTO = userService.formatDTO({
+            "username": "admin",
+            "password": "Password1!",
+            "email": "admin@example.com",
             "tier": 3,
             "agency": agencies[0].id
         });
 
+        var superDTO = userService.formatDTO({
+            "username": "super",
+            "password": "Password1!",
+            "email": "super@example.com",
+            "tier": 2,
+            "agency": agencies[0].id
+        });
+
+        var officerDTO = userService.formatDTO({
+            "username": "officer",
+            "password": "Password1!",
+            "email": "officer@example.com",
+            "tier": 1,
+            "agency": agencies[0].id
+        });
         console.log(
-            "Attempting to create user with the following document properties: \n",
-            JSON.stringify( userDTO, null, 4 )
+            "Attempting to create users..."
         );
 
         /** Try to register the user **/
-        userService.registerUser( userDTO ).then( function ( response ) {
+        userService.registerUser( adminDTO ).then( function ( response ) {
+            console.log( "Created user -- Cloudant Response is: \n", response );
+        }).catch( function ( error ) {
+            console.error( "An error occurred -- Cloudant Response Error: \n", error );
+        });
+
+        userService.registerUser( superDTO ).then( function ( response ) {
+            console.log( "Created user -- Cloudant Response is: \n", response );
+        }).catch( function ( error ) {
+            console.error( "An error occurred -- Cloudant Response Error: \n", error );
+        });
+
+        userService.registerUser( officerDTO ).then( function ( response ) {
             console.log( "Created user -- Cloudant Response is: \n", response );
         }).catch( function ( error ) {
             console.error( "An error occurred -- Cloudant Response Error: \n", error );
