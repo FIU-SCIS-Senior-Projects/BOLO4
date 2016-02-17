@@ -30,20 +30,35 @@ function AgencyService ( AgencyRepository ) {
  * @param {object} attachments - Agency Attachments
  */
 AgencyService.prototype.createAgency = function ( agencyData, attachments) {
-    var agency = new Agency( agencyData );
-
-    if ( !agency.isValid() ) {
-        Promise.reject( new Error( "invalid agency data" ) );
+    var agency = new Agency(agencyData);
+    var context = this;
+    if (!agency.isValid()) {
+        Promise.reject(new Error("invalid agency data"));
     }
 
-    return this.AgencyRepository.insert( agency, attachments)
-        .then( function ( value ) {
-            return value;
-        })
-        .catch( function ( error ) {
-            throw new Error( 'Unable to create Agency.' );
-        });
+    console.log('agency id is ' + agency.agency_id);
+     return context.findAgencyId(agency.agency_id).then(function (results) {
+        console.log("num of results are " + results);
+        if (results > 0) {
+            Promise.reject(new Error("Agency id already registered"));
+        }
+
+        else {
+            console.log('in the else');
+            return context.AgencyRepository.insert(agency, attachments)
+
+                .then(function (value) {
+                    console.log(value);
+                    return value;
+                })
+                .catch(function (error) {
+                    throw new Error('Unable to create Agency.');
+                });
+        }
+    })
+
 };
+
 
 /**
  * Create a new Agency in the system.
@@ -94,6 +109,14 @@ AgencyService.prototype.getAgency = function ( id ) {
 AgencyService.prototype.searchAgencies = function(query_string){
 
     var result = this.AgencyRepository.searchAgencies(query_string);
+    return result;
+
+};
+
+AgencyService.prototype.findAgencyId = function(id){
+
+    console.log("find id service call");
+    var result = this.AgencyRepository.findAgencyId(id);
     return result;
 
 };

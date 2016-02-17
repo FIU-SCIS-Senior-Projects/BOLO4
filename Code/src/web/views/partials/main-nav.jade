@@ -24,7 +24,8 @@ mixin dropdown_menu ( label )
                 li: a( href="/bolo/archive" ) Archived BOLOs
             li: a( href="/agency" ) Agency Directory
             li: a( href="/bolo/search" ) Search
-
+            if (tier === 'ADMINISTRATOR')
+                li: a( href="/admin" ) Admin
         ul.nav.navbar-nav.navbar-right
             li: a( href="/account" ) Logged in as <b>#{username}</b>
             li: a( href="/logout" ) Logout

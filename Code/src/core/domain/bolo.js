@@ -12,6 +12,14 @@ var schema = {
     agency: {
         required: true,
         type: 'string'
+    },
+    createdOn: {
+        required: true,
+        type: 'string'
+    },
+    updatedOn: {
+        required: true,
+        type: 'string'
     }
 };
 
@@ -35,8 +43,8 @@ module.exports = Bolo;
 function Bolo( data ) {
     var defaults = {
         id              : null,
-        createdOn       : '',
-        lastUpdatedOn   : '',
+        createdOn       : null,
+        lastUpdatedOn   : null,
         agency          : null,
         author          : '',
         category        : '',

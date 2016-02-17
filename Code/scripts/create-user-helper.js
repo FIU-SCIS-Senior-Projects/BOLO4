@@ -3,10 +3,12 @@
  */
 /* jshint node:true */
 'use strict';
+
 var path        = require('path');
 var Promise     = require('promise');
 
 require('dotenv').config({ 'path': path.resolve( __dirname, '../.env' ) });
+
 var core            = path.resolve( __dirname, '../src/core' );
 var UserService     = require( path.join( core, 'service/user-service' ) );
 var UserRepository  = require( path.join( core, 'adapters/persistence/cloudant-user-repository' ) );
@@ -15,6 +17,7 @@ var AgencyRepository  = require( path.join( core, 'adapters/persistence/cloudant
 /** This is the main module we will be using **/
 var userService = new UserService( new UserRepository() );
 var agencyService = new AgencyService( new AgencyRepository() );
+
 
 /** Light sanity check **/
 if ( process.argv.length != 4 ) {
@@ -25,7 +28,7 @@ if ( process.argv.length != 4 ) {
     return;
 }
 
-agencyService.searchAgencies("name:PineCrest").then( function ( results ) {
+agencyService.searchAgencies("name:Pinecrest").then( function ( results ) {
         var agencies = results.agencies;
         var userDTO = userService.formatDTO({
             "username": process.argv[2],

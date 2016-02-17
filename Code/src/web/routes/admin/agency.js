@@ -76,12 +76,19 @@ module.exports.postCreateForm = function ( req, res, next ) {
         var result = agencyService.createAgency( agencyDTO, atts );
         return Promise.all( [ result, formDTO ] );
     })
-    .then(function (pData) {
-        if (pData[1].files.length) cleanTemporaryFiles(pData[1].files);
-        req.flash( GFMSG, 'Agency registration successful.' );
-        res.redirect('/admin/agency');
+    .then(function (pData,error) {
+        if(error)
+        throw error;
+
+        else {
+            if (pData[1].files.length) cleanTemporaryFiles(pData[1].files);
+            req.flash(GFMSG, 'Agency registration successful.');
+            res.redirect('/admin/agency');
+        }
     }).catch( function ( error ) {
-        next( error );
+        req.flash(GFERR, 'Agency Creation unsuccessful ' + error);
+        res.redirect('back');
+        throw new FormError();
     });
 };
 

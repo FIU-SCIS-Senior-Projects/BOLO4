@@ -32,7 +32,7 @@ app.set( 'view engine', 'jade' );
 app.disable( 'x-powered-by' ); /** https://www.youtube.com/watch?v=W-8XeQ-D1RI **/
 
 var inDevelopmentMode = ( 'development' == app.get( 'env' ) );
-var secretKey = new Buffer( process.env.SESSION_SECRET || 'pw0rd' ).toString();
+var secretKey = new Buffer( process.env.SESSION_SECRET || 'secret' ).toString();
 
 
 /*
@@ -91,6 +91,7 @@ app.use( function ( req, res, next ) {
     if ( req.user ) {
         res.locals.userLoggedIn = true;
         res.locals.username = req.user.username;
+        res.locals.tier = req.user.roleName();
     }
     next();
 });

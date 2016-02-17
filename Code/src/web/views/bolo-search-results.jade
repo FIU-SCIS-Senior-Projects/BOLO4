@@ -19,7 +19,7 @@ block content
 
     .row
         for bolo in bolos
-            div.col-sm-6.col-md-4
+            div.col-sm-6.col-md-3
                 include ./partials/bolo-thumbnail.jade
                     .actions
                         a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
@@ -27,5 +27,5 @@ block content
                         a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
 
     .row.text-center
-        - var route = '/bolo'
-        include ./partials/paging.jade
+        - var route = '/bolo/search/results'
+        include ./partials/search-paging.jade
