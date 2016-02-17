@@ -25,6 +25,7 @@ block admin-content
     form( action=( route + form_action ) enctype="multipart/form-data" method="post" )
         input( name="id" type="hidden" value=agency.id )
 
+        +input_text( "admin_id", "Agency ID", "", false, agency.agency_id)
         +input_text( "name", "Agency Name", "", false, agency.name)
         +input_text( "address", "Address", "", false, agency.address )
         +input_text( "city", "City", "", false, agency.city )
@@ -63,4 +64,3 @@ block admin-content
 
 
     .row
-
