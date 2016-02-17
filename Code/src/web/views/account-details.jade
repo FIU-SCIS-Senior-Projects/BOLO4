@@ -1,43 +1,106 @@
-extends ./account-layout.jade
-include ./includes/mixins.jade
+include includes/mixins
+extends layout
 
 
-block styles
-    link(href="/css/vendor/callouts.css" rel="stylesheet")
+block jumbo
+  .jumbotron
+    .container
+          h1 BOLO Details
+          p Detailed BOLO information.
+          button( type="submit", onClick="javascript:window.print()") PDF
 
-
-block jumbo-desc
-    p Your Account Details
-
-
-block account-content
-    h3 #{user.username}
-    table.table
-        tr
-            td Name
-            td #{user.fname} #{user.lname}
-        tr
-            td Email
-            td #{user.email}
-        tr
-            td Badge Number
-            td #{user.badge}
-        tr
-            td Section / Unit
-            td #{user.sectunit}
-        tr
-            td Rank / Title
-            td #{user.ranktitle}
-        tr
-            td Role
-            td #{user.roleName()}
-        tr
-            td Agency
-            td #{agency.name}
-
-    if ( ! /administrator/i.test( user.roleName() ) )
-        .bs-callout.bs-callout-info
-            p Please contact your Agency administrator for changes to your
-                | account details.
+block content
+    include ./partials/global-alerts.jade
+    div.container-fluid
+        div.row
+            - var att_route = '/agency/' + agency.id + '/img';
+            div.col-xs-12.col-md-2
+              img( src=att_route + '/logo' alt="", width=150, height=175 )
+            div.col-xs-12.col-md-7
+              p.text-danger.strong #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
+              p.strong #{agency.name} Police Department
+              p
+                em #{agency.address}
+              p
+                em #{agency.city}, #{agency.state}. #{agency.zip}
+              p
+                em #{agency.phone}
+            div.col-xs-12.col-md-2
+              img( src=att_route + '/shield' alt="", width=150, height=180)
+        div.text-center
+          h1.text-danger.strong #{bolo.data.category}
+        | &nbsp;
+        | &nbsp;
+        div.row
+            div.col-xs-12.col-md-5
+                if Object.keys( bolo.attachments ).length
+                  - var keys = Object.keys( bolo.data.attachments )
+                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
+                else
+                  img( src="/img/nopic.png" alt="", width=400 )
+                form.form-horizontal
+                +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
+            div.col-xs-12.col-md-7
+                form.form-horizontal
+                +form_labels_row("Bolo ID", bolo.data.id )
+                if bolo.data.authorFName != null || bolo.data.authorLName != null
+                  +form_labels_row("Author", bolo.data.authorFName + " " +  bolo.data.authorLName )
+                else
+                  +form_labels_row("Author", "N/A")
+                if bolo.data.firstName.length || bolo.data.lastName.length
+                  +form_labels_row("Name", bolo.data.firstName + " " +  bolo.data.lastName)
+                else
+                  +form_labels_row("Name", "N/A" )
+                if bolo.data.race != "Select an option..."
+                  +form_labels_row("Race", bolo.data.race, bolo.data.race?"":"hidden")
+                else
+                  +form_labels_row("Race", "N/A" )
+                if bolo.data.dob.length
+                  +form_labels_row("DOB", bolo.data.dob, bolo.data.dob?"":"hidden")
+                else
+                  +form_labels_row("DOB", "N/A" )
+                if bolo.data.dlNumber.length
+                  +form_labels_row("License #", bolo.data.dlNumber, bolo.data.dlNumber?"":"hidden")
+                else
+                  +form_labels_row("License #", "N/A" )
+                if bolo.data.height.length
+                  +form_labels_row("Height", bolo.data.height, bolo.data.height?"":"hidden")
+                else
+                  +form_labels_row("Height", "N/A" )
+                if bolo.data.weight.length
+                  +form_labels_row("Weight", bolo.data.weight + "lbs", bolo.data.weight?"":"hidden")
+                else
+                  +form_labels_row("Weight", "N/A" )
+                if bolo.data.address.length
+                  +form_labels_row("Address", bolo.data.address, bolo.data.address?"":"hidden")
+                else
+                  +form_labels_row("Address", "N/A" )
+                if bolo.data.sex != "Select an option..."
+                  +form_labels_row("Sex", bolo.data.sex, bolo.data.sex?"":"hidden")
+                else
+                  +form_labels_row("Sex", "N/A" )
+                if bolo.data.hairColor != "Select an option..."
+                  +form_labels_row("Hair Color", bolo.data.hairColor, bolo.data.hairColor?"":"hidden")
+                else
+                  +form_labels_row("Hair Color", "N/A" )
+                if bolo.data.tattoos.length
+                  +form_labels_row("Tattoos/Scars", bolo.data.tattoos,bolo.data.tattoos?"":"hidden")
+                else
+                  +form_labels_row("Tattoos/Scars", "N/A" )
+    form.form-horizontal
+    | &nbsp;
+    p.strong Additional Info:
+    if bolo.data.additional.length
+      p #{bolo.data.additional}
     else
-        a( href='/admin/users/' + user.id +'/edit-details' ) Update Your Account Details
+      | &nbsp;
+    | &nbsp;
+    if bolo.data.video_url.length
+      p.strong Video Link:
+      p #{bolo.data.video_url}
+    | &nbsp;
+    p.strong Summary:
+    if bolo.data.additional.length
+      p #{bolo.data.summary}
+    else
+      | &nbsp;
