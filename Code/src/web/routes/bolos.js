@@ -14,10 +14,12 @@ var fs              = require('fs');
 
 
 var config          = require('../config');
+
 var userService     = new config.UserService( new config.UserRepository() );
 var boloService     = new config.BoloService( new config.BoloRepository() );
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
 var emailService    = config.EmailService;
+
 var BoloAuthorize   = require('../lib/authorization.js').BoloAuthorize;
 
 var formUtil        = require('../lib/form-util');
@@ -260,7 +262,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
-            attDTOs.push( renameFile( fi, 'featured' ) );
+            attDTOs.push(renameFile( fi, 'featured' ) );
         }
 
         if ( formDTO.fields['image_upload[]'] ) {

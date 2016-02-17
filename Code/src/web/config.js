@@ -11,7 +11,6 @@ require('dotenv').config({
 var core                = path.resolve( __dirname, '../core' );
 var config              = {};
 
-
 /* Export the config object */
 module.exports          = config;
 
@@ -30,6 +29,7 @@ config.EmailService     = require( path.join( core, 'adapters/email/sendgrid-ema
 config.CommonService    = require( path.join( core, 'service/common-service' ) );
 
 
+
 /* Application Config */
 config.appURL           = process.env.APP_URL || 'http://localhost:3000';
 
@@ -46,7 +46,16 @@ config.const = config.constants = {
     'BOLOS_PER_PAGE'    : 8,
 
     /* http://momentjs.com/docs/#/displaying/ */
-    'DATE_FORMAT'       : 'MM-DD-YY HH:mm:ss'
+    'DATE_FORMAT'       : 'MM-DD-YY HH:mm:ss',
+
+    'MAX_IMG_SIZE'      : 512000,
+
+    'HIGH_COMPRESSION' : 10,
+
+    'MEDIUM_COMPRESSION' : 40,
+
+    'LOW_COMPRESSION' : 70
+
 };
 
 /**

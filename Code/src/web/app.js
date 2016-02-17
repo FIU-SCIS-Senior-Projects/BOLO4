@@ -32,7 +32,7 @@ app.set( 'view engine', 'jade' );
 app.disable( 'x-powered-by' ); /** https://www.youtube.com/watch?v=W-8XeQ-D1RI **/
 
 var inDevelopmentMode = ( 'development' == app.get( 'env' ) );
-var secretKey = new Buffer( process.env.SESSION_SECRET || 'pw0rd' ).toString();
+var secretKey = new Buffer( process.env.SESSION_SECRET || 'secret' ).toString();
 
 
 /*

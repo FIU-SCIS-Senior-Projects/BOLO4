@@ -115,7 +115,6 @@ function CloudantAgencyRepository() {
 CloudantAgencyRepository.prototype.insert = function (agency, attachments) {
     var context = this;
     var atts = attachments || [];
-
     var newdoc = agencyToCloudant(agency);
     newdoc._id = createAgencyID();
 
@@ -244,6 +243,25 @@ CloudantAgencyRepository.prototype.searchAgencies = function (query_string) {
         return { 'agencies': agencies, total: result.total_rows };
         });
 };
+
+
+CloudantAgencyRepository.prototype.findAgencyById = function (id) {
+
+    console.log("find id repo call");
+    //TODO: implement to index for both name and id
+    // var selector = {selector:{"$or":[{agency_id:id},{name:agency_name}]}};
+
+    var selector = {selector:{agency_id:id}};
+   return db.find(selector).then( function (result ) {
+
+       console.log('Found %d documents with agency id: ' + id, result.docs.length);
+       for (var i = 0; i < result.docs.length; i++) {
+           console.log('  Doc id: %s', result.docs[i]._id);
+       }
+       return result.docs.length;
+   });
+};
+
 CloudantAgencyRepository.prototype.delete = function ( id ) {
     // **UNDOCUMENTED BEHAVIOR**
     // cloudant/nano library destroys the database if a null/undefined argument

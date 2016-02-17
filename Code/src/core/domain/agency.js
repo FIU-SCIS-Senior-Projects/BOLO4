@@ -25,6 +25,10 @@ var schema = {
     'isActive': {
         'required'  : true,
         'type'      : 'boolean'
+    },
+    'agency_id':{
+        'required'  : true,
+        'type'      : 'string'
     }
 
 };
@@ -49,6 +53,7 @@ function Agency(data) {
         'state'         : '',
         'zip'           : '',
         'phone'         : '',
+        'agency_id'     : '',
         'isActive'      : true,
         'attachments'   : {}
     };

@@ -1,7 +1,7 @@
 {
-  "name": "boloDev ",
-  "version": "0.0.4",
-  "description": "BOLO Flier Creator and PDF communication management",
+  "name": "BOLOFlyerCreatorApp",
+  "version": "0.0.1",
+  "description": "BOLO Flyer Creator by Pinecrest Police Department",
   "scripts": {
     "start": "node ./src/web/app.js",
 
@@ -22,6 +22,8 @@
     "errorhandler": "1.4.1",
     "express": "4.12.x",
     "express-session": "1.7.6",
+	"gm": "^1.21.1",
+    "imagemin": "^4.0.0",
     "jade": "^1.11.0",
     "jimp": "^0.2.9",
     "lodash": "^3.10.1",

@@ -16,7 +16,7 @@ module.exports = AgencyService;
  * @classdesc Provides an API for client adapters to interact with user facing
  * functionality.
  *
- * @param {AgencyRepository} 
+ * @param {AgencyRepository}
  */
 function AgencyService ( AgencyRepository ) {
     this.AgencyRepository = AgencyRepository;
@@ -30,20 +30,38 @@ function AgencyService ( AgencyRepository ) {
  * @param {object} attachments - Agency Attachments
  */
 AgencyService.prototype.createAgency = function ( agencyData, attachments) {
-    var agency = new Agency( agencyData );
+    var agency = new Agency(agencyData);
+    var context = this;
+    if (!agency.isValid()) {
+        //TODO: promise should be returned but it is awaiting correct implemenation of isValid() function
+        // return Promise.reject(new Error("ERROR: Invalid agency data."));
+        Promise.reject(new Error("ERROR: Invalid agency data."));
 
-    if ( !agency.isValid() ) {
-        Promise.reject( new Error( "invalid agency data" ) );
     }
 
-    return this.AgencyRepository.insert( agency, attachments)
-        .then( function ( value ) {
-            return value;
-        })
-        .catch( function ( error ) {
-            throw new Error( 'Unable to create Agency.' );
-        });
+    console.log('agency id is ' + agency.agency_id);
+     return context.findAgencyById(agency.agency_id, agency.name).then(function (results) {
+        console.log("num of results are " + results);
+        if (results > 0) {
+            return Promise.reject(new Error("ERROR: Agency ID already registered"));
+        }
+
+        else {
+            console.log('in the else');
+            return context.AgencyRepository.insert(agency, attachments)
+
+                .then(function (value) {
+                    console.log(value);
+                    return value;
+                })
+                .catch(function (error) {
+                    throw new Error('Unable to create Agency.');
+                });
+        }
+    });
+
 };
+
 
 /**
  * Create a new Agency in the system.
@@ -97,6 +115,15 @@ AgencyService.prototype.searchAgencies = function(query_string){
     return result;
 
 };
+
+AgencyService.prototype.findAgencyById = function(id){
+
+    console.log("find by id service call");
+    var result = this.AgencyRepository.findAgencyById(id);
+    return result;
+
+};
+
 /**
  * Get an attachment for a specified Agency.
  */
