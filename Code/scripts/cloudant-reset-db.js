@@ -232,7 +232,7 @@ function createDoc(dbname, doc) {
 function createIndex(dbname){
     return new Promise(function (resolve, reject) {
 
-        var agency_id = {name:'agency_id_indexer', type:'json', index:{fields:['agency_id']}}
+        var agency_id = {name:'agency_id_indexer', type:'json', index:{fields:['agency_id']}};
 
         var db = cloudant.db.use(dbname);
 
