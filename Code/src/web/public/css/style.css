@@ -3,6 +3,7 @@
 .navbar {
     border-radius: 0;
     margin-bottom: 0;
+    background-color: #01020a;
 }
 .nav-stacked {
     margin-bottom: 2em;
@@ -51,4 +52,6 @@ input[type="file"] {
 .jumbotron{
   background-color: #030b2f;
   color:white;
+  font-weight: bold;
+  padding: 15px;
 }

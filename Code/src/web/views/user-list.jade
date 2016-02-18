@@ -2,7 +2,7 @@ extends admin-layout
 include includes/mixins
 
 block jumbo-desc
-    p User Directory
+    p Admin Portal: User Directory
 
 block admin-content
     p.lead Total Users: #{users.length}
@@ -15,7 +15,7 @@ block admin-content
                     th Name
                     th Email
                     th Role
-                    th 
+                    th
             tbody
                 each user in users
                     tr
