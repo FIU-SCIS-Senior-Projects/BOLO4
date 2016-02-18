@@ -139,7 +139,6 @@ router.get( '/bolo/archive', function ( req, res, next ) {
     });
 });
 
-
 router.get( '/bolo/search/results', function ( req, res ) {
 
     console.log(req.query.bookmark );
@@ -452,6 +451,44 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
         next( error );
     });
 });
+
+//'New', 'Canceled', 'In Custody', 'Located', 'Recovered'
+router.get( '/bolo/update/custody/:id', function ( req, res, next ) {
+  boloService.getBolo(req.params.id).then(function(bolo){
+    bolo.status = "In Custody";
+    var att = [];
+    boloService.updateBolo(bolo, att);
+    console.log(bolo.status);
+  }, function(reason){
+    console.log(reason);
+  });
+  res.redirect( '/bolo' );
+});
+
+router.get( '/bolo/update/located/:id', function ( req, res, next ) {
+  boloService.getBolo(req.params.id).then(function(bolo){
+    bolo.status = "Located";
+    var att = [];
+    boloService.updateBolo(bolo, att);
+    console.log(bolo.status);
+  }, function(reason){
+    console.log(reason);
+  });
+  res.redirect( '/bolo' );
+});
+
+router.get( '/bolo/update/cancelled/:id', function ( req, res, next ) {
+  boloService.getBolo(req.params.id).then(function(bolo){
+    bolo.status = "Cancelled";
+    var att = [];
+    boloService.updateBolo(bolo, att);
+    console.log(bolo.status);
+  }, function(reason){
+    console.log(reason);
+  });
+  res.redirect( '/bolo' );
+});
+
 
 
 // handle requests for bolo attachments

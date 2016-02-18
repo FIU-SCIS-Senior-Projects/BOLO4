@@ -26,11 +26,11 @@ block content
                           a.btn.btn-default( href="#", data-toggle="dropdown" role="button" ) Update
                           ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu')
                             li
-                              a(href='/bolo/update/custody', tabindex='-1') In Custody
+                              a(href='/bolo/update/custody/' + bolo.id, tabindex='-1') In Custody
                             li 
-                              a(href='/bolo/update/located', tabindex='-1') Located
+                              a(href='/bolo/update/located/' + bolo.id, tabindex='-1') Located
                             li
-                              a(href='/bolo/update/cancelled', tabindex='-1') Cancelled
+                              a(href='/bolo/update/cancelled/' + bolo.id, tabindex='-1') Cancelled
 
     .row.text-center
         - var route = '/bolo'
