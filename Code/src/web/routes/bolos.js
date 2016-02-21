@@ -324,7 +324,9 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
-        boloDTO.lastUpdatedOn = moment().format( config.const.DATE_FORMAT );
+        boloDTO.lastUpdatedOn = moment().format( config.const.DATE_FORMAT);
+        boloDTO.lastUpdatedOn = boloDTO.lastUpdatedOn.toString();
+        console.log(boloDTO.lastUpdatedOn);
 
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
@@ -463,39 +465,108 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
 //'New', 'Canceled', 'In Custody', 'Located', 'Recovered'
 router.get( '/bolo/update/custody/:id', function ( req, res, next ) {
-  boloService.getBolo(req.params.id).then(function(bolo){
-    bolo.status = "In Custody";
-    var att = [];
-    boloService.updateBolo(bolo, att);
-    console.log(bolo.status);
-  }, function(reason){
-    console.log(reason);
+  var data = {
+      'form_errors': req.flash( 'form-errors' )
+  };
+
+  getAllBoloData( req.params.id ).then( function(boloData)   {
+
+      _.extend(data, boloData);
+
+      var auth = new BoloAuthorize( data.bolo, data.author, req.user );
+
+      if ( auth.authorizedToEdit() ) {
+        data.bolo.status = "In Custody";
+        var temp = moment().format( config.const.DATE_FORMAT);
+        data.bolo.lastUpdatedOn = temp.toString();
+        console.log(data.bolo.lastUpdatedOn);
+        var att = [];
+        boloService.updateBolo(data.bolo, att);
+
+        res.redirect( '/bolo' );
+      }
+  }).catch( function ( error ) {
+      if ( ! /unauthorized/i.test( error.message ) ) throw error;
+
+      req.flash( GFERR,
+          'You do not have permissions to edit this BOLO. Please ' +
+          'contact your agency\'s supervisor or administrator ' +
+          'for access.'
+      );
+      res.redirect( 'back' );
+  }).catch( function ( error ) {
+      next( error );
   });
-  res.redirect( '/bolo' );
 });
 
 router.get( '/bolo/update/located/:id', function ( req, res, next ) {
-  boloService.getBolo(req.params.id).then(function(bolo){
-    bolo.status = "Located";
-    var att = [];
-    boloService.updateBolo(bolo, att);
-    console.log(bolo.status);
-  }, function(reason){
-    console.log(reason);
+  var data = {
+      'form_errors': req.flash( 'form-errors' )
+  };
+
+  getAllBoloData( req.params.id ).then( function(boloData)   {
+
+      _.extend(data, boloData);
+
+      var auth = new BoloAuthorize( data.bolo, data.author, req.user );
+
+      if ( auth.authorizedToEdit() ) {
+        data.bolo.status = "Located";
+        var temp = moment().format( config.const.DATE_FORMAT);
+        data.bolo.lastUpdatedOn = temp.toString();
+        console.log(data.bolo.lastUpdatedOn);
+        var att = [];
+        boloService.updateBolo(data.bolo, att);
+
+        res.redirect( '/bolo' );
+      }
+  }).catch( function ( error ) {
+      if ( ! /unauthorized/i.test( error.message ) ) throw error;
+
+      req.flash( GFERR,
+          'You do not have permissions to edit this BOLO. Please ' +
+          'contact your agency\'s supervisor or administrator ' +
+          'for access.'
+      );
+      res.redirect( 'back' );
+  }).catch( function ( error ) {
+      next( error );
   });
-  res.redirect( '/bolo' );
 });
 
 router.get( '/bolo/update/cancelled/:id', function ( req, res, next ) {
-  boloService.getBolo(req.params.id).then(function(bolo){
-    bolo.status = "Cancelled";
-    var att = [];
-    boloService.updateBolo(bolo, att);
-    console.log(bolo.status);
-  }, function(reason){
-    console.log(reason);
+  var data = {
+      'form_errors': req.flash( 'form-errors' )
+  };
+
+  getAllBoloData( req.params.id ).then( function(boloData)   {
+
+      _.extend(data, boloData);
+
+      var auth = new BoloAuthorize( data.bolo, data.author, req.user );
+
+      if ( auth.authorizedToEdit() ) {
+        data.bolo.status = "Cancelled";
+        var temp = moment().format( config.const.DATE_FORMAT);
+        data.bolo.lastUpdatedOn = temp.toString();
+        console.log(data.bolo.lastUpdatedOn);
+        var att = [];
+        boloService.updateBolo(data.bolo, att);
+
+        res.redirect( '/bolo' );
+      }
+  }).catch( function ( error ) {
+      if ( ! /unauthorized/i.test( error.message ) ) throw error;
+
+      req.flash( GFERR,
+          'You do not have permissions to edit this BOLO. Please ' +
+          'contact your agency\'s supervisor or administrator ' +
+          'for access.'
+      );
+      res.redirect( 'back' );
+  }).catch( function ( error ) {
+      next( error );
   });
-  res.redirect( '/bolo' );
 });
 
 
