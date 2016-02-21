@@ -31,6 +31,10 @@ var parseFormData       = formUtil.parseFormData;
 var cleanTemporaryFiles = formUtil.cleanTempFiles;
 
 
+function alertHi(){
+alert("weeeeeee");
+console.log('hiiii');
+}
 /**
  * Send email notification of a new bolo.
  */
@@ -370,7 +374,7 @@ router.get( '/bolo/archive/:id', function ( req, res, next ) {
         }
     }).then( function ( response ) {
         req.flash( GFMSG, 'Successfully archived BOLO.' );
-        res.redirect( '/bolo/archive' );
+        res.redirect( '/bolo' );
     }).catch( function ( error ) {
         if ( ! /unauthorized/i.test( error.message ) ) throw error;
 

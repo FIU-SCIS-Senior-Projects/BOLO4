@@ -1,6 +1,5 @@
 extends layout
 
-
 block jumbo
     .jumbotron
         .container
@@ -9,18 +8,30 @@ block jumbo
 
 block content
     include ./partials/global-alerts.jade
+    script(type='text/javascript' src='./views/yo')
 
     if bolos && 0 === bolos.length
         p.lead No archived BOLOs.
 
-    .row
-        for bolo in bolos
-            div.col-sm-6.col-md-4
-                include ./partials/bolo-thumbnail.jade
-                    .action
-                        a.btn.btn-default( href="/bolo/restore/" + bolo.id role="button" type="submit" ) Restore
-                        a.btn.btn-danger( href="/bolo/delete/" + bolo.id role="button" type="submit" ) Delete
+    else
 
-    .row.text-center
-        - var route = '/bolo/archive'
-        include ./partials/paging.jade
+        if (tier === 'ADMINISTRATOR')
+            div.col-sm-12
+                button.btn.btn-danger.pull-right(
+                type='submit'
+                style='margin-bottom:25px;'
+                onclick='hii()'
+                ) Purge
+
+        .row
+            for bolo in bolos
+                div.col-xs-12.col-sm-6.col-md-3
+                    include ./partials/bolo-thumbnail.jade
+                        .action
+                            a.btn.btn-default( href="/bolo/restore/" + bolo.id role="button" type="submit" ) Restore
+                            a.btn.btn-danger( href="/bolo/delete/" + bolo.id role="button" type="submit" ) Delete
+
+        .row.text-center
+            - var route = '/bolo/archive'
+            include ./partials/paging.jade
+
