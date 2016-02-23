@@ -1,4 +1,5 @@
 extends layout
+include ./includes/mixins.jade
 
 block jumbo
     .jumbotron
@@ -8,7 +9,8 @@ block jumbo
 
 block content
     include ./partials/global-alerts.jade
-    script(type='text/javascript' src='./views/yo')
+
+    link(rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css")
 
     if bolos && 0 === bolos.length
         p.lead No archived BOLOs.
@@ -16,16 +18,20 @@ block content
     else
 
         if (tier === 'ADMINISTRATOR')
-            div.col-sm-12
-                button.btn.btn-danger.pull-right(
+
+            include ./partials/purge-select.jade
+
+            div.col-xs-12
+                button#purge.btn.btn-danger.pull-right(
                 type='submit'
                 style='margin-bottom:25px;'
-                onclick='hii()'
                 ) Purge
+
+            include ./partials/dialog-box.jade
+
 
         .row
             for bolo in bolos
-                div.col-xs-12.col-sm-6.col-md-3
                     include ./partials/bolo-thumbnail.jade
                         .action
                             a.btn.btn-default( href="/bolo/restore/" + bolo.id role="button" type="submit" ) Restore

@@ -9,7 +9,11 @@ var Promise         = require('promise');
 var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
-var PDFDocument     = require ('pdfkit');
+var PDFDocument     = require('pdfkit');
+var blobStream      = require('blob-stream');
+var blobUtil        = require('blob-util');
+var wkhtml          = require('node-wkhtml');
+var iframe          = require('iframe')
 var fs              = require('fs');
 
 
@@ -76,7 +80,6 @@ function sendBoloNotificationEmail ( bolo, template ) {
  */
 function getAllBoloData ( id ) {
     var data = {};
-console.log("called get all bolo data");
     return boloService.getBolo( id ).then( function ( bolo ) {
         data.bolo = bolo;
 
@@ -145,8 +148,56 @@ router.get( '/bolo/archive', function ( req, res, next ) {
         next( error );
     });
 });
+router.post('/bolo/archive/purge',function(req,res) {
 
+   // = req.body.bolo_data;
+    var pass = req.body.password;
+    var username = req.user.data.username;
+    var range = req.body.range;
 
+    //2nd level of auth
+    userService.authenticate(username, pass)
+        .then(function (account) {
+            if (account)
+            {
+                //third level of auth
+                var tier = req.user.roleName();
+                if (tier === 'ADMINISTRATOR') {
+
+                    boloService.getArchiveBolosForPurge().then(function(bolos){
+                        console.log(bolos);
+                        for(var i = 0; i < bolos.bolos.length;i++){
+                            var curr = bolos.bolos[i];
+                            console.log(curr);
+                            console.log(curr.data.lastUpdatedOn);
+
+                        }
+                    });
+
+                    var promises = [];
+                    /*
+                    archived_bolos.forEach(function (bolo) {
+                        promises.push(boloService.removeBolo(bolo.data.id));
+                    });
+                     return Promise.all(promises).then(function (responses) {
+                         console.log("Purge successful");
+                         req.flash(GFMSG, 'Successfully purged BOLOs.');
+                        res.redirect('/bolo');
+                    })
+                    */
+                }
+            }
+
+            //if reaches here unauthorized...
+            req.flash(GFERR,
+                'You do not have permissions to purge BOLOs. Please ' +
+                'contact your agency\'s administrator ' +
+                'for access.');
+            res.redirect('back');
+
+        })
+
+});
 router.get( '/bolo/search/results', function ( req, res ) {
 
     console.log(req.query.bookmark );
@@ -177,8 +228,6 @@ router.get( '/bolo/search/results', function ( req, res ) {
     });
 
 });
-
-
 
 
 router.get( '/bolo/search', function ( req, res ) {
@@ -372,10 +421,10 @@ router.get( '/bolo/archive/:id', function ( req, res, next ) {
         if ( auth.authorizedToArchive() ) {
             boloService.activate( data.bolo.id, false );
         }
-    }).then( function ( response ) {
+    }).then(setTimeout(function ( response ){
         req.flash( GFMSG, 'Successfully archived BOLO.' );
-        res.redirect( '/bolo' );
-    }).catch( function ( error ) {
+        res.redirect( 'back' );
+    },1000)).catch( function ( error ) {
         if ( ! /unauthorized/i.test( error.message ) ) throw error;
 
         req.flash( GFERR,
@@ -457,7 +506,7 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
         return agencyService.getAgency( bolo.agency );
     }).then( function ( agency ) {
         data.agency = agency;
-        generatePDF(data.bolo.data);
+       // generatePDF(data.bolo.data);
         res.render( 'bolo-details', data );
     }).catch( function ( error ) {
         next( error );
@@ -476,74 +525,15 @@ function getAttachment ( req, res ) {
         });
 }
 
+router.post('/bolo/viewPDF/:id', function ( req, res) {
+    var data = req.body.bolo_data;
+    var w = window.open('bolo/pdf/'+req.id, 'windowname');
+    w.document.write(data);
+    w.document.close();
+  URL.toBlob()
+});
 
-function generatePDF(data){
-  var doc = new PDFDocument();
-  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.id + ".pdf"));  //creating a write stream
-        //to write the content on the file system
+    router.get('/bolo/asset/:boloid/:attname', getAttachment);
+    router.getAttachment = getAttachment;
 
-  // console.log(Object.keys(data.bolo.data));
-  var x, y = 100;
-
-  for( var key in data){
-    if(data.hasOwnProperty(key)){
-        // console.log(data.bolo[key]);
-        doc.font('Times-Roman')
-           .text(data[key], x, y)
-           .moveDown(0.5);
-    }
-    y+=15;
-  }
-               //adding the text to be written,
-  doc.end();
-}
-
-
-
-
-router.get( '/bolo/viewPDF/:id', function ( req, res, next ) {
-   var data = {};
-  // instead of running the services again...an object should kept in session
-   boloService.getBolo( req.params.id ).then( function ( bolo ) {
-       data.bolo = bolo;
-       return agencyService.getAgency( bolo.agency );
-   }).then( function ( agency ) {
-       data.agency = agency;
-      //  res.render( 'bolo-pdf', data );
-
-      var text = 'ANY_TEXT_YOU_WANT_TO_WRITE_IN_PDF_DOC';
-      var doc = new PDFDocument();                        //creating a new PDF object
-      doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.bolo.id + ".pdf"));  //creating a write stream
-
-            //to write the content on the file system
-
-      // console.log(Object.keys(data.bolo.data));
-      var x, y = 100;
-
-      for( var key in data.bolo.data){
-        if(data.bolo.data.hasOwnProperty(key)){
-            // console.log(data.bolo[key]);
-            doc.font('Times-Roman')
-               .text(data.bolo.data[key], x, y)
-               .moveDown(0.5);
-        }
-        y+=15;
-      }
-                   //adding the text to be written,
-      doc.end(); //we end the document writing.
-      //res.render( "bolo-pdf" ,data );
-       //res.header(type=)
-      // res.send(data.doc);
-   }).catch( function ( error ) {
-       next( error );
-   });
-
-//res.render('bolo-pdf');
-    // res.send('ALERT');
-});// end of /bolo/viewPDF/id router
-
-
-router.get( '/bolo/asset/:boloid/:attname', getAttachment );
-router.getAttachment = getAttachment;
-
-module.exports = router;
+    module.exports = router;

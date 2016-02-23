@@ -41,10 +41,7 @@ ImageService.prototype.compressImageFromBuffer = function (attDTOs)
         throw new Error('Invalid Image Data');
     }
 
-    console.log(config.const.LOW_COMPRESSION);
     var img_type = attDTOs.content_type.substring(attDTOs.content_type.lastIndexOf("/") + 1);
-    console.log(img_type);
-
 
       return convertToJpg(attDTOs,img_type).then(function(content)
       {
@@ -52,7 +49,6 @@ ImageService.prototype.compressImageFromBuffer = function (attDTOs)
           attDTOs.data = content;
             
             var img_size = attDTOs.data.length;
-            console.log(img_size);
 
             var compression_level = config.const.LOW_COMPRESSION;
 

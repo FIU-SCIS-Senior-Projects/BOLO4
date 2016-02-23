@@ -47,5 +47,14 @@ block content
 
         .form-group
             button.btn.btn-primary( type="submit" value="save" ) Publish
-            a.btn.btn-default( ) Preview
+            button#preview.btn.btn-default(
+                type='submit'
+                ) Preview
+
             button.btn.btn-default( type="submit" disabled=true value="pdf" ) PDF
+        script.
+            $("#preview").click(function (e) {
+
+                //$.post('/bolo/preview');
+
+            });

@@ -135,26 +135,22 @@ CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
     newdoc._id = createUUID();
 
     var atts = _.map(attachments, attachmentsToCloudant);
-    console.log(atts);
     return Promise.all(atts).then(function (attDTOs) {
-        console.log('length of attdtos orig: ' + attDTOs.length);
         if (attDTOs.length) {
             var need_comp_attDTOs = [];
             for (var i = 0; i < attDTOs.length; i++) {
-                console.log('Original image length: '+ attDTOs[i].data.length);
                 if (attDTOs[i].data.length > config.const.MAX_IMG_SIZE) {
-                    console.log('image needs compression: ' + attDTOs[i].name + " with length: " + attDTOs[i].data.length);
+
                     Array.prototype.push.apply(need_comp_attDTOs,attDTOs.splice(i));
 
                 }
 
             }
-            console.log('need to compress: ' + need_comp_attDTOs.length + ' images');
-            console.log("wont need to compress: " + attDTOs.length + " images");
+
             if (need_comp_attDTOs.length) {
 
             var comp_atts = _.map(need_comp_attDTOs, imageService.compressImageFromBuffer);
-            console.log(comp_atts.length);
+
             return Promise.all(comp_atts).then(function (comp_attDTOs) {
 
                 Array.prototype.push.apply(comp_attDTOs,attDTOs);
@@ -282,8 +278,6 @@ CloudantBoloRepository.prototype.getBolos = function (limit, skip) {
 };
 
 CloudantBoloRepository.prototype.searchBolos = function (limit, query_string, bookmark) {
-
-
     var query_obj =
     {
         q: query_string,
@@ -308,7 +302,7 @@ CloudantBoloRepository.prototype.searchBolos = function (limit, query_string, bo
             var flag = true;
             while (flag === true) {
                 flag = false;
-                for (var i = 0; i < bolos.length - 1; i++) {
+                for (i = 0; i < bolos.length - 1; i++) {
 
                     var date_one = bolos[i].createdOn;
                     var date_two = bolos[i + 1].createdOn;
@@ -347,7 +341,21 @@ CloudantBoloRepository.prototype.getArchiveBolos = function (limit, skip) {
     });
 };
 
+CloudantBoloRepository.prototype.getArchiveBolosForPurge = function () {
 
+    var opts = {
+        'include_docs': true
+
+    };
+    return db.view('bolo', 'all_archive',opts).then(function (result) {
+        var bolos = [];
+        for (var i = 0; i < result.rows.length; i++) {
+
+            bolos.push({id: result.rows[i].id, lastUpdatedOn: result.rows[i].key});
+        }
+        return {bolos: bolos, total: result.total_rows};
+    });
+};
 CloudantBoloRepository.prototype.getBolo = function (id) {
     return db.get(id)
         .then(function (bolo_doc) {
