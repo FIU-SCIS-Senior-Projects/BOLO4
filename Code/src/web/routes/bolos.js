@@ -462,81 +462,67 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
 });
 
+function generatePDF(data){
+  var doc = new PDFDocument();
+  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.id + ".pdf"));  //creating a write stream
+        //to write the content on the file system
+
+//  console.log(Object.keys(data.bolo.data));
+  var x, y = 100;
+  var keys = Object.keys(data.attachments);
+  // console.log(keys);
+  //var att = boloService.getAttachment(data.id, featured);
+
+  var testImage = fs.readFileSync('src/web/public/img/nopic.png');
+  //console.log(testImage + "TEST IMAGE!!!!!!!!");
+
+  //  doc.image('/bolo/asset/'+ data.id +'/'+ keys[0], 0,0);
+//  var image = boloService.getAttachment(data.id, 'featured');
+
+
+  // gets image from boloRepository and chains it to embed on (PDFDocument)doc
+  boloService.getAttachment(data.id, 'featured').then(function (attDTO) {
+          return attDTO.data
+  }).then( function(image){
+        doc.image(image, 0, 15, {width: 300});
+        for( var key in data){
+          if(data.hasOwnProperty(key)){
+              // console.log(data.bolo[key]);
+
+              doc.font('Times-Roman')
+                 .text(key +": " + data[key], 400)
+                 .moveDown();
+          }
+        }
+        doc.end();
+  });
+
+
+  // for( var key in data){
+  //   if(data.hasOwnProperty(key)){
+  //       // console.log(data.bolo[key]);
+  //
+  //       doc.font('Times-Roman')
+  //          .text(key +": " + data[key], 400)
+  //          .moveDown();
+  //   }
+  //   y+=15;
+  // }
+               //adding the text to be written,
+  //doc.end();
+}
+
 
 // handle requests for bolo attachments
 function getAttachment ( req, res ) {
     boloService.getAttachment(req.params.boloid, req.params.attname)
         .then(function (attDTO) {
             res.type(attDTO.content_type);
+          //  console.log(attDTO.data + " A:OIJF:OIAEJRO:IJE:ROIJW:EOIRJWE:OIR");
             res.send(attDTO.data);
         });
+
 }
-
-
-function generatePDF(data){
-  var doc = new PDFDocument();
-  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.id + ".pdf"));  //creating a write stream
-        //to write the content on the file system
-
-  // console.log(Object.keys(data.bolo.data));
-  var x, y = 100;
-
-  for( var key in data){
-    if(data.hasOwnProperty(key)){
-        // console.log(data.bolo[key]);
-        doc.font('Times-Roman')
-           .text(data[key], x, y)
-           .moveDown(0.5);
-    }
-    y+=15;
-  }
-               //adding the text to be written,
-  doc.end();
-}
-
-
-
-
-router.get( '/bolo/viewPDF/:id', function ( req, res, next ) {
-   var data = {};
-  // instead of running the services again...an object should kept in session
-   boloService.getBolo( req.params.id ).then( function ( bolo ) {
-       data.bolo = bolo;
-       return agencyService.getAgency( bolo.agency );
-   }).then( function ( agency ) {
-       data.agency = agency;
-      //  res.render( 'bolo-pdf', data );
-
-      var text = 'ANY_TEXT_YOU_WANT_TO_WRITE_IN_PDF_DOC';
-      var doc = new PDFDocument();                        //creating a new PDF object
-      doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.bolo.id + ".pdf"));  //creating a write stream
-
-            //to write the content on the file system
-
-      // console.log(Object.keys(data.bolo.data));
-      var x, y = 100;
-
-      for( var key in data.bolo.data){
-        if(data.bolo.data.hasOwnProperty(key)){
-            // console.log(data.bolo[key]);
-            doc.font('Times-Roman')
-               .text(data.bolo.data[key], x, y)
-               .moveDown(0.5);
-        }
-        y+=15;
-      }
-                   //adding the text to be written,
-      doc.end(); //we end the document writing.
-      //res.render( "bolo-pdf" ,data );
-       //res.header(type=)
-      // res.send(data.doc);
-   }).catch( function ( error ) {
-       next( error );
-   });
-
-//res.render('bolo-pdf');
-    // res.send('ALERT');
-});// end of /bolo/viewPDF/id router
 
 
 router.get( '/bolo/asset/:boloid/:attname', getAttachment );
