@@ -18,6 +18,7 @@ var parseFormData = formUtil.parseFormData;
 var cleanTemporaryFiles = formUtil.cleanTempFiles;
 var FormError = formUtil.FormError;
 
+var BoloAuthorize   = require('../../lib/authorization.js').BoloAuthorize;
 
 /**
  * Responds with a form to create a new user.
@@ -94,7 +95,9 @@ module.exports.postCreateForm = function ( req, res ) {
  * @todo implement sorting, filtering, and paging
  */
 module.exports.getList = function ( req, res ) {
-    var data = {};
+    var data = {
+      'currentAgency': req.user.agency,
+    };
 
     userService.getUsers().then( function ( users ) {
         data.users = users.filter( function ( oneUser ) {
@@ -114,7 +117,11 @@ module.exports.getList = function ( req, res ) {
  * Responds with account information for a specified user.
  */
 module.exports.getDetails = function ( req, res, next ) {
-    var data = {};
+    var data = {
+      'currentAgency':req.user.agency
+    };
+
+    console.log("shit\n", req);
 
     userService.getUser( req.params.id ).then( function ( user ) {
         data.user = user;
@@ -246,4 +253,3 @@ module.exports.getDelete = function ( req, res ) {
         }
     );
 };
-
