@@ -32,8 +32,6 @@ var GFMSG           = config.const.GFMSG;
 var parseFormData       = formUtil.parseFormData;
 var cleanTemporaryFiles = formUtil.cleanTempFiles;
 
-//var Bolo = require('..src/core/domain/bolo.js');
-
 /**
  * Send email notification of a new bolo.
  */
