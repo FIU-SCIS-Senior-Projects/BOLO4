@@ -10,10 +10,7 @@ var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
 var PDFDocument     = require('pdfkit');
-var blobStream      = require('blob-stream');
-var blobUtil        = require('blob-util');
-var wkhtml          = require('node-wkhtml');
-var iframe          = require('iframe')
+
 var fs              = require('fs');
 
 
@@ -155,47 +152,79 @@ router.post('/bolo/archive/purge',function(req,res) {
     var username = req.user.data.username;
     var range = req.body.range;
 
+    var authorized = false;
     //2nd level of auth
     userService.authenticate(username, pass)
         .then(function (account) {
+            var min_days = 0;;
             if (account)
             {
                 //third level of auth
                 var tier = req.user.roleName();
                 if (tier === 'ADMINISTRATOR') {
+                    authorized = true;
+                    if (range == 1){
+                        min_days = 365;
+                    }
+                    else if(range == 2){
 
+                        min_days = 31;
+                    }
+                    else if(range == 3){
+
+                        min_days = 7;
+                    }
+                    else if(range == 4){
+
+                        min_days = 1;
+                    }
+                    console.log("mindays " + min_days);
+                    var now  = moment().format( config.const.DATE_FORMAT);
+                    var then = "";
                     boloService.getArchiveBolosForPurge().then(function(bolos){
-                        console.log(bolos);
+
+                        var promises = [];
                         for(var i = 0; i < bolos.bolos.length;i++){
                             var curr = bolos.bolos[i];
-                            console.log(curr);
-                            console.log(curr.data.lastUpdatedOn);
+                            then = curr.lastUpdatedOn;
 
+                            var ms = moment(now,config.const.DATE_FORMAT).diff(moment(then,config.const.DATE_FORMAT));
+                            var d = moment.duration(ms);
+                            var days = parseInt(d.asDays());
+
+                            if(days > min_days){
+
+                                 promises.push(boloService.removeBolo(curr.id));
+
+                            }
                         }
+                         Promise.all(promises).then(function (responses) {
+                            if (responses.length >= 1) {
+                                console.log("Purge successful");
+                                req.flash(GFMSG, 'Successfully purged BOLOs.');
+
+                            }
+                            else{
+                                req.flash(GFMSG, 'No BOLOs meet purge criteria.');
+                            }
+                            res.redirect('back');
+                        })
                     });
 
-                    var promises = [];
-                    /*
-                    archived_bolos.forEach(function (bolo) {
-                        promises.push(boloService.removeBolo(bolo.data.id));
-                    });
-                     return Promise.all(promises).then(function (responses) {
-                         console.log("Purge successful");
-                         req.flash(GFMSG, 'Successfully purged BOLOs.');
-                        res.redirect('/bolo');
-                    })
-                    */
                 }
             }
+            if(authorized === false) {
+                req.flash(GFERR,
+                    'You do not have permissions to purge BOLOs. Please ' +
+                    'contact your agency\'s administrator ' +
+                    'for access.');
+                res.redirect('back');
+            }
 
-            //if reaches here unauthorized...
-            req.flash(GFERR,
-                'You do not have permissions to purge BOLOs. Please ' +
-                'contact your agency\'s administrator ' +
-                'for access.');
-            res.redirect('back');
+        }).catch(function(){
 
-        })
+        console.log("error in purge process");
+    })
 
 });
 router.get( '/bolo/search/results', function ( req, res ) {
@@ -294,9 +323,12 @@ router.get( '/bolo/create', function ( req, res ) {
     res.render( 'bolo-create-form', data );
 });
 
+
 // process bolo creation user form input
 router.post( '/bolo/create', function ( req, res, next ) {
+
     parseFormData( req, attachmentFilter ).then( function ( formDTO ) {
+        console.log(formDTO.fields);
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
