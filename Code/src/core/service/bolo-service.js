@@ -44,6 +44,16 @@ BoloService.prototype.createBolo = function ( boloDTO, attachments ) {
     });
 };
 
+BoloService.prototype.previewBolo = function ( boloDTO) {
+    var bolo = new Bolo( boloDTO );
+
+    if ( ! bolo.isValid() ) {
+        Promise.reject( new Error( "Invalid bolo data" ) );
+    }
+
+    return bolo;
+};
+
 /**
  * Update BOLO data.
  *
