@@ -22,6 +22,7 @@ block admin-content
     p  Fill out the form and submit to create a new agency.
 
     form( action=( route + form_action ) enctype="multipart/form-data" method="post" )
+        
         +input_text( "agency_id", "Agency ID", "", false, "" )
         +input_text( "name", "Agency Name", "", false, "" )
         +input_text( "address", "Address", "", false, "" )

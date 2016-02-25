@@ -27,10 +27,12 @@ block admin-content
                 label.control-label( for="role") Role
                 select.form-control( name="role" )
                     each role in roles
+                      if (role != 'ROOT' || tier === 'ROOT')
                         - var formattedRole = _.startCase( role.toLowerCase() );
                         option( value=role, selected ) #{formattedRole}
-
+          
         if ( agencies )
+          if (tier === 'ROOT')
             .form-group
                 label.control-label( for="agency" ) Agency
                 select.form-control( name="agency" )
@@ -39,7 +41,8 @@ block admin-content
                             option( value=agency.id selected ) #{agency.name}
                         else
                             option( value=agency.id ) #{agency.name}
-
+          else 
+            option #{user.agency.name}
 
         +input_text( "badge", "Badge No.", "", false,  "" )
         +input_text( "sectunit", "Section / Unit", "", false,  "" )

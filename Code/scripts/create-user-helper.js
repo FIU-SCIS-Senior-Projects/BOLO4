@@ -30,6 +30,14 @@ var agencyService = new AgencyService( new AgencyRepository() );
 
 agencyService.searchAgencies("name:Pinecrest").then( function ( results ) {
         var agencies = results.agencies;
+        var rootDTO = userService.formatDTO({
+            "username": "root",
+            "password": "Password1!",
+            "email": "root@example.com",
+            "tier": 4,
+            "agency": agencies[0].id
+        });
+
         var adminDTO = userService.formatDTO({
             "username": "admin",
             "password": "Password1!",
@@ -57,7 +65,13 @@ agencyService.searchAgencies("name:Pinecrest").then( function ( results ) {
             "Attempting to create users..."
         );
 
-        /** Try to register the user **/
+        /** Try to register the users **/
+        userService.registerUser( rootDTO ).then( function ( response ) {
+            console.log( "Created user -- Cloudant Response is: \n", response );
+        }).catch( function ( error ) {
+            console.error( "An error occurred -- Cloudant Response Error: \n", error );
+        });
+
         userService.registerUser( adminDTO ).then( function ( response ) {
             console.log( "Created user -- Cloudant Response is: \n", response );
         }).catch( function ( error ) {
