@@ -484,32 +484,76 @@ function generatePDF(data){
   boloService.getAttachment(data.id, 'featured').then(function (attDTO) {
           return attDTO.data
   }).then( function(image){
-        doc.image(image, 0, 15, {width: 300});
-        for( var key in data){
-          if(data.hasOwnProperty(key)){
-              // console.log(data.bolo[key]);
+        //console.log(data.category + 'XXXXXXXX');
+        //var lorem = data.category;
+        doc.fontSize(20);
+        doc.fillColor('red');
+        doc.text(data.category, {align: 'center'})
+          .moveDown();
+          doc.image(image, 15, 100, {width: 300});
+        doc.fillColor('black');
+        doc.fontSize(11);
 
-              doc.font('Times-Roman')
-                 .text(key +": " + data[key], 400)
-                 .moveDown();
-          }
-        }
+        doc.font('Times-Roman')
+           .text("Bolo ID: "  + data['id'], 350)
+           .moveDown();
+
+        doc.font('Times-Roman')
+          .text("Name: "  + data['firstName'] + " " + data['lastName'], 350)
+          .moveDown();
+
+        doc.font('Times-Roman')
+           .text("Race: "  + data['race'], 350)
+           .moveDown();
+
+        doc.font('Times-Roman')
+           .text("DOB: "  + data['dob'], 350)
+           .moveDown();
+
+        doc.font('Times-Roman')
+          .text("License#: "  + data['dlNumber'], 350)
+          .moveDown();
+
+         doc.font('Times-Roman')
+            .text("Height: "  + data['height'], 350)
+            .moveDown();
+
+         doc.font('Times-Roman')
+            .text("Weight: "  + data['weight'] + "lbs", 350)
+            .moveDown();
+
+
+         doc.font('Times-Roman')
+            .text("Address: "  + data['address'], 350)
+            .moveDown();
+
+         doc.font('Times-Roman')
+            .text("Sex: "  + data['sex'], 350)
+            .moveDown();
+
+         doc.font('Times-Roman')
+            .text("Hair Color: "  + data['hairColor'], 350)
+            .moveDown();
+
+
+         doc.font('Times-Roman')
+            .text("Tattoos/Scars: "  + data['tattoos'], 350)
+            .moveDown();
+
+
+
+
+
+
+        // for( var key in data){
+        //   if(data.hasOwnProperty(key)){
+        //       // console.log(data.bolo[key]);
+        //
+        //   }
+        // }
+
         doc.end();
   });
-
-
-  // for( var key in data){
-  //   if(data.hasOwnProperty(key)){
-  //       // console.log(data.bolo[key]);
-  //
-  //       doc.font('Times-Roman')
-  //          .text(key +": " + data[key], 400)
-  //          .moveDown();
-  //   }
-  //   y+=15;
-  // }
-               //adding the text to be written,
-  //doc.end();
 }
 
 

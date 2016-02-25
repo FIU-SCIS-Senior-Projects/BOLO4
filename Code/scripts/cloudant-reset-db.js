@@ -122,7 +122,7 @@ var user_indexer = function (doc) {
 
 };
 
-var BOLO_DB = 'bolo_dev_db';
+var BOLO_DB = 'bolo';
 
 var BOLO_DESIGN_DOC = {
     "views": {
