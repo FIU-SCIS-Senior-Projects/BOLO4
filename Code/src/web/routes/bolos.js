@@ -11,6 +11,8 @@ var util            = require('util');
 var uuid            = require('node-uuid');
 var PDFDocument     = require ('pdfkit');
 var fs              = require('fs');
+var bodyParser      = require('body-parser'); 
+var _bodyparser     = bodyParser.urlencoded({ 'extended': true });
 
 
 var config          = require('../config');
@@ -29,7 +31,6 @@ var GFMSG           = config.const.GFMSG;
 
 var parseFormData       = formUtil.parseFormData;
 var cleanTemporaryFiles = formUtil.cleanTempFiles;
-
 
 /**
  * Send email notification of a new bolo.
@@ -90,6 +91,18 @@ console.log("called get all bolo data");
     });
 }
 
+function getAgencyData(id){
+    var data = {};
+    console.log("retrieving Agency data");
+    
+    return agencyService.getAgency(id).then( function(responses){
+        console.log(responses);
+        data.agency = responses;
+        return data;
+    });
+
+
+}
 
 function attachmentFilter ( fileDTO ) {
     return /image/i.test( fileDTO.content_type );
@@ -186,6 +199,7 @@ router.get( '/bolo/search', function ( req, res ) {
 });
 // process bolo search user form input
 router.post( '/bolo/search', function ( req, res, next ) {
+
     parseFormData( req, attachmentFilter ).then( function ( formDTO )
     {
 
@@ -241,19 +255,21 @@ router.get( '/bolo/create', function ( req, res ) {
     res.render( 'bolo-create-form', data );
 });
 
+
 // process bolo creation user form input
-router.post( '/bolo/create', function ( req, res, next ) {
+// if the user slected preview mode, a view of the current form is rendered.
+router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
+
     parseFormData( req, attachmentFilter ).then( function ( formDTO ) {
+
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
         boloDTO.createdOn = moment().format( config.const.DATE_FORMAT);
         boloDTO.createdOn = boloDTO.createdOn.toString();
-        console.log(boloDTO.createdOn);
+        console.log("BOLO created on:" + boloDTO.createdOn);
         boloDTO.lastUpdatedOn = boloDTO.createdOn;
-
         boloDTO.agency = req.user.agency;
-
         boloDTO.author = req.user.id;
         boloDTO.authorFName = req.user.fname;
         boloDTO.authorLName = req.user.lname;
@@ -273,16 +289,48 @@ router.post( '/bolo/create', function ( req, res, next ) {
             });
         }
 
-        var result = boloService.createBolo( boloDTO, attDTOs );
-        return Promise.all([result, formDTO]);
+        if(formDTO.fields.option === "preview"){
+            var preview = {};
+            var bolo = boloService.previewBolo(boloDTO);
+            preview.bolo = bolo;
+            preview.agency = bolo.agency;
+                                
+            return Promise.all([preview, formDTO]);
+                              
+        }
+
+        if(formDTO.fields.option === "submit"){
+            var result = boloService.createBolo( boloDTO, attDTOs );
+            
+            return Promise.all([result, formDTO]);
+
+        }
+
     }).then( function ( pData ) {
-        if ( pData[1].files.length ) cleanTemporaryFiles( pData[1].files );
-        sendBoloNotificationEmail( pData[0], 'new-bolo-notification' );
-        req.flash( GFMSG, 'BOLO successfully created.' );
-        res.redirect( '/bolo' );
+
+        if(pData[1].fields.option === "submit"){
+            if ( pData[1].files.length ) cleanTemporaryFiles( pData[1].files );
+            sendBoloNotificationEmail( pData[0], 'new-bolo-notification' );
+            req.flash( GFMSG, 'BOLO successfully created.' );
+            res.redirect( '/bolo' );
+        }
+        else{
+            agencyService.getAgency(pData[0].agency).then( function(response){
+                pData[0].agency_name = response.data.name;
+                pData[0].agency_address = response.data.address;
+                pData[0].agency_city = response.data.city;
+                pData[0].agency_zip = response.data.zip;
+                pData[0].agency_state = response.data.state;
+                pData[0].agency_phone = response.data.phone;
+                
+                res.render( 'bolo-preview-details', pData[0] );
+            });
+        }
+
     }).catch( function ( error ) {
-        next( error );
-    });
+         next( error );
+       });
+
 });
 
 
@@ -316,6 +364,7 @@ router.get( '/bolo/edit/:id', function ( req, res, next ) {
         next( error );
     });
 });
+
 
 // handle requests to process edits on a specific bolo
 router.post( '/bolo/edit/:id', function ( req, res, next ) {
@@ -450,8 +499,10 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
     console.log(req.params.id);
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
         data.bolo = bolo;
+        console.log(bolo.agency);
         return agencyService.getAgency( bolo.agency );
     }).then( function ( agency ) {
+        console.log(agency);
         data.agency = agency;
         generatePDF(data.bolo.data);
         res.render( 'bolo-details', data );
@@ -500,7 +551,8 @@ function generatePDF(data){
 router.get( '/bolo/viewPDF/:id', function ( req, res, next ) {
    var data = {};
   // instead of running the services again...an object should kept in session
-   boloService.getBolo( req.params.id ).then( function ( bolo ) {
+   boloService.getBolo( req.params.id )
+   .then( function ( bolo ) {
        data.bolo = bolo;
        return agencyService.getAgency( bolo.agency );
    }).then( function ( agency ) {
