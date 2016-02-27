@@ -18,6 +18,7 @@ block admin-content
                     th
             tbody
                 each user in users
+                  if(user.tier <= 3)
                     tr
                         td #{user.username}
                         td #{user.fname} #{user.lname}
