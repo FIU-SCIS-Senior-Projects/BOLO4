@@ -13,8 +13,16 @@ div#dialog(style='display:none;')
                 modal: true,
                 buttons: {
                     "Confirm": function () {
-                        var pass = $("#password").val();
-                        callback(pass);
+                        $.ajax({
+                            url: '/bolo/archive/purge',
+                            type: 'POST',
+                            data: {password: $("#password").val(), range: $("#purgeRange option:selected").val()},
+                            dataType: 'json',
+                            success: function(data){
+                                console.log('redirect');
+                                if (typeof data.redirect == 'string')
+                                    window.location = data.redirect;
+                    }})
                         $(this).dialog("close");
                     },
                     "Cancel": function () {
@@ -30,11 +38,5 @@ div#dialog(style='display:none;')
 
         });
 
-        function callback(pass) {
-            var range = $( "#purgeRange option:selected" ).val();
-            var local_data = !{JSON.stringify(bolos)};
-            $.post('/bolo/archive/purge', {bolo_data: local_data, password: pass, range:range});
-
-        }
 
 

@@ -156,7 +156,7 @@ router.post('/bolo/archive/purge',function(req,res) {
     //2nd level of auth
     userService.authenticate(username, pass)
         .then(function (account) {
-            var min_days = 0;;
+            var min_days = 0;
             if (account)
             {
                 //third level of auth
@@ -178,7 +178,6 @@ router.post('/bolo/archive/purge',function(req,res) {
 
                         min_days = 1;
                     }
-                    console.log("mindays " + min_days);
                     var now  = moment().format( config.const.DATE_FORMAT);
                     var then = "";
                     boloService.getArchiveBolosForPurge().then(function(bolos){
@@ -204,11 +203,12 @@ router.post('/bolo/archive/purge',function(req,res) {
                                 req.flash(GFMSG, 'Successfully purged BOLOs.');
 
                             }
-                            else{
+                            else {
                                 req.flash(GFMSG, 'No BOLOs meet purge criteria.');
                             }
-                            res.redirect('back');
-                        })
+                             res.send({redirect: '/bolo/archive'});
+
+                         })
                     });
 
                 }
@@ -218,12 +218,13 @@ router.post('/bolo/archive/purge',function(req,res) {
                     'You do not have permissions to purge BOLOs. Please ' +
                     'contact your agency\'s administrator ' +
                     'for access.');
-                res.redirect('back');
+                res.send({redirect: '/bolo/archive'});
+
             }
 
         }).catch(function(){
-
-        console.log("error in purge process");
+        req.flash(GFERR,"error in purge process, please try again");
+        res.send({redirect: '/bolo/archive'});
     })
 
 });
@@ -270,7 +271,7 @@ router.get( '/bolo/search', function ( req, res ) {
 router.post( '/bolo/search', function ( req, res, next ) {
     parseFormData( req, attachmentFilter ).then( function ( formDTO )
     {
-
+        console.log(formDTO.fields);
         var query_obj = formDTO.fields;
         var query_string = '';
         var key = '';
