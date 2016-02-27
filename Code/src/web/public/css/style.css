@@ -49,6 +49,14 @@ input[type="file"] {
     border-top: none;
 }
 
+.strong {
+    font-weight: 700;
+}
+
+.btn {
+    margin: 3px;
+}
+
 .jumbotron{
   background-color: #030b2f;
   color:white;

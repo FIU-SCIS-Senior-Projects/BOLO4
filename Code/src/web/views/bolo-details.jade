@@ -16,7 +16,7 @@ block content
             div.col-xs-12.col-md-2
               img( src=att_route + '/logo' alt="", width=150, height=175 )
             div.col-xs-12.col-md-7
-              p.text-danger.strong #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
+              p.text-danger #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
               p.strong #{agency.name} Police Department
               p
                 em #{agency.address}
@@ -42,10 +42,6 @@ block content
             div.col-xs-12.col-md-7
                 form.form-horizontal
                 +form_labels_row("Bolo ID", bolo.data.id )
-                if bolo.data.authorFName != null || bolo.data.authorLName != null
-                  +form_labels_row("Author", bolo.data.authorFName + " " +  bolo.data.authorLName )
-                else
-                  +form_labels_row("Author", "N/A")
                 if bolo.data.firstName.length || bolo.data.lastName.length
                   +form_labels_row("Name", bolo.data.firstName + " " +  bolo.data.lastName)
                 else
@@ -88,7 +84,7 @@ block content
                   +form_labels_row("Tattoos/Scars", "N/A" )
     form.form-horizontal
     | &nbsp;
-    p.strong Additional Info:
+    p Additional Info:
     if bolo.data.additional.length
       p #{bolo.data.additional}
     else
@@ -98,8 +94,11 @@ block content
       p.strong Video Link:
       p #{bolo.data.video_url}
     | &nbsp;
-    p.strong Summary:
+    p Summary:
     if bolo.data.additional.length
       p #{bolo.data.summary}
     else
       | &nbsp;
+    if bolo.data.authorFName != null || bolo.data.authorLName != null
+      p.strong This BOLO was created by #{bolo.data.authorFName} #{bolo.data.authorLName}.
+      p.strong Please contact the agency should clarification be required. 
