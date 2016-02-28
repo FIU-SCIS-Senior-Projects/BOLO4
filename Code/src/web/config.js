@@ -45,6 +45,7 @@ config.const = config.constants = {
     /* BOLO Page Settings */
     'BOLOS_PER_PAGE'    : 8,
 
+    'pdf_view_path' : path.resolve( __dirname, './views/pdf-view' ),
     /* http://momentjs.com/docs/#/displaying/ */
     'DATE_FORMAT'       : 'MM-DD-YY HH:mm:ss',
 
@@ -69,7 +70,9 @@ config.email = {
     'from'              : 'bolo.flyer@gmail.com',
     'fromName'          : 'BOLO Flier Creator',
 
-    'template_path'     : path.resolve( __dirname, './views/email' )
+    'template_path'     : path.resolve( __dirname, './views/email' ),
+
+
 };
 
 

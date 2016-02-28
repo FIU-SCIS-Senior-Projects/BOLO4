@@ -156,7 +156,7 @@ router.post('/bolo/archive/purge',function(req,res) {
     //2nd level of auth
     userService.authenticate(username, pass)
         .then(function (account) {
-            var min_days = 0;
+            var min_hours = 0;
             if (account)
             {
                 //third level of auth
@@ -164,19 +164,19 @@ router.post('/bolo/archive/purge',function(req,res) {
                 if (tier === 'ADMINISTRATOR') {
                     authorized = true;
                     if (range == 1){
-                        min_days = 365;
+                        min_hours = 8760;
                     }
                     else if(range == 2){
 
-                        min_days = 31;
+                        min_hours = 744;
                     }
                     else if(range == 3){
 
-                        min_days = 7;
+                        min_hours = 168;
                     }
                     else if(range == 4){
 
-                        min_days = 1;
+                        min_hours = 24;
                     }
                     var now  = moment().format( config.const.DATE_FORMAT);
                     var then = "";
@@ -189,9 +189,8 @@ router.post('/bolo/archive/purge',function(req,res) {
 
                             var ms = moment(now,config.const.DATE_FORMAT).diff(moment(then,config.const.DATE_FORMAT));
                             var d = moment.duration(ms);
-                            var days = parseInt(d.asDays());
-
-                            if(days > min_days){
+                            var hours = parseInt(d.asHours());
+                            if(hours > min_hours){
 
                                  promises.push(boloService.removeBolo(curr.id));
 
@@ -199,8 +198,7 @@ router.post('/bolo/archive/purge',function(req,res) {
                         }
                          Promise.all(promises).then(function (responses) {
                             if (responses.length >= 1) {
-                                console.log("Purge successful");
-                                req.flash(GFMSG, 'Successfully purged BOLOs.');
+                                req.flash(GFMSG, 'Successfully purged '+ responses.length+ ' BOLOs.');
 
                             }
                             else {
