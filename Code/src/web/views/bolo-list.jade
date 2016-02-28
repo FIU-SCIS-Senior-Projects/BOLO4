@@ -1,6 +1,5 @@
 extends layout
 
-
 block jumbo
     .jumbotron
         .container
@@ -21,7 +20,16 @@ block content
                         a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
                         a.btn.btn-default( href="/bolo/details/" + bolo.id role="button" ) Details
                         a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
-
+                        .dropdown
+                          a.btn.btn-default( href="#", data-toggle="dropdown" role="button" ) Update
+                          ul.dropdown-menu(role='menu', aria-labelledby='dropdownMenu')
+                            li
+                              a(href='/bolo/update/custody/' + bolo.id, tabindex='-1') In Custody
+                            li 
+                              a(href='/bolo/update/located/' + bolo.id, tabindex='-1') Located
+                            li
+                              a(href='/bolo/update/cancelled/' + bolo.id, tabindex='-1') Cancelled
+                            
     .row.text-center
         - var route = '/bolo'
         include ./partials/paging.jade
