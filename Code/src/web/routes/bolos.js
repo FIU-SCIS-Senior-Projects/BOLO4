@@ -481,9 +481,23 @@ router.get( '/bolo/update/custody/:id', function ( req, res, next ) {
         data.bolo.lastUpdatedOn = temp.toString();
         console.log(data.bolo.lastUpdatedOn);
         var att = [];
-        boloService.updateBolo(data.bolo, att);
+        boloService.updateBolo(data.bolo, att).then(function(bolo){
+          var page = parseInt( req.query.page ) || 1;
+          var limit = config.const.BOLOS_PER_PAGE;
+          var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
 
-        res.redirect( '/bolo' );
+          data = {
+              'paging': { 'first': 1, 'current': page }
+          };
+
+          boloService.getBolos( limit, skip ).then( function ( results ) {
+              data.bolos = results.bolos;
+              data.paging.last = Math.ceil( results.total / limit );
+              res.render( 'bolo-list', data );
+          }).catch( function ( error ) {
+              next( error );
+          });
+        });
       }
   }).catch( function ( error ) {
       if ( ! /unauthorized/i.test( error.message ) ) throw error;
@@ -516,9 +530,23 @@ router.get( '/bolo/update/located/:id', function ( req, res, next ) {
         data.bolo.lastUpdatedOn = temp.toString();
         console.log(data.bolo.lastUpdatedOn);
         var att = [];
-        boloService.updateBolo(data.bolo, att);
+        boloService.updateBolo(data.bolo, att).then(function(bolo){
+          var page = parseInt( req.query.page ) || 1;
+          var limit = config.const.BOLOS_PER_PAGE;
+          var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
 
-        res.redirect( '/bolo' );
+          data = {
+              'paging': { 'first': 1, 'current': page }
+          };
+
+          boloService.getBolos( limit, skip ).then( function ( results ) {
+              data.bolos = results.bolos;
+              data.paging.last = Math.ceil( results.total / limit );
+              res.render( 'bolo-list', data );
+          }).catch( function ( error ) {
+              next( error );
+          });
+        });
       }
   }).catch( function ( error ) {
       if ( ! /unauthorized/i.test( error.message ) ) throw error;
@@ -551,9 +579,23 @@ router.get( '/bolo/update/cancelled/:id', function ( req, res, next ) {
         data.bolo.lastUpdatedOn = temp.toString();
         console.log(data.bolo.lastUpdatedOn);
         var att = [];
-        boloService.updateBolo(data.bolo, att);
+        boloService.updateBolo(data.bolo, att).then(function(bolo){
+          var page = parseInt( req.query.page ) || 1;
+          var limit = config.const.BOLOS_PER_PAGE;
+          var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
 
-        res.redirect( '/bolo' );
+          data = {
+              'paging': { 'first': 1, 'current': page }
+          };
+
+          boloService.getBolos( limit, skip ).then( function ( results ) {
+              data.bolos = results.bolos;
+              data.paging.last = Math.ceil( results.total / limit );
+              res.render( 'bolo-list', data );
+          }).catch( function ( error ) {
+              next( error );
+          });
+        });
       }
   }).catch( function ( error ) {
       if ( ! /unauthorized/i.test( error.message ) ) throw error;
