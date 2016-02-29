@@ -67,5 +67,10 @@ function SETNAV ( title ) {
 }
 
 function getIndex ( req, res ) {
-    res.render( 'admin' );
+  if ( req.user.tier === User.ROOT || req.user.tier === User.ADMINISTRATOR) {
+      res.render( 'admin' );
+  } else {
+      res.render( 'unauthorized' );
+  }
+
 }
