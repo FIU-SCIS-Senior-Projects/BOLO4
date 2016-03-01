@@ -4,7 +4,11 @@ extends layout
 block jumbo
     .jumbotron
         .container
-            p Active BOLOs
+                p Active BOLOs
+                select (name = "Select agency")
+                    for agency in agencies
+                        option #{agency.name}
+                    option view all
 
 
 block content

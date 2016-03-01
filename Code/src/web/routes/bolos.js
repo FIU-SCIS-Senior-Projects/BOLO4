@@ -100,9 +100,9 @@ function getAgencyData(id){
         data.agency = responses;
         return data;
     });
-
-
 }
+
+
 
 function attachmentFilter ( fileDTO ) {
     return /image/i.test( fileDTO.content_type );
@@ -124,13 +124,19 @@ router.get( '/bolo', function ( req, res, next ) {
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
 
     var data = {
-        'paging': { 'first': 1, 'current': page }
+        'paging': { 'first': 1, 'current': page },
+        'agencies': []
     };
 
     boloService.getBolos( limit, skip ).then( function ( results ) {
         data.bolos = results.bolos;
         data.paging.last = Math.ceil( results.total / limit );
-        res.render( 'bolo-list', data );
+        console.log(data.bolos);
+
+        agencyService.getAgencies().then( function ( agencies ) {
+            data.agencies = agencies;
+            res.render('bolo-list', data );
+        });
     }).catch( function ( error ) {
         next( error );
     });
