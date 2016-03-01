@@ -4,13 +4,16 @@ extends layout
 block jumbo
     .jumbotron
         .container
-                p Active BOLOs
-                select (name = "Select agency")
-                    for agency in agencies
-                        option #{agency.name}
-                    option view all
+            div.row
+                div.col-xs-2.col-md-10
+                    p Active BOLOs
+                div.col-xs-2
+                    select.form-control (name = "Select agency")
+                        option View all
+                        for agency in agencies
+                            option  #{agency.name}
 
-
+                    
 block content
     include ./partials/global-alerts.jade
 
