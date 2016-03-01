@@ -9,9 +9,10 @@ var Promise         = require('promise');
 var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
-var PDFDocument     = require ('pdfkit');
+var PDFDocument     = require('pdfkit');
+
 var fs              = require('fs');
-var bodyParser      = require('body-parser'); 
+var bodyParser      = require('body-parser');
 var _bodyparser     = bodyParser.urlencoded({ 'extended': true });
 
 
@@ -31,6 +32,7 @@ var GFMSG           = config.const.GFMSG;
 
 var parseFormData       = formUtil.parseFormData;
 var cleanTemporaryFiles = formUtil.cleanTempFiles;
+
 
 /**
  * Send email notification of a new bolo.
@@ -73,7 +75,6 @@ function sendBoloNotificationEmail ( bolo, template ) {
  */
 function getAllBoloData ( id ) {
     var data = {};
-console.log("called get all bolo data");
     return boloService.getBolo( id ).then( function ( bolo ) {
         data.bolo = bolo;
 
@@ -94,7 +95,7 @@ console.log("called get all bolo data");
 function getAgencyData(id){
     var data = {};
     console.log("retrieving Agency data");
-    
+
     return agencyService.getAgency(id).then( function(responses){
         console.log(responses);
         data.agency = responses;
@@ -154,8 +155,87 @@ router.get( '/bolo/archive', function ( req, res, next ) {
         next( error );
     });
 });
+router.post('/bolo/archive/purge',function(req,res) {
 
+   // = req.body.bolo_data;
+    var pass = req.body.password;
+    var username = req.user.data.username;
+    var range = req.body.range;
 
+    var authorized = false;
+    //2nd level of auth
+    userService.authenticate(username, pass)
+        .then(function (account) {
+            var min_hours = 0;
+            if (account)
+            {
+                //third level of auth
+                var tier = req.user.roleName();
+                if (tier === 'ADMINISTRATOR') {
+                    authorized = true;
+                    if (range == 1){
+                        min_hours = 8760;
+                    }
+                    else if(range == 2){
+
+                        min_hours = 744;
+                    }
+                    else if(range == 3){
+
+                        min_hours = 168;
+                    }
+                    else if(range == 4){
+
+                        min_hours = 24;
+                    }
+                    var now  = moment().format( config.const.DATE_FORMAT);
+                    var then = "";
+                    boloService.getArchiveBolosForPurge().then(function(bolos){
+
+                        var promises = [];
+                        for(var i = 0; i < bolos.bolos.length;i++){
+                            var curr = bolos.bolos[i];
+                            then = curr.lastUpdatedOn;
+
+                            var ms = moment(now,config.const.DATE_FORMAT).diff(moment(then,config.const.DATE_FORMAT));
+                            var d = moment.duration(ms);
+                            var hours = parseInt(d.asHours());
+                            if(hours > min_hours){
+
+                                 promises.push(boloService.removeBolo(curr.id));
+
+                            }
+                        }
+                         Promise.all(promises).then(function (responses) {
+                            if (responses.length >= 1) {
+                                req.flash(GFMSG, 'Successfully purged '+ responses.length+ ' BOLOs.');
+
+                            }
+                            else {
+                                req.flash(GFMSG, 'No BOLOs meet purge criteria.');
+                            }
+                             res.send({redirect: '/bolo/archive'});
+
+                         })
+                    });
+
+                }
+            }
+            if(authorized === false) {
+                req.flash(GFERR,
+                    'You do not have permissions to purge BOLOs. Please ' +
+                    'contact your agency\'s administrator ' +
+                    'for access.');
+                res.send({redirect: '/bolo/archive'});
+
+            }
+
+        }).catch(function(){
+        req.flash(GFERR,"error in purge process, please try again");
+        res.send({redirect: '/bolo/archive'});
+    })
+
+});
 router.get( '/bolo/search/results', function ( req, res ) {
 
     console.log(req.query.bookmark );
@@ -188,8 +268,6 @@ router.get( '/bolo/search/results', function ( req, res ) {
 });
 
 
-
-
 router.get( '/bolo/search', function ( req, res ) {
     var data = {
         'form_errors': req.flash( 'form-errors' )
@@ -202,7 +280,7 @@ router.post( '/bolo/search', function ( req, res, next ) {
 
     parseFormData( req, attachmentFilter ).then( function ( formDTO )
     {
-
+        console.log(formDTO.fields);
         var query_obj = formDTO.fields;
         var query_string = '';
         var key = '';
@@ -257,11 +335,8 @@ router.get( '/bolo/create', function ( req, res ) {
 
 
 // process bolo creation user form input
-// if the user slected preview mode, a view of the current form is rendered.
-router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
-
+router.post( '/bolo/create', function ( req, res, next ) {
     parseFormData( req, attachmentFilter ).then( function ( formDTO ) {
-
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
@@ -294,14 +369,14 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             var bolo = boloService.previewBolo(boloDTO);
             preview.bolo = bolo;
             preview.agency = bolo.agency;
-                                
+
             return Promise.all([preview, formDTO]);
-                              
+
         }
 
         if(formDTO.fields.option === "submit"){
             var result = boloService.createBolo( boloDTO, attDTOs );
-            
+
             return Promise.all([result, formDTO]);
 
         }
@@ -322,7 +397,7 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
                 pData[0].agency_phone = response.data.phone;
-                
+
                 res.render( 'bolo-preview-details', pData[0] );
             });
         }
@@ -417,10 +492,10 @@ router.get( '/bolo/archive/:id', function ( req, res, next ) {
         if ( auth.authorizedToArchive() ) {
             boloService.activate( data.bolo.id, false );
         }
-    }).then( function ( response ) {
+    }).then(setTimeout(function ( response ){
         req.flash( GFMSG, 'Successfully archived BOLO.' );
-        res.redirect( '/bolo/archive' );
-    }).catch( function ( error ) {
+        res.redirect( 'back' );
+    },1000)).catch( function ( error ) {
         if ( ! /unauthorized/i.test( error.message ) ) throw error;
 
         req.flash( GFERR,
@@ -504,7 +579,7 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
     }).then( function ( agency ) {
         console.log(agency);
         data.agency = agency;
-        generatePDF(data.bolo.data);
+       // generatePDF(data.bolo.data);
         res.render( 'bolo-details', data );
     }).catch( function ( error ) {
         next( error );
@@ -591,7 +666,7 @@ router.get( '/bolo/viewPDF/:id', function ( req, res, next ) {
 });// end of /bolo/viewPDF/id router
 
 
-router.get( '/bolo/asset/:boloid/:attname', getAttachment );
-router.getAttachment = getAttachment;
+    router.get('/bolo/asset/:boloid/:attname', getAttachment);
+    router.getAttachment = getAttachment;
 
-module.exports = router;
+    module.exports = router;

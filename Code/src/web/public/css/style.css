@@ -63,3 +63,52 @@ input[type="file"] {
   font-weight: bold;
   padding: 15px;
 }
+
+.thumbnail{
+    word-wrap:break-word;
+
+}
+.boloImageContainer {
+    overflow: hidden;
+    position: relative;
+    height:300px;
+    border-color: black;
+}
+.boloImageCenterer {
+
+}
+.boloImageCenterer img {
+    display: block;
+    margin: 0 auto;
+}
+.status{
+
+}
+.status h2 {
+
+    font-weight: 900;
+    color: red;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0;
+   /* position: absolute;*/
+    top: 10%;
+    left: 50%;
+    font-size: 2rem;
+    /*transform: translate(-50%, -50%);*/
+}
+a.thumbnail:hover,
+a.thumbnail:focus,
+a.thumbnail.active {
+    border-color: #008cba;
+}
+
+.ui-dialog-titlebar-close{
+    display: none;
+}
+
+#purgeRange{
+    margin-left: 10px;
+
+
+}

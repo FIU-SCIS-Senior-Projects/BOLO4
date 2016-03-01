@@ -18,6 +18,7 @@ var Promise     = require('promise');
  */
 module.exports.parseFormData = function ( req, filterFn ) {
     return new Promise( function ( resolve, reject ) {
+
         var form = new multiparty.Form();
         var files = [];
         var fields = {};
