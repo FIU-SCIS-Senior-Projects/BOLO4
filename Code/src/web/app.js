@@ -59,7 +59,13 @@ var session = expressSession({
     /** @todo confirm the next two options **/
     'resave': true,
     'saveUninitialized': true,
-
+    'cookie': {
+        path: '/',
+        httpOnly: true,
+        secure: false,
+        maxAge: 5* 10 * 6000
+    },
+    'rolling': true
     /**
      * @todo Uncomment the below option before going to production. HTTPS is
      * required for this option or the cookie will not be set per the
