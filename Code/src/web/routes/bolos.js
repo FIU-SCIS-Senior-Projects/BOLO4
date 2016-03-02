@@ -145,6 +145,9 @@ router.get( '/bolo', function ( req, res, next ) {
 // list bolos by agency at the root route
 router.get( '/bolo/:id', function ( req, res, next ) {
     var agency = req.params.id;
+    //var agency = req.getParameter("agencyID");
+    console.log(agency);
+
     var page = parseInt( req.query.page ) || 1;
     var limit = config.const.BOLOS_PER_PAGE;
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
@@ -156,7 +159,12 @@ router.get( '/bolo/:id', function ( req, res, next ) {
     boloService.getBolos( limit, skip ).then( function ( results ) {
         data.bolos = results.bolos;
         data.paging.last = Math.ceil( results.total / limit );
-        res.render( 'bolo-list', data );
+        console.log(data.bolos);
+
+        agencyService.getAgencies().then( function ( agencies ) {
+            data.agencies = agencies;
+            res.render('bolo-list', data );
+        });
     }).catch( function ( error ) {
         next( error );
     });
