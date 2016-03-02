@@ -163,28 +163,6 @@ if ( inDevelopmentMode ) {
  */
 var server = http.createServer( app );
 
-// Loading socket.io
-/*
-var io = require('socket.io').listen(server);
-io.use(ios(session));
-
-// When a client connects, we note it in the console
-io.sockets.on('connection', function (socket) {
-    socket.emit('message', "Session: " + JSON.stringify(socket.handshake.session));
-    socket.emit('message', 'You are connected!');
-
-    // When the server receives a “message” type signal from the client
-    socket.on('purge-request', function (message) {
-        console.log('purge-response','Purge request confirmed...Beginning Purge...');
-        for(var bolo in message){
-
-        }
-
-    });
-
-
-});
-*/
 server.listen( app.get( 'port' ), function() {
     console.log( 'Express server listening on port ' + app.get( 'port' ) );
 });

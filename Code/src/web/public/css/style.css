@@ -65,14 +65,16 @@ input[type="file"] {
 }
 
 .thumbnail{
+    border: solid #cccccc 2px;
     word-wrap:break-word;
-
+    background-color:#f2f2f2;
+    max-width:275px;
+    min-width: 275px;
+    margin-right:15px ;
 }
 .boloImageContainer {
     overflow: hidden;
     position: relative;
-    height:300px;
-    border-color: black;
 }
 .boloImageCenterer {
 
@@ -80,12 +82,18 @@ input[type="file"] {
 .boloImageCenterer img {
     display: block;
     margin: 0 auto;
+    border: solid #cccccc 2px;
+    height: 250px;
+    width: 250px;
+}
+.caption{
 }
 .status{
 
 }
 .status h2 {
 
+font-family: "Courier New", Courier, monospace;
     font-weight: 900;
     color: red;
     text-transform: uppercase;
