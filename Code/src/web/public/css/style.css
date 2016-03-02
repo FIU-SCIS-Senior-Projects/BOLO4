@@ -71,6 +71,8 @@ input[type="file"] {
     max-width:275px;
     min-width: 275px;
     margin-right:15px ;
+    min-height:565px;
+    max-height:565px;
 }
 .boloImageContainer {
     overflow: hidden;
