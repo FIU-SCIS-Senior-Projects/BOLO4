@@ -142,6 +142,26 @@ router.get( '/bolo', function ( req, res, next ) {
     });
 });
 
+// list bolos by agency at the root route
+router.get( '/bolo/:id', function ( req, res, next ) {
+    var agency = req.params.id;
+    var page = parseInt( req.query.page ) || 1;
+    var limit = config.const.BOLOS_PER_PAGE;
+    var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
+
+    var data = {
+        'paging': { 'first': 1, 'current': page }
+    };
+
+    boloService.getBolos( limit, skip ).then( function ( results ) {
+        data.bolos = results.bolos;
+        data.paging.last = Math.ceil( results.total / limit );
+        res.render( 'bolo-list', data );
+    }).catch( function ( error ) {
+        next( error );
+    });
+});
+
 // list archive bolos
 router.get( '/bolo/archive', function ( req, res, next ) {
     var page = parseInt( req.query.page ) || 1;
