@@ -281,6 +281,24 @@ CloudantBoloRepository.prototype.getBolos = function (limit, skip) {
     });
 };
 
+CloudantBoloRepository.prototype.getBolosByAgency = function (id, limit, skip) {
+    var opts = {
+        'include_docs': true,
+        'limit': limit,
+        'skip': skip,
+        'descending': true
+    };
+
+    console.log(id);
+
+    return db.view('bolo', 'all_active', opts).then(function (result) {
+        var bolos = _.map(result.rows, function (row) {
+            return boloFromCloudant(row.doc);
+        });
+        return {'bolos': bolos, total: result.total_rows};
+    });
+};
+
 CloudantBoloRepository.prototype.searchBolos = function (limit, query_string, bookmark) {
 
 

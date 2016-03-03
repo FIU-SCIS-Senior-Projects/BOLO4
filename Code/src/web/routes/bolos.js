@@ -131,7 +131,6 @@ router.get( '/bolo', function ( req, res, next ) {
     boloService.getBolos( limit, skip ).then( function ( results ) {
         data.bolos = results.bolos;
         data.paging.last = Math.ceil( results.total / limit );
-        console.log(data.bolos);
 
         agencyService.getAgencies().then( function ( agencies ) {
             data.agencies = agencies;
@@ -145,9 +144,6 @@ router.get( '/bolo', function ( req, res, next ) {
 // list bolos by agency at the root route
 router.get( '/bolo/:id', function ( req, res, next ) {
     var agency = req.params.id;
-    //var agency = req.getParameter("agencyID");
-    console.log(agency);
-
     var page = parseInt( req.query.page ) || 1;
     var limit = config.const.BOLOS_PER_PAGE;
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
@@ -156,10 +152,9 @@ router.get( '/bolo/:id', function ( req, res, next ) {
         'paging': { 'first': 1, 'current': page }
     };
 
-    boloService.getBolos( limit, skip ).then( function ( results ) {
+    boloService.getBolosByAgency( agency, limit, skip ).then( function ( results ) {
         data.bolos = results.bolos;
         data.paging.last = Math.ceil( results.total / limit );
-        console.log(data.bolos);
 
         agencyService.getAgencies().then( function ( agencies ) {
             data.agencies = agencies;
@@ -221,9 +216,6 @@ router.get( '/bolo/search/results', function ( req, res ) {
 
 });
 
-
-
-
 router.get( '/bolo/search', function ( req, res ) {
     var data = {
         'form_errors': req.flash( 'form-errors' )
@@ -231,6 +223,7 @@ router.get( '/bolo/search', function ( req, res ) {
 
     res.render( 'bolo-search-form', data );
 });
+
 // process bolo search user form input
 router.post( '/bolo/search', function ( req, res, next ) {
 
