@@ -453,7 +453,7 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
         return agencyService.getAgency( bolo.agency );
     }).then( function ( agency ) {
         data.agency = agency;
-        generatePDF(data.bolo.data);
+        generatePDF(data);
         res.render( 'bolo-details', data );
     }).catch( function ( error ) {
         next( error );
@@ -464,96 +464,137 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
 function generatePDF(data){
   var doc = new PDFDocument();
-  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.id + ".pdf"));  //creating a write stream
+  var someData = {};
+  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.bolo.id + ".pdf"));  //creating a write stream
         //to write the content on the file system
 
-//  console.log(Object.keys(data.bolo.data));
-  var x, y = 100;
-  var keys = Object.keys(data.attachments);
-  // console.log(keys);
-  //var att = boloService.getAttachment(data.id, featured);
-
-  var testImage = fs.readFileSync('src/web/public/img/nopic.png');
-  //console.log(testImage + "TEST IMAGE!!!!!!!!");
-
-  //  doc.image('/bolo/asset/'+ data.id +'/'+ keys[0], 0,0);
-//  var image = boloService.getAttachment(data.id, 'featured');
-
+  //var x, y = 100;
+  //var keys = Object.keys(data.bolo.attachments);
+  //var testImage = fs.readFileSync('src/web/public/img/nopic.png');
 
   // gets image from boloRepository and chains it to embed on (PDFDocument)doc
-  boloService.getAttachment(data.id, 'featured').then(function (attDTO) {
-          return attDTO.data
-  }).then( function(image){
-        //console.log(data.category + 'XXXXXXXX');
-        //var lorem = data.category;
-        doc.fontSize(20);
-        doc.fillColor('red');
-        doc.text(data.category, {align: 'center'})
-          .moveDown();
-          doc.image(image, 15, 100, {width: 300});
-        doc.fillColor('black');
-        doc.fontSize(11);
+  doc.fontSize(8);
 
-        doc.font('Times-Roman')
-           .text("Bolo ID: "  + data['id'], 350)
-           .moveDown();
-
-        doc.font('Times-Roman')
-          .text("Name: "  + data['firstName'] + " " + data['lastName'], 350)
-          .moveDown();
-
-        doc.font('Times-Roman')
-           .text("Race: "  + data['race'], 350)
-           .moveDown();
-
-        doc.font('Times-Roman')
-           .text("DOB: "  + data['dob'], 350)
-           .moveDown();
-
-        doc.font('Times-Roman')
-          .text("License#: "  + data['dlNumber'], 350)
-          .moveDown();
-
-         doc.font('Times-Roman')
-            .text("Height: "  + data['height'], 350)
-            .moveDown();
-
-         doc.font('Times-Roman')
-            .text("Weight: "  + data['weight'] + "lbs", 350)
-            .moveDown();
+  doc.fillColor('red');
+  doc.text("UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE", 120,15)
+    .moveDown(0.25);
+  doc.fillColor('black');
+  doc.text(data.agency.name)
+    .moveDown(0.25);
+  doc.text(data.agency.address)
+    .moveDown(0.25);
+  doc.text(data.agency.city+ ", " + data.agency.state + ", " + data.agency.zip)
+    .moveDown(0.25);
+  doc.text(data.agency.phone)
+    .moveDown(0.25);
+  doc.fontSize(20);
+  doc.fillColor('red');
+  doc.text(data.bolo.category,120,115,{align: 'center'})
+    .moveDown();
 
 
-         doc.font('Times-Roman')
-            .text("Address: "  + data['address'], 350)
-            .moveDown();
+  doc.fillColor('black');
+  doc.fontSize(11);
+  doc.font('Times-Roman')
+    .text("Name: "  + data.bolo['firstName'] + " " + data.bolo['lastName'], 350)
+    .moveDown();
 
-         doc.font('Times-Roman')
-            .text("Sex: "  + data['sex'], 350)
-            .moveDown();
+  doc.font('Times-Roman')
+     .text("Race: "  + data.bolo['race'], 350)
+     .moveDown();
 
-         doc.font('Times-Roman')
-            .text("Hair Color: "  + data['hairColor'], 350)
-            .moveDown();
+  doc.font('Times-Roman')
+     .text("DOB: "  + data.bolo['dob'], 350)
+     .moveDown();
+
+  doc.font('Times-Roman')
+    .text("License#: "  + data.bolo['dlNumber'], 350)
+    .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Height: "  + data.bolo['height'], 350)
+      .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Weight: "  + data.bolo['weight'] + "lbs", 350)
+      .moveDown();
 
 
-         doc.font('Times-Roman')
-            .text("Tattoos/Scars: "  + data['tattoos'], 350)
-            .moveDown();
+   doc.font('Times-Roman')
+      .text("Address: "  + data.bolo['address'], 350)
+      .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Sex: "  + data.bolo['sex'], 350)
+      .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Hair Color: "  + data.bolo['hairColor'], 350)
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Tattoos/Scars: "  + data.bolo['tattoos'], 350)
+      .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Additional: ",  15,465)
+      .moveDown(0.25);
+   doc.font('Times-Roman')
+      .text(data.bolo['additional'], {width : 200})
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Summary: ", 15  )
+      .moveDown(0.25);
+   doc.font('Times-Roman')
+      .text(data.bolo['summary'], {width : 200})
+      .moveDown(5);
+
+      doc.font('Times-Roman')
+         .text("Any Agency having questions regarding this document may contact: "
+         + data.bolo.authorFName
+         + " "
+         + data.bolo.authorLName,  15);
+
+    //  doc.end();
 
 
-
-
-
-
-        // for( var key in data){
-        //   if(data.hasOwnProperty(key)){
-        //       // console.log(data.bolo[key]);
-        //
-        //   }
-        // }
-
-        doc.end();
+  //boloService.getAttachment(data.bolo.id, 'featured').then(function (attDTO)
+  //agencyService.getAttachment(data.agency.id, 'logo').then(function (logoDTO)
+  boloService.getAttachment(data.bolo.id, 'featured').then(function (attDTO){
+          someData.featured = attDTO.data;
+          doc.image(someData.featured, 15, 150, {width: 300, height:300});
+        //  doc.image(someData.logo, 15, 15, {height: 100});
+        //  doc.end();
+        //  return attDTO.data
+        return agencyService.getAttachment(data.agency.data.id, 'logo')
+  }).then( function(logoDTO){
+          someData.logo = logoDTO.data;
+          doc.image(someData.logo, 15, 15, {height: 100});
+          return agencyService.getAttachment(data.agency.data.id, 'shield')
+  }).then(function(shieldDTO){
+          someData.shield = shieldDTO.data;
+          doc.image(someData.shield, 500, 15, {height: 100});
+          doc.end();
   });
+  // .then( function(featuredDTO){
+  //     someData.featured = featuredDTO.data;
+  //     return agencyService.getAttachment(data.agency.id, 'shield')
+  // }).then(function(shieldDTO){
+  //   someData.shield = shieldDTO.data;
+  //   doc.image(someData.logo, 15, 15, {height: 100});
+  //   doc.image(someData.featured, 15, 150, {width: 300, height:300});
+  //   doc.image(someData.shield, 500, 15, {height: 100});
+  //   doc.end();
+  //   return agencyService.getAttachment(data.agency.id, 'shield')
+  // });
+
+
+  // });
+
+
+
+
+
+
 }
 
 
