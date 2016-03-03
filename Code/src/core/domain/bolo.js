@@ -12,6 +12,14 @@ var schema = {
     agency: {
         required: true,
         type: 'string'
+    },
+    createdOn: {
+        required: true,
+        type: 'string'
+    },
+    updatedOn: {
+        required: true,
+        type: 'string'
     }
 };
 
@@ -35,9 +43,9 @@ module.exports = Bolo;
 function Bolo( data ) {
     var defaults = {
         id              : null,
-        createdOn       : '',
-        lastUpdatedOn   : '',
-        agency          : '',
+        createdOn       : null,
+        lastUpdatedOn   : null,
+        agency          : null,
         author          : '',
         category        : '',
         firstName       : '',
@@ -100,6 +108,7 @@ Bolo.prototype.same = function ( other ) {
  */
 Bolo.prototype.diff = function ( other ) {
     var source = this;
+
     return Object.getOwnPropertyNames( source.data )
         .filter( function ( key ) {
             return ! _.isEqual( other.data[key], source.data[key] );

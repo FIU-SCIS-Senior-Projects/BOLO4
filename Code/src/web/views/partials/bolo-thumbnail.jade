@@ -10,5 +10,6 @@ div.thumbnail
         h3 #{bolo.category} 
             if bolo.status
                 small.text-danger #{bolo.status}
-        p <b>Updated</b> #{bolo.lastUpdatedOn}
-        p <b>Created</b> #{bolo.authorFName} #{bolo.authorLName}
+        p <b>Updated:</b> #{bolo.lastUpdatedOn}
+        p <b>Created On:</b> #{bolo.createdOn}
+        p <b>Posted By:</b> #{bolo.authorFName} #{bolo.authorLName}

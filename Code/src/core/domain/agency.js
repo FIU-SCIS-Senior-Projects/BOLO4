@@ -8,6 +8,34 @@ var Entity = require('./entity');
 /** @module core/domain */
 module.exports = Agency;
 
+
+var schema = {
+    'name': {
+        'required'  : true,
+        'type'      : 'string'
+    },
+    'city': {
+        'required'  : true,
+        'type'      : 'string'
+    },
+    'state': {
+        'required'  : true,
+        'type'      : 'string'
+    },
+    'isActive': {
+        'required'  : true,
+        'type'      : 'boolean'
+    },
+    'agency_id':{
+        'required'  : true,
+        'type'      : 'string'
+    }
+
+};
+
+var required = Object.keys( schema ).filter( function ( key ) {
+    return schema[key].required;
+});
 /**
  * Create a new Agency object.
  *
@@ -25,6 +53,7 @@ function Agency(data) {
         'state'         : '',
         'zip'           : '',
         'phone'         : '',
+        'agency_id'     : '',
         'isActive'      : true,
         'attachments'   : {}
     };
@@ -33,6 +62,10 @@ function Agency(data) {
     Entity.setDataAccessors( this.data, this );
 }
 
+Agency.prototype.same = function ( other ) {
+    return 0 === this.diff( other ).length;
+};
+
 /**
  * Checks if the agency is valid
  *
@@ -40,7 +73,14 @@ function Agency(data) {
  */
 Agency.prototype.isValid = function () {
     // TODO Pending Implementation
-    return true;
+    Agency.prototype.isValid = function () {
+        var data = this.data;
+        var result = required.filter( function ( key ) {
+            return ( data[key] && typeof data[key] === schema[key].type );
+        });
+
+        return ( result.length === required.length );
+    };
 };
 
 /**

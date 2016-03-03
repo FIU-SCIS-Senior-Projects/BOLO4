@@ -9,12 +9,17 @@ var Promise         = require('promise');
 var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
+var PDFDocument     = require ('pdfkit');
+var fs              = require('fs');
+
 
 var config          = require('../config');
+
 var userService     = new config.UserService( new config.UserRepository() );
 var boloService     = new config.BoloService( new config.BoloRepository() );
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
 var emailService    = config.EmailService;
+
 var BoloAuthorize   = require('../lib/authorization.js').BoloAuthorize;
 
 var formUtil        = require('../lib/form-util');
@@ -67,7 +72,7 @@ function sendBoloNotificationEmail ( bolo, template ) {
  */
 function getAllBoloData ( id ) {
     var data = {};
-
+console.log("called get all bolo data");
     return boloService.getBolo( id ).then( function ( bolo ) {
         data.bolo = bolo;
 
@@ -76,8 +81,10 @@ function getAllBoloData ( id ) {
             userService.getUser( bolo.author )
         ]);
     }).then( function ( responses ) {
+        console.log(responses);
         data.agency = responses[0];
         data.author = responses[1];
+        console.log("finishing get all bolo data");
 
         return data;
     });
@@ -135,8 +142,98 @@ router.get( '/bolo/archive', function ( req, res, next ) {
     });
 });
 
+
+router.get( '/bolo/search/results', function ( req, res ) {
+
+    console.log(req.query.bookmark );
+    var query_string = req.query.valid;
+    console.log(query_string);
+    var data = {bookmark: req.query.bookmark || {} ,more:true ,query:query_string};
+    // Do something with variable
+    var limit = config.const.BOLOS_PER_PAGE;
+
+    boloService.searchBolos(limit,query_string,data.bookmark).then( function ( results ) {
+        data.paging = results.total > limit;
+
+        if (results.returned < limit)
+        {
+            console.log('theres no more!!');
+            data.more = false; //indicate that another page exists
+        }
+
+
+            data.previous_bookmark = data.bookmark || {};
+            data.bookmark = results.bookmark;
+
+        data.bolos = results.bolos;
+        res.render( 'bolo-search-results', data );
+    })
+        .catch( function ( error ) {
+        next( error );
+    });
+
+});
+
+
+
+
+router.get( '/bolo/search', function ( req, res ) {
+    var data = {
+        'form_errors': req.flash( 'form-errors' )
+    };
+
+    res.render( 'bolo-search-form', data );
+});
+// process bolo search user form input
+router.post( '/bolo/search', function ( req, res, next ) {
+    parseFormData( req, attachmentFilter ).then( function ( formDTO )
+    {
+
+        var query_obj = formDTO.fields;
+        var query_string = '';
+        var key = '';
+        var value = '';
+        var MATCH_EXPR = ' OR ';
+        var expression = false;
+
+        if (query_obj['matchFields'] === "on")
+        {
+            MATCH_EXPR = ' AND ';
+        }
+
+        for (var i = 0; i < Object.keys(query_obj).length; i++) {
+            key = Object.keys(query_obj)[i];
+            value = query_obj[Object.keys(query_obj)[i]];
+        console.log(key+':'+value);
+            if (key !== "status" && key !== 'matchFields' && value !== "" ) {
+                if(expression === true) {
+                    query_string += MATCH_EXPR;
+                    expression = false;
+                }
+                query_string += key + ':' + value;
+                expression = true;
+            }
+
+        }
+
+        //form was empty, return empty object
+        if(query_string === '')
+        {
+            query_string = {};
+        }
+        return query_string;
+
+    }).then( function ( query_string) {
+        var string = encodeURIComponent(query_string);
+        res.redirect('/bolo/search/results?valid=' + string);
+    }).catch(function(error) {
+        next( error );
+    });
+});
+
 // render the bolo create form
 router.get( '/bolo/create', function ( req, res ) {
+
     var data = {
         'form_errors': req.flash( 'form-errors' )
     };
@@ -150,7 +247,9 @@ router.post( '/bolo/create', function ( req, res, next ) {
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
-        boloDTO.createdOn = moment().format( config.const.DATE_FORMAT );
+        boloDTO.createdOn = moment().format( config.const.DATE_FORMAT);
+        boloDTO.createdOn = boloDTO.createdOn.toString();
+        console.log(boloDTO.createdOn);
         boloDTO.lastUpdatedOn = boloDTO.createdOn;
 
         boloDTO.agency = req.user.agency;
@@ -163,7 +262,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
-            attDTOs.push( renameFile( fi, 'featured' ) );
+            attDTOs.push(renameFile( fi, 'featured' ) );
         }
 
         if ( formDTO.fields['image_upload[]'] ) {
@@ -195,8 +294,10 @@ router.get( '/bolo/edit/:id', function ( req, res, next ) {
 
     /** @todo car we trust that this is really an id? **/
 
-    getAllBoloData( req.params.id ).then( function ( _data ) {
-        _.extend( data, _data );
+    getAllBoloData( req.params.id ).then( function(boloData)   {
+
+        _.extend(data, boloData);
+
         var auth = new BoloAuthorize( data.bolo, data.author, req.user );
 
         if ( auth.authorizedToEdit() ) {
@@ -229,7 +330,7 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
-            attDTOs.push( renameFile( fi, 'featured' ) );
+            attDTOs.push( renameFile( fi, 'featured' ));
         }
 
         if ( formDTO.fields['image_upload[]'] ) {
@@ -346,17 +447,155 @@ router.get( '/bolo/delete/:id', function ( req, res, next ) {
 // handle requests to view the details of a bolo
 router.get( '/bolo/details/:id', function ( req, res, next ) {
     var data = {};
-
+    console.log(req.params.id);
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
         data.bolo = bolo;
         return agencyService.getAgency( bolo.agency );
     }).then( function ( agency ) {
         data.agency = agency;
+        generatePDF(data);
         res.render( 'bolo-details', data );
     }).catch( function ( error ) {
         next( error );
     });
+
+
 });
+
+function generatePDF(data){
+  var doc = new PDFDocument();
+  var someData = {};
+  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.bolo.id + ".pdf"));  //creating a write stream
+        //to write the content on the file system
+
+  //var x, y = 100;
+  //var keys = Object.keys(data.bolo.attachments);
+  //var testImage = fs.readFileSync('src/web/public/img/nopic.png');
+
+  // gets image from boloRepository and chains it to embed on (PDFDocument)doc
+  doc.fontSize(8);
+
+  doc.fillColor('red');
+  doc.text("UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE", 120,15)
+    .moveDown(0.25);
+  doc.fillColor('black');
+  doc.text(data.agency.name)
+    .moveDown(0.25);
+  doc.text(data.agency.address)
+    .moveDown(0.25);
+  doc.text(data.agency.city+ ", " + data.agency.state + ", " + data.agency.zip)
+    .moveDown(0.25);
+  doc.text(data.agency.phone)
+    .moveDown(0.25);
+  doc.fontSize(20);
+  doc.fillColor('red');
+  doc.text(data.bolo.category,120,115,{align: 'center'})
+    .moveDown();
+
+
+  doc.fillColor('black');
+  doc.fontSize(11);
+  doc.font('Times-Roman')
+    .text("Name: "  + data.bolo['firstName'] + " " + data.bolo['lastName'], 350)
+    .moveDown();
+
+  doc.font('Times-Roman')
+     .text("Race: "  + data.bolo['race'], 350)
+     .moveDown();
+
+  doc.font('Times-Roman')
+     .text("DOB: "  + data.bolo['dob'], 350)
+     .moveDown();
+
+  doc.font('Times-Roman')
+    .text("License#: "  + data.bolo['dlNumber'], 350)
+    .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Height: "  + data.bolo['height'], 350)
+      .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Weight: "  + data.bolo['weight'] + "lbs", 350)
+      .moveDown();
+
+
+   doc.font('Times-Roman')
+      .text("Address: "  + data.bolo['address'], 350)
+      .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Sex: "  + data.bolo['sex'], 350)
+      .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Hair Color: "  + data.bolo['hairColor'], 350)
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Tattoos/Scars: "  + data.bolo['tattoos'], 350)
+      .moveDown();
+
+   doc.font('Times-Roman')
+      .text("Additional: ",  15,465)
+      .moveDown(0.25);
+   doc.font('Times-Roman')
+      .text(data.bolo['additional'], {width : 200})
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Summary: ", 15  )
+      .moveDown(0.25);
+   doc.font('Times-Roman')
+      .text(data.bolo['summary'], {width : 200})
+      .moveDown(5);
+
+      doc.font('Times-Roman')
+         .text("Any Agency having questions regarding this document may contact: "
+         + data.bolo.authorFName
+         + " "
+         + data.bolo.authorLName,  15);
+
+    //  doc.end();
+
+
+  //boloService.getAttachment(data.bolo.id, 'featured').then(function (attDTO)
+  //agencyService.getAttachment(data.agency.id, 'logo').then(function (logoDTO)
+  boloService.getAttachment(data.bolo.id, 'featured').then(function (attDTO){
+          someData.featured = attDTO.data;
+          doc.image(someData.featured, 15, 150, {width: 300, height:300});
+        //  doc.image(someData.logo, 15, 15, {height: 100});
+        //  doc.end();
+        //  return attDTO.data
+        return agencyService.getAttachment(data.agency.data.id, 'logo')
+  }).then( function(logoDTO){
+          someData.logo = logoDTO.data;
+          doc.image(someData.logo, 15, 15, {height: 100});
+          return agencyService.getAttachment(data.agency.data.id, 'shield')
+  }).then(function(shieldDTO){
+          someData.shield = shieldDTO.data;
+          doc.image(someData.shield, 500, 15, {height: 100});
+          doc.end();
+  });
+  // .then( function(featuredDTO){
+  //     someData.featured = featuredDTO.data;
+  //     return agencyService.getAttachment(data.agency.id, 'shield')
+  // }).then(function(shieldDTO){
+  //   someData.shield = shieldDTO.data;
+  //   doc.image(someData.logo, 15, 15, {height: 100});
+  //   doc.image(someData.featured, 15, 150, {width: 300, height:300});
+  //   doc.image(someData.shield, 500, 15, {height: 100});
+  //   doc.end();
+  //   return agencyService.getAttachment(data.agency.id, 'shield')
+  // });
+
+
+  // });
+
+
+
+
+
+
+}
 
 
 // handle requests for bolo attachments
@@ -364,9 +603,13 @@ function getAttachment ( req, res ) {
     boloService.getAttachment(req.params.boloid, req.params.attname)
         .then(function (attDTO) {
             res.type(attDTO.content_type);
+          //  console.log(attDTO.data + " A:OIJF:OIAEJRO:IJE:ROIJW:EOIRJWE:OIR");
             res.send(attDTO.data);
         });
+
 }
+
+
 router.get( '/bolo/asset/:boloid/:attname', getAttachment );
 router.getAttachment = getAttachment;
 

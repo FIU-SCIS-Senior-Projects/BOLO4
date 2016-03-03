@@ -5,7 +5,6 @@ include ./includes/mixins.jade
 block jumbo
     .jumbotron
         .container
-            h1 Be On the Lookout
             p Update BOLO Details
 
 
@@ -20,8 +19,8 @@ block content
                 .panel-heading: h3.panel-title Details
                 .panel-body
                     p <b>Author:</b> #{bolo.authorFName} #{bolo.authorLName}
-                    p <b>Agency:</b> 
-                        a( href="/agency/" + agency.id target="_blank" ) #{agency.name}
+                    p <b>Agency:</b>
+                       a( href="/agency/" + agency.id target="_blank" ) #{agency.name}
                     p <b>Created:</b> #{bolo.createdOn}
                     p <b>Updated:</b> #{bolo.lastUpdatedOn}
 
@@ -36,7 +35,7 @@ block content
         +input_text( "dob", "Date of Birth (DD/MM/YYYY )", "DD/MM/YYYY", false, bolo.dob )
         +input_text( "dlNumber", "Drivers License Number", "", false, bolo.dlNumber )
         +select_options( "race", "Race", races, false, bolo.race )
-        +select_options( "sex", "Sex", ["Male", "Female"], false, bolo.sex )
+        +select_options( "sex", "Sex", sex, false, bolo.sex )
         +input_text( "height", "Height - Feet-Inches (e.g. 05-09)", "e.g. 05-09", false, bolo.height )
         +input_text( "weight", "Weight - Pounds", "", false, bolo.weight )
         +select_options( "hairColor", "Hair Color", hair_colors, false, bolo.hairColor )
@@ -63,7 +62,7 @@ block content
                     tr
                         td: input( type="checkbox" name="image_remove[]" value=uuid )
                         td: p
-                            a( href=img target="_blank" ) #{name} 
+                            a( href=img target="_blank" ) #{name}
                             if 'featured' === uuid
                                 i ( Featured Image )
 
