@@ -1,6 +1,6 @@
 include ./includes/mixins.jade
+include ../routes/bolos.js
 extends ./layout.jade
-
 
 block jumbo
     .jumbotron
@@ -10,11 +10,10 @@ block jumbo
 
 block content
     include ./partials/global-alerts.jade
-
     include ./partials/bolo-options.jade
-
-    form#create-bolo-form(action="/bolo/create" enctype="multipart/form-data" method="post")
-        input( type="hidden" name="status" value="New" )
+    
+    form#create-bolo-form(action= "/bolo/create" enctype="multipart/form-data" method="post")
+        input( type = "hidden" name="status" value="new")
         +select_options( "category", "Category", categories, true, "" )
 
         +input_text( "firstName", "First Name", "", false, "" )
@@ -46,6 +45,8 @@ block content
         +input_textarea( "summary", "Summary", "", false, "" )
 
         .form-group
-            button.btn.btn-primary( type="submit" value="save" ) Publish
-            a.btn.btn-default( ) Preview
-            button.btn.btn-default( type="submit" disabled=true value="pdf" ) PDF
+            button.btn.btn-default( name = "option" type = "submit" value = "submit") SUBMIT
+            button.btn.btn-default( name = "option" type = "submit" value = "preview" ) PREVIEW
+            button.btn.btn-default( name = "option" type="button" value="pdf" ) PDF
+            
+                      

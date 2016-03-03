@@ -44,6 +44,16 @@ BoloService.prototype.createBolo = function ( boloDTO, attachments ) {
     });
 };
 
+BoloService.prototype.previewBolo = function ( boloDTO) {
+    var bolo = new Bolo( boloDTO );
+
+    if ( ! bolo.isValid() ) {
+        Promise.reject( new Error( "Invalid bolo data" ) );
+    }
+
+    return bolo;
+};
+
 /**
  * Update BOLO data.
  *
@@ -76,7 +86,9 @@ BoloService.prototype.getBolos = function ( limit, skip ) {
 BoloService.prototype.getArchiveBolos = function ( limit, skip ) {
     return this.boloRepository.getArchiveBolos( limit, skip );
 };
-
+BoloService.prototype.getArchiveBolosForPurge = function () {
+    return this.boloRepository.getArchiveBolosForPurge();
+};
 BoloService.prototype.activate = function ( id, activate ) {
     return this.boloRepository.activate( id, activate );
 };

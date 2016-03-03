@@ -17,13 +17,6 @@ var bolo_indexer = function (doc) {
     if (typeof(doc.agency) !== 'undefined') {
         index("agency", doc.agency);
     }
-
-    if (typeof(doc.createdOn) !== 'undefined') {
-        index("createdOn", doc.createdOn);
-    }
-    if (typeof(doc.lastUpdatedOn) !== 'undefined') {
-        index("lastUpdatedOn", doc.lastUpdatedOn);
-    }
     if (typeof(doc.author) !== 'undefined') {
         index("author", doc.author);
     }
@@ -127,16 +120,16 @@ var BOLO_DB = 'bolo';
 var BOLO_DESIGN_DOC = {
     "views": {
         "all_active": {
-            "map": "function (doc) { if ( 'bolo' === doc.Type && true === doc.isActive ) emit( doc.lastUpdatedOn, 1 ); }"
+            "map": "function (doc) { if ( 'bolo' === doc.Type && true === doc.isActive ) {emit( doc.lastUpdatedOn,1);} }"
         },
         "all_archive": {
-            "map": "function (doc) { if ( 'bolo' === doc.Type && false === doc.isActive ) emit( doc.lastUpdatedOn, 1 ); }"
+            "map": "function (doc) { if ( 'bolo' === doc.Type && false === doc.isActive ){ emit( doc.lastUpdatedOn,1 ); }}"
         },
         "all": {
-            "map": "function (doc) { if ( 'bolo' === doc.Type ) emit( doc.createdOn, 1 ); }"
+            "map": "function (doc) { if ( 'bolo' === doc.Type ) {emit( doc.createdOn, 1 ); }}"
         },
         "revs": {
-            "map": "function (doc) { if ( 'bolo' === doc.Type ) emit( null, doc._rev ); }"
+            "map": "function (doc) { if ( 'bolo' === doc.Type ) {emit( null, doc._rev ); }}"
         }
     },
     indexes: {

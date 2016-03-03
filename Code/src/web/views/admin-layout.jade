@@ -5,7 +5,7 @@ block jumbo
         .container
             block jumbo-desc
 
-block content
+  block content
     .row
         .col-sm-3
             ul.nav.nav-pills.nav-stacked(role="nav")
@@ -14,6 +14,7 @@ block content
                 li(class=( admin_nav === 'admin-users' ? 'active' : '' ))
                     a(href="/admin/users") User Management
                 li(class=( admin_nav === 'admin-agency' ? 'active' : '' ))
+                  if(tier === 'ROOT')
                     a(href="/admin/agency") Agency Management
         .col-sm-9
             include ./partials/global-alerts.jade

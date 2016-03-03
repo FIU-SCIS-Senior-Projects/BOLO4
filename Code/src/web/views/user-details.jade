@@ -33,4 +33,5 @@ block admin-content
     - var resource = "/admin/users/" + user.id
     a.btn.btn-default(href=resource + "/edit-details") Edit Account Details
     a.btn.btn-default(href=resource + "/reset-password") Reset Password
-    a.btn.btn-danger(href=resource + "/delete") Delete User
+    if(currentAgency === agency.id)  
+      a.btn.btn-danger(href=resource + "/delete") Delete User

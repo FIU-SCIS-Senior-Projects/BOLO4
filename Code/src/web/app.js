@@ -6,22 +6,23 @@ var http            = require('http');
 var path            = require('path');
 
 var express         = require('express');
-
 var cookieParser    = require('cookie-parser');
 var errorHandler    = require('errorhandler');
 var expressSession  = require('express-session');
+var ios             = require('socket.io-express-session');
 var favicon         = require('serve-favicon');
 var flash           = require('connect-flash');
 var logger          = require('morgan');
 var methodOverride  = require('method-override');
-
 var config          = require('./config');
 var routes          = require('./routes');
 var auth            = require('./lib/auth.js');
-
+var bodyParser      = require('body-parser');
 var GFMSG           = config.const.GFMSG;
 var GFERR           = config.const.GFERR;
 
+var boloRepository    = new config.BoloRepository();
+var boloService      = new config.BoloService(boloRepository );
 /*
  * Express Init and Config
  */
@@ -45,22 +46,34 @@ if ( inDevelopmentMode ) {
 
 app.use( favicon( path.join( __dirname, '/public/favicon.ico' ) ) );
 app.use( express.static( path.join( __dirname, 'public' ) ) );
-
+app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 app.use( methodOverride() );
 app.use( cookieParser( secretKey ) );
-app.use( expressSession({
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
+
+var session = expressSession({
     'secret': secretKey,
     /** @todo confirm the next two options **/
     'resave': true,
     'saveUninitialized': true,
-
+    'cookie': {
+        path: '/',
+        httpOnly: true,
+        secure: false,
+        maxAge: 5* 10 * 6000
+    },
+    'rolling': true
     /**
      * @todo Uncomment the below option before going to production. HTTPS is
      * required for this option or the cookie will not be set per the
      * documentation.
      */
     // 'cookie': { secure: true }
-}));
+});
+app.use(session);
 
 app.use( flash() );
 app.use( auth.passport.initialize() );
@@ -104,6 +117,10 @@ app.use( function ( req, res, next ) {
 
 /** https://www.youtube.com/watch?v=W-8XeQ-D1RI **/
 app.use( function ( req, res, next ) {
+    res.setHeader('Access-Control-Allow-Origin', "http://"+req.headers.host);
+
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader( 'X-Frame-Options', 'sameorigin' );
     next();
 });
@@ -141,10 +158,11 @@ if ( inDevelopmentMode ) {
     });
 }
 
-
 /*
  * Server Start
  */
-http.createServer( app ).listen( app.get( 'port' ), function() {
+var server = http.createServer( app );
+
+server.listen( app.get( 'port' ), function() {
     console.log( 'Express server listening on port ' + app.get( 'port' ) );
 });

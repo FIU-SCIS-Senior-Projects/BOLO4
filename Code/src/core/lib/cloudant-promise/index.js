@@ -94,9 +94,7 @@ db_wrapper.search = function ( designname, searchname, params ) {
     return new Promise( function ( resolve, reject ) {
         context.db.search( designname, searchname, params, function ( err, body ) {
 
-            if ( !err ) {
-                resolve( body );
-            }
+            if ( !err ) resolve( body );
             reject( err );
         });
     });
@@ -107,7 +105,7 @@ db_wrapper.index = function (index_name) {
     return new Promise( function ( resolve, reject ) {
         context.db.index( index_name, function ( err, body ) {
             if ( !err ) {
-                resolve( body );
+                resolve( body )
             }
                 reject( err );
         });
@@ -122,7 +120,7 @@ db_wrapper.find = function (selector) {
         context.db.find( selector, function ( err, body ) {
             if ( !err ) {
                 console.log(body);
-                resolve( body );
+                resolve( body )
             }
             reject( err );
         });

@@ -39,6 +39,7 @@ UserService.prototype.authenticate = function ( username, password ) {
         if ( user && user.isValidPassword( password ) ) {
             return user;
         }
+
         return null;
     })
     .catch( function ( error ) {

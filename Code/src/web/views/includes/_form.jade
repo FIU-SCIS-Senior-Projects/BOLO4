@@ -7,9 +7,10 @@ mixin option( value, selected )
 
 mixin check_box(name,label,required)
     .form-group
-        label#active-me.checkbox #{label}
         input(type="hidden", name=name, value=0)
-        input(type="checkbox", name=name, id="active",checked='checked')
+        label(for='checkbox1')
+            span #{label}
+        input#checkbox1.checkbox.style-2(type='checkbox',name=name, checked=false)
 
 
 mixin input_text( name, label, placeholder, required, value, type )
