@@ -14,7 +14,7 @@ block jumbo
                           #myDropdown.dropdown-content
                             a.btn.btn-default(href = "/bolo/", type="button") View all
                             for agency in agencies
-                                a.btn.btn-default(href="/bolo/" + agency.id, name = "agencyID", value = agency.id, type="button") #{agency.name}
+                                a.btn.btn-default(href="/bolo/agency/" + agency.id, name = "agencyID", value = agency.id, type="button") #{agency.name}
 
             script.
                 function myFunction() {

@@ -142,7 +142,7 @@ router.get( '/bolo', function ( req, res, next ) {
 });
 
 // list bolos by agency at the root route
-router.get( '/bolo/:id', function ( req, res, next ) {
+router.get( '/bolo/agency/:id', function ( req, res, next ) {
     var agency = req.params.id;
     var page = parseInt( req.query.page ) || 1;
     var limit = config.const.BOLOS_PER_PAGE;
@@ -167,6 +167,7 @@ router.get( '/bolo/:id', function ( req, res, next ) {
 
 // list archive bolos
 router.get( '/bolo/archive', function ( req, res, next ) {
+
     var page = parseInt( req.query.page ) || 1;
     var limit = config.const.BOLOS_PER_PAGE;
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
