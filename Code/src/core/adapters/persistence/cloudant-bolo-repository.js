@@ -282,24 +282,19 @@ CloudantBoloRepository.prototype.getBolos = function (limit, skip) {
 };
 
 CloudantBoloRepository.prototype.getBolosByAgency = function (id, limit, skip) {
-    //var query = "agency:" + id;
 
     var opts = {
         'include_docs': true,
         'limit': limit,
         'skip': skip,
         'descending': true,
-        //'q': query
     };
-
-    console.log(JSON.stringify(opts));
 
     return db.view('bolo', 'all_active', opts).then(function (result) {
         var bolos = _.map(result.rows, function (row) {
             return boloFromCloudant(row.doc);
         });
 
-        console.log(bolos);
         bolos.agency = id ;
 
         return {'bolos': bolos, total: result.total_rows};
