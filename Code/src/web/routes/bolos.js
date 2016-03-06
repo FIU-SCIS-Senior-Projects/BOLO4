@@ -158,7 +158,7 @@ router.get( '/bolo/agency/:id', function ( req, res, next ) {
 
         agencyService.getAgencies().then( function ( agencies ) {
             data.agencies = agencies;
-            res.render('bolo-list', data );
+            res.render('bolo-list-by-agency', data );
         });
     }).catch( function ( error ) {
         next( error );
