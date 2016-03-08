@@ -321,8 +321,7 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             var preview = {};
             var bolo = boloService.previewBolo(boloDTO);
             preview.bolo = bolo;
-            preview.agency = bolo.agency;
-                                
+            preview.agency = bolo.agency;               
             return Promise.all([preview, formDTO]);
                               
         }
@@ -349,8 +348,7 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
                 pData[0].agency_city = response.data.city;
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
-                pData[0].agency_phone = response.data.phone;
-                
+                pData[0].agency_phone = response.data.phone;     
                 res.render( 'bolo-preview-details', pData[0] );
             });
         }
