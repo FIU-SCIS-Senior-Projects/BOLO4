@@ -6,9 +6,9 @@
     "start": "node ./src/web/app.js",
 
     "pretest": "jshint ./test/** ./src/**",
-    "test": "istanbul cover _mocha --check-leaks ./test/unit/** ./test/functional/** ./test/integration/**",
+    "test": "istanbul cover _mocha --check-leaks -- ./test/unit/** ./test/integration/**",
     "unit-test": "mocha --check-leaks ./test/unit/**",
-    "cover": "istanbul cover _mocha -- ./test/unit/** ./test/functional/**",
+    "cover": "istanbul cover _mocha -- ./test/unit/** ./test/integration/**",
     "docs": "jsdoc -r -R README.md -d ./jsdoc ./src"
   },
   "dependencies": {
