@@ -321,7 +321,8 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             var preview = {};
             var bolo = boloService.previewBolo(boloDTO);
             preview.bolo = bolo;
-            preview.agency = bolo.agency;               
+            preview.agency = bolo.agency;
+
             return Promise.all([preview, formDTO]);
                               
         }
@@ -348,7 +349,8 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
                 pData[0].agency_city = response.data.city;
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
-                pData[0].agency_phone = response.data.phone;     
+                pData[0].agency_phone = response.data.phone; 
+                //console.log(fi);    
                 res.render( 'bolo-preview-details', pData[0] );
             });
         }
@@ -523,20 +525,38 @@ router.get( '/bolo/delete/:id', function ( req, res, next ) {
 router.get( '/bolo/details/:id', function ( req, res, next ) {
     var data = {};
     console.log(req.params.id);
+
+
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
-        data.bolo = bolo;
-        console.log(bolo.agency);
-        return agencyService.getAgency( bolo.agency );
+        data.bolo = bolo;     
+    return agencyService.getAgency( bolo.agency );
+
     }).then( function ( agency ) {
-        console.log(agency);
         data.agency = agency;
+        return userService.getByUsername(data.bolo.authorUName);
+
+    }).then(function(user) {
+        data.user = user;
         generatePDF(data.bolo.data);
         res.render( 'bolo-details', data );
+
     }).catch( function ( error ) {
         next( error );
     });
 
+});
 
+router.get('/bolo/details/pics/:id', function (req, res, next){
+    var data = {
+        'form_errors': req.flash( 'form-errors' )
+    };
+    boloService.getBolo(req.params.id).then( function (bolo){
+        data.bolo = bolo;
+        res.render('bolo-additional-pics', data);
+
+    }).catch( function ( error ) {
+        next( error );
+    });
 });
 
 

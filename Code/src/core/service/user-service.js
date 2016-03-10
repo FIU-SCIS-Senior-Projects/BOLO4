@@ -57,6 +57,10 @@ UserService.prototype.deserializeId = function ( id ) {
     return this.userRepository.getById( id );
 };
 
+UserService.prototype.getByUsername = function (username) {
+    return this.userRepository.getByUsername(username);
+};
+
 UserService.prototype.getUser = UserService.prototype.deserializeId;
 
 /**

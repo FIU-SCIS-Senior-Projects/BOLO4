@@ -41,7 +41,8 @@ block content
                 else
                   img( src="/img/nopic.png" alt="", width=400 )
                 form.form-horizontal
-                +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
+                +form_labels_row("Created", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
+                a(href='/bolo/details/pics/' + bolo.data.id) Additional images
             div.col-xs-12.col-md-7
                 form.form-horizontal
                 +form_labels_row("Bolo ID", bolo.data.id )
@@ -103,5 +104,5 @@ block content
     else
       | &nbsp;
     if bolo.data.authorFName != null || bolo.data.authorLName != null
-      p.strong This BOLO was created by #{bolo.data.authorFName} #{bolo.data.authorLName}.
+      p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
       p.strong Please contact the agency should clarification be required. 
