@@ -615,7 +615,7 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
     }).then(function(user) {
         data.user = user;
-        generatePDF(data.bolo.data);
+        generatePDF(data);
         res.render( 'bolo-details', data );
 
     }).catch( function ( error ) {
