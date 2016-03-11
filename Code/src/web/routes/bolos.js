@@ -631,7 +631,7 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
     }).catch( function ( error ) {
         next( error );
     });
-
+});
     /**
      * Generates PDF from bolo / agency information
      */
@@ -721,7 +721,7 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
             doc.end();
         })
     }
-});
+
 // handle requests for bolo attachments
 function getAttachment ( req, res ) {
     boloService.getAttachment(req.params.boloid, req.params.attname)
