@@ -17,7 +17,6 @@ block content
 
     form#create-bolo-form(action="/bolo/search" enctype="multipart/form-data" method="post")
         input( type="hidden" name="status" value="New" )
-        +check_box("matchFields","Match Fields",true)
         +select_options( "category", "Category", categories, true, "" )
         +input_text( "firstName", "First Name", "", false, "" )
         +input_text( "lastName", "Last Name", "", false,  "" )
@@ -28,6 +27,6 @@ block content
         +input_text( "height", "Height - Feet-Inches (e.g. 05-09)", "e.g. 05-09", false, "" )
         +input_text( "weight", "Weight - Pounds", "", false, "" )
         +select_options( "hairColor", "Hair Color", hair_colors, false, "" )
-
+        +check_box("matchFields","Match Fields",true)
         .form-group
             button.btn.btn-primary( type="submit" value="save") Search

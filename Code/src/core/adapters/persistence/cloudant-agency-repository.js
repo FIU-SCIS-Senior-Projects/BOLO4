@@ -264,18 +264,7 @@ CloudantAgencyRepository.prototype.findAgencyById = function (id, name) {
        for (var i = 0; i < id_result.docs.length; i++) {
            console.log('  Doc id: %s', id_result.docs[i]._id);
        }
-
-       //result = id_result.docs.length;
-
-       //return db.find(selector1).then( function(name_result){
-
-         //   result = result + name_result.docs.length;
-
-           // return result; 
-       //});
    });
-
-
 
 };
 

@@ -93,7 +93,9 @@ BoloService.prototype.getBolosByAgency = function ( id, limit, skip ) {
 BoloService.prototype.getArchiveBolos = function ( limit, skip ) {
     return this.boloRepository.getArchiveBolos( limit, skip );
 };
-
+BoloService.prototype.getArchiveBolosForPurge = function () {
+    return this.boloRepository.getArchiveBolosForPurge();
+};
 BoloService.prototype.activate = function ( id, activate ) {
     return this.boloRepository.activate( id, activate );
 };
