@@ -32,16 +32,12 @@ block content
         | &nbsp;
         div.row
             div.col-xs-12.col-md-5
-                if Object.keys( bolo.attachments ).length
-                  - var keys = Object.keys( bolo.data.attachments )
-                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
-                else
-                  img( src="/img/nopic.png" alt="", width=400 )
+                img( src="/img/nopic.png" alt="", width=400 )
                 form.form-horizontal
                 +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
             div.col-xs-12.col-md-7
                 form.form-horizontal
-                +form_labels_row("Bolo ID", bolo.data.id )
+                +form_labels_row("Bolo ID", "XYZ000" )
                 if bolo.data.authorFName != null || bolo.data.authorLName != null
                   +form_labels_row("Author", bolo.data.authorFName + " " +  bolo.data.authorLName )
                 else

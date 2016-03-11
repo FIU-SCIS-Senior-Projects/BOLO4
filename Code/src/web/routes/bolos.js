@@ -11,7 +11,7 @@ var util            = require('util');
 var uuid            = require('node-uuid');
 var PDFDocument     = require ('pdfkit');
 var fs              = require('fs');
-var bodyParser      = require('body-parser'); 
+var bodyParser      = require('body-parser');
 var _bodyparser     = bodyParser.urlencoded({ 'extended': true });
 
 
@@ -94,7 +94,7 @@ console.log("called get all bolo data");
 function getAgencyData(id){
     var data = {};
     console.log("retrieving Agency data");
-    
+
     return agencyService.getAgency(id).then( function(responses){
         console.log(responses);
         data.agency = responses;
@@ -184,6 +184,7 @@ router.get( '/bolo/archive', function ( req, res, next ) {
         next( error );
     });
 });
+
 router.post('/bolo/archive/purge',function(req,res) {
 
    // = req.body.bolo_data;
@@ -258,6 +259,7 @@ router.post('/bolo/archive/purge',function(req,res) {
     })
 
 });
+
 router.get( '/bolo/search/results', function ( req, res ) {
 
     console.log(req.query.bookmark );
@@ -394,14 +396,14 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             var preview = {};
             var bolo = boloService.previewBolo(boloDTO);
             preview.bolo = bolo;
-            preview.agency = bolo.agency;               
+            preview.agency = bolo.agency;
             return Promise.all([preview, formDTO]);
-                              
+
         }
 
         if(formDTO.fields.option === "submit"){
             var result = boloService.createBolo( boloDTO, attDTOs );
-            
+
             return Promise.all([result, formDTO]);
 
         }
@@ -421,7 +423,7 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
                 pData[0].agency_city = response.data.city;
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
-                pData[0].agency_phone = response.data.phone;     
+                pData[0].agency_phone = response.data.phone;
                 res.render( 'bolo-preview-details', pData[0] );
             });
         }
@@ -598,19 +600,36 @@ router.get( '/bolo/delete/:id', function ( req, res, next ) {
 router.get( '/bolo/details/:id', function ( req, res, next ) {
     var data = {};
     console.log(req.params.id);
-    boloService.getBolo(req.params.id).then(function (bolo) {
+
+
+    boloService.getBolo( req.params.id ).then( function ( bolo ) {
         data.bolo = bolo;
-        console.log(bolo.agency);
-        return agencyService.getAgency(bolo.agency);
-    }).then(function (agency) {
-        console.log(agency);
+    return agencyService.getAgency( bolo.agency );
+
+    }).then( function ( agency ) {
         data.agency = agency;
+        return userService.getByUsername(data.bolo.authorUName);
 
+    }).then(function(user) {
+        data.user = user;
         generatePDF(data);
+        res.render( 'bolo-details', data );
 
-        res.render('bolo-details', data);
-    }).catch(function (error) {
-        next(error);
+    }).catch( function ( error ) {
+        next( error );
+    });
+});
+
+router.get('/bolo/details/pics/:id', function (req, res, next){
+    var data = {
+        'form_errors': req.flash( 'form-errors' )
+    };
+    boloService.getBolo(req.params.id).then( function (bolo){
+        data.bolo = bolo;
+        res.render('bolo-additional-pics', data);
+
+    }).catch( function ( error ) {
+        next( error );
     });
 
     /**

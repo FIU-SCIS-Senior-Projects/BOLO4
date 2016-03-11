@@ -5,8 +5,11 @@ extends layout
 block jumbo
   .jumbotron
     .container
-          p BOLO Details
-          a.btn.btn-default( href='/pdf/' + bolo.id  + '.pdf') View as PDF
+      div.row
+        div.col-xs-2.col-md-10
+           p BOLO Details
+        div.col-xs-2
+           a.btn.btn-default( href='/pdf/' + bolo.id  + '.pdf') View as PDF
 
 block content
 
@@ -50,11 +53,12 @@ block content
             div.col-xs-5#featured
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
-                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="")
+                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
                 else
                   img( src="/img/nopic.png" alt="", width=400 )
                 form.form-horizontal
-                +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
+                +form_labels_row("Created", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
+                a(href='/bolo/details/pics/' + bolo.data.id) Additional images
             div.col-xs-7
                 form.form-horizontal
                 +form_labels_row("Bolo ID", bolo.data.id )
@@ -116,6 +120,6 @@ block content
     else
       | &nbsp;
     if bolo.data.authorFName != null || bolo.data.authorLName != null
-      p.strong This BOLO was created by #{bolo.data.authorFName} #{bolo.data.authorLName}.
+      p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
       p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName}
-      p.strong Please contact the agency should clarification be required. 
+      p.strong Please contact the agency should clarification be required.

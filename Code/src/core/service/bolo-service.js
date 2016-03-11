@@ -83,6 +83,13 @@ BoloService.prototype.getBolos = function ( limit, skip ) {
     return this.boloRepository.getBolos( limit, skip );
 };
 
+/**
+ * Retrieve a collection of bolos from a specific agency
+ */
+BoloService.prototype.getBolosByAgency = function ( id, limit, skip ) {
+    return this.boloRepository.getBolosByAgency( id, limit, skip );
+};
+
 BoloService.prototype.getArchiveBolos = function ( limit, skip ) {
     return this.boloRepository.getArchiveBolos( limit, skip );
 };

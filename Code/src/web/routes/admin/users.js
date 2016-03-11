@@ -21,6 +21,33 @@ var FormError = formUtil.FormError;
 var BoloAuthorize   = require('../../lib/authorization.js').BoloAuthorize;
 
 /**
+ * Validating whther or not the fields in the form have been left empty.
+ * If one of the fields has been left empty, validateFields will return false.
+ */
+function validateFields (fields){
+  var fieldValidator = true;
+
+  if(fields.fname == ""){
+    fieldValidator = false;
+  }
+  if(fields.lname == ""){
+    fieldValidator = false;
+  }
+  if(fields.badge== ""){
+    fieldValidator = false;
+  }
+  if(fields.sectunit == ""){
+    fieldValidator = false;
+  }
+  if(fields.ranktitle == ""){
+    fieldValidator = false;
+  }
+
+  return fieldValidator;
+}
+
+
+/**
  * Responds with a form to create a new user.
  */
 module.exports.getCreateForm = function ( req, res, next ) {
@@ -46,6 +73,8 @@ module.exports.postCreateForm = function ( req, res ) {
     };
 
     parseFormData( req ).then( function ( formDTO ) {
+
+        var formFields = validateFields(formDTO.fields);
         var validationErrors = passwordUtil.validatePassword(
             formDTO.fields.password, formDTO.fields.confirm
         );
@@ -55,6 +84,12 @@ module.exports.postCreateForm = function ( req, res ) {
         if ( validationErrors ) {
             req.flash( 'form-errors', validationErrors );
             throw new FormError();
+        }
+        
+        if(formFields == false){
+          req.flash(GFERR, 'No field can be left empty. This information is required');
+          res.redirect('back');
+          throw new FormError();
         }
 
         formDTO.fields.tier = formDTO.fields.role;
@@ -84,7 +119,7 @@ module.exports.postCreateForm = function ( req, res ) {
     .catch( function ( error ) {
         /** @todo inform of duplicate registration errors */
         console.error( 'Error at /users/create >>> ', error.message );
-        req.flash( FERR, 'Error saving new user, please try again.' );
+        req.flash( FERR, 'Error saving new user, please try again. Every field is required.' );
         res.redirect( 'back' );
     });
 };

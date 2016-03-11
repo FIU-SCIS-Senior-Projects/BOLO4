@@ -104,6 +104,7 @@ module.exports.postCreateForm = function ( req, res, next ) {
         var agencyDTO = agencyService.formatDTO( formDTO.fields );
         var atts = getAgencyAttachments( formDTO.fields );
         var formFields = validateFields(formDTO.fields);
+        
         if(formFields == false){
           req.flash(GFERR, 'No field can be left empty. This information is required');
           res.redirect('back');

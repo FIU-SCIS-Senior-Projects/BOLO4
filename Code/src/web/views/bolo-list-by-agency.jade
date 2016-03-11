@@ -44,11 +44,13 @@ block content
 
     .row
         for bolo in bolos
-                include ./partials/bolo-thumbnail.jade
-                    .actions
-                        a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
-                        a.btn.btn-default( href="/bolo/details/" + bolo.id role="button" ) Details
-                        a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
+            if bolos.agency === bolo.agency
+                div.col-sm-6.col-md-3
+                    include ./partials/bolo-thumbnail.jade
+                        .actions
+                            a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
+                            a.btn.btn-default( href="/bolo/details/" + bolo.id role="button" ) Details
+                            a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
 
     .row.text-center
         - var route = '/bolo'
