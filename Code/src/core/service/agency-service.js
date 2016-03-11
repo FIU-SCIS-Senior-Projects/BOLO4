@@ -116,10 +116,10 @@ AgencyService.prototype.searchAgencies = function(query_string){
 
 };
 
-AgencyService.prototype.findAgencyById = function(id){
+AgencyService.prototype.findAgencyById = function(id, name){
 
     console.log("find by id service call");
-    var result = this.AgencyRepository.findAgencyById(id);
+    var result = this.AgencyRepository.findAgencyById(id, name);
     return result;
 
 };

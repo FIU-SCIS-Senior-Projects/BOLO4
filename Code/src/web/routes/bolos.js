@@ -101,9 +101,9 @@ function getAgencyData(id){
         data.agency = responses;
         return data;
     });
-
-
 }
+
+
 
 function attachmentFilter ( fileDTO ) {
     return /image/i.test( fileDTO.content_type );
@@ -125,13 +125,42 @@ router.get( '/bolo', function ( req, res, next ) {
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
 
     var data = {
-        'paging': { 'first': 1, 'current': page }
+        'paging': { 'first': 1, 'current': page },
+        'agencies': []
     };
 
     boloService.getBolos( limit, skip ).then( function ( results ) {
         data.bolos = results.bolos;
         data.paging.last = Math.ceil( results.total / limit );
-        res.render( 'bolo-list', data );
+
+        agencyService.getAgencies().then( function ( agencies ) {
+            data.agencies = agencies;
+            res.render('bolo-list', data );
+        });
+    }).catch( function ( error ) {
+        next( error );
+    });
+});
+
+// list bolos by agency at the root route
+router.get( '/bolo/agency/:id', function ( req, res, next ) {
+    var agency = req.params.id;
+    var page = parseInt( req.query.page ) || 1;
+    var limit = config.const.BOLOS_PER_PAGE;
+    var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
+
+    var data = {
+        'paging': { 'first': 1, 'current': page }
+    };
+
+    boloService.getBolosByAgency( agency, limit, skip ).then( function ( results ) {
+        data.bolos = results.bolos;
+        data.paging.last = Math.ceil( results.total / limit );
+
+        agencyService.getAgencies().then( function ( agencies ) {
+            data.agencies = agencies;
+            res.render('bolo-list-by-agency', data );
+        });
     }).catch( function ( error ) {
         next( error );
     });
@@ -139,6 +168,7 @@ router.get( '/bolo', function ( req, res, next ) {
 
 // list archive bolos
 router.get( '/bolo/archive', function ( req, res, next ) {
+
     var page = parseInt( req.query.page ) || 1;
     var limit = config.const.BOLOS_PER_PAGE;
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
@@ -267,7 +297,10 @@ router.get( '/bolo/search/results', function ( req, res ) {
 
 });
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> develop
 router.get( '/bolo/search', function ( req, res ) {
     var data = {
         'form_errors': req.flash( 'form-errors' )
@@ -275,6 +308,7 @@ router.get( '/bolo/search', function ( req, res ) {
 
     res.render( 'bolo-search-form', data );
 });
+
 // process bolo search user form input
 router.post( '/bolo/search', function ( req, res, next ) {
 
@@ -396,8 +430,13 @@ router.post( '/bolo/create', function ( req, res, next ) {
                 pData[0].agency_city = response.data.city;
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
+<<<<<<< HEAD
+                pData[0].agency_phone = response.data.phone; 
+                //console.log(fi);    
+=======
                 pData[0].agency_phone = response.data.phone;
 
+>>>>>>> develop
                 res.render( 'bolo-preview-details', pData[0] );
             });
         }
@@ -572,20 +611,47 @@ router.get( '/bolo/delete/:id', function ( req, res, next ) {
 router.get( '/bolo/details/:id', function ( req, res, next ) {
     var data = {};
     console.log(req.params.id);
+
+
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
-        data.bolo = bolo;
-        console.log(bolo.agency);
-        return agencyService.getAgency( bolo.agency );
+        data.bolo = bolo;     
+    return agencyService.getAgency( bolo.agency );
+
     }).then( function ( agency ) {
-        console.log(agency);
         data.agency = agency;
+<<<<<<< HEAD
+        return userService.getByUsername(data.bolo.authorUName);
+
+    }).then(function(user) {
+        data.user = user;
+        generatePDF(data.bolo.data);
+=======
 
         generatePDF(data);
 
+>>>>>>> develop
         res.render( 'bolo-details', data );
+
     }).catch( function ( error ) {
         next( error );
     });
+<<<<<<< HEAD
+
+});
+
+router.get('/bolo/details/pics/:id', function (req, res, next){
+    var data = {
+        'form_errors': req.flash( 'form-errors' )
+    };
+    boloService.getBolo(req.params.id).then( function (bolo){
+        data.bolo = bolo;
+        res.render('bolo-additional-pics', data);
+
+    }).catch( function ( error ) {
+        next( error );
+    });
+=======
+>>>>>>> develop
 });
 
 
