@@ -185,6 +185,7 @@ router.get( '/bolo/archive', function ( req, res, next ) {
         next( error );
     });
 });
+
 router.post('/bolo/archive/purge',function(req,res) {
 
    // = req.body.bolo_data;
@@ -266,6 +267,7 @@ router.post('/bolo/archive/purge',function(req,res) {
     })
 
 });
+
 router.get( '/bolo/search/results', function ( req, res ) {
 
     console.log(req.query.bookmark );
@@ -297,10 +299,6 @@ router.get( '/bolo/search/results', function ( req, res ) {
 
 });
 
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
 router.get( '/bolo/search', function ( req, res ) {
     var data = {
         'form_errors': req.flash( 'form-errors' )
@@ -430,13 +428,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
                 pData[0].agency_city = response.data.city;
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
-<<<<<<< HEAD
                 pData[0].agency_phone = response.data.phone; 
-                //console.log(fi);    
-=======
-                pData[0].agency_phone = response.data.phone;
-
->>>>>>> develop
                 res.render( 'bolo-preview-details', pData[0] );
             });
         }
@@ -619,24 +611,16 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
     }).then( function ( agency ) {
         data.agency = agency;
-<<<<<<< HEAD
         return userService.getByUsername(data.bolo.authorUName);
 
     }).then(function(user) {
         data.user = user;
         generatePDF(data.bolo.data);
-=======
-
-        generatePDF(data);
-
->>>>>>> develop
         res.render( 'bolo-details', data );
 
     }).catch( function ( error ) {
         next( error );
     });
-<<<<<<< HEAD
-
 });
 
 router.get('/bolo/details/pics/:id', function (req, res, next){
@@ -650,8 +634,6 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
     }).catch( function ( error ) {
         next( error );
     });
-=======
->>>>>>> develop
 });
 
 
