@@ -204,13 +204,37 @@ CloudantBoloRepository.prototype.update = function (bolo, attachments) {
             doc._attachments = _.omit(doc._attachments, newdoc.images_deleted);
             doc.images = _.omit(doc.images, newdoc.images_deleted);
         }
-
         if (attDTOs.length) {
+
             _.extend(doc.images, newdoc.images);
-            return db.insertMultipart(doc, attDTOs, newdoc._id);
-        } else {
+
+            var need_comp_attDTOs = [];
+            for (var i = 0; i < attDTOs.length; i++) {
+                if (attDTOs[i].data.length > config.const.MAX_IMG_SIZE) {
+
+                    Array.prototype.push.apply(need_comp_attDTOs,attDTOs.splice(i));
+
+                }
+
+            }
+
+            if (need_comp_attDTOs.length) {
+
+                var comp_atts = _.map(need_comp_attDTOs, imageService.compressImageFromBuffer);
+
+                return Promise.all(comp_atts).then(function (comp_attDTOs) {
+
+                    Array.prototype.push.apply(comp_attDTOs,attDTOs);
+
+                    return db.insertMultipart(doc, comp_attDTOs, newdoc._id);
+                })
+            }
+            else  return db.insertMultipart(doc, attDTOs, newdoc._id);
+        }
+        else {
             return db.insert(doc);
         }
+
     }).then(function (response) {
         if (!response.ok) throw new Error('Unable to update BOLO');
         return context.getBolo(response.id);

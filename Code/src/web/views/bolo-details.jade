@@ -50,7 +50,7 @@ block content
         | &nbsp;
         | &nbsp;
         div.row
-            div.col-xs-12.col-md-5
+            div.col-xs-5#featured
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
                   img(src="/bolo/asset/" + bolo.data.id + "/featured" alt="", width=400)
@@ -121,4 +121,5 @@ block content
       | &nbsp;
     if bolo.data.authorFName != null || bolo.data.authorLName != null
       p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
-      p.strong Please contact the agency should clarification be required. 
+      p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName}
+      p.strong Please contact the agency should clarification be required.
