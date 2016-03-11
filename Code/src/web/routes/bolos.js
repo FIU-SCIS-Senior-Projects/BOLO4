@@ -374,7 +374,8 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
         boloDTO.authorFName = req.user.fname;
         boloDTO.authorLName = req.user.lname;
         boloDTO.authorUName = req.user.username;
-
+        boloDTO.lastUpdatedBy.firstName = req.user.fname;
+        boloDTO.lastUpdatedBy.lastName = req.user.lname;
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
@@ -473,6 +474,8 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         var attDTOs = [];
 
         boloDTO.lastUpdatedOn = moment().format( config.const.DATE_FORMAT );
+        boloDTO.lastUpdatedBy.firstName = req.user.fname;
+        boloDTO.lastUpdatedBy.lastName = req.user.lname;
 
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;

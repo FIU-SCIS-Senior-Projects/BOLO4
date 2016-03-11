@@ -26,12 +26,12 @@ block content
 
         });
 
-    div.container-fluid
+    div.container-fluid#boloDetails
         div.row
             - var att_route = '/agency/' + agency.id + '/img';
-            div.col-xs-12.col-md-2
-              img( src=att_route + '/logo' alt="", width=150, height=175 )
-            div.col-xs-12.col-md-7
+            div.col-xs-2#logo
+              img( src=att_route + '/logo' alt="" )
+            div.col-xs-8
               p.text-danger #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
               p.strong #{agency.name} Police Department
               p
@@ -40,22 +40,22 @@ block content
                 em #{agency.city}, #{agency.state}. #{agency.zip}
               p
                 em #{agency.phone}
-            div.col-xs-12.col-md-2
-              img( src=att_route + '/shield' alt="", width=150, height=180)
+            div.col-xs-2#badge
+              img( src=att_route + '/shield' alt="")
         div.text-center
           h1.text-danger.strong #{bolo.data.category}
         | &nbsp;
         | &nbsp;
         div.row
-            div.col-xs-12.col-md-5
+            div.col-xs-5#featured
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
-                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
+                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="")
                 else
                   img( src="/img/nopic.png" alt="", width=400 )
                 form.form-horizontal
                 +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
-            div.col-xs-12.col-md-7
+            div.col-xs-7
                 form.form-horizontal
                 +form_labels_row("Bolo ID", bolo.data.id )
                 if bolo.data.firstName.length || bolo.data.lastName.length
@@ -117,4 +117,5 @@ block content
       | &nbsp;
     if bolo.data.authorFName != null || bolo.data.authorLName != null
       p.strong This BOLO was created by #{bolo.data.authorFName} #{bolo.data.authorLName}.
+      p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName}
       p.strong Please contact the agency should clarification be required. 
