@@ -11,6 +11,7 @@ block admin-content
         table.table.table-striped
             thead
                 tr
+                    th Agency
                     th Username
                     th Name
                     th Email
@@ -19,7 +20,8 @@ block admin-content
             tbody
                 each user in users
                   if(user.tier <= 3)
-                    tr
+                    tr 
+                        td #{user.agencyName}
                         td #{user.username}
                         td #{user.fname} #{user.lname}
                         td #{user.email}
