@@ -73,15 +73,9 @@ AgencyService.prototype.updateAgency = function ( agencyData, attachments ) {
     var context = this;
     var updated = new Agency( agencyData );
 
-
-    //*********************************************************************
-    //--INCOMPLETE IMPLEMENTATION--
-    //DO NOT DELETE THE FOLLOWING:
-    //
     if ( ! updated.isValid() ) {
         throw new Error( "Invalid agency data" );
     }
-    //**********************************************************************
 
     return context.AgencyRepository.getAgency( updated.data.id )
     .then( function ( original ) {
