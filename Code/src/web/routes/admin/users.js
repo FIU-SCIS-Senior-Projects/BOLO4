@@ -132,8 +132,8 @@ module.exports.postCreateForm = function ( req, res ) {
 module.exports.getList = function ( req, res ) {
     var data = {
       'currentAgency': req.user.agency,
+      'currentUser':req.user
     };
-
     userService.getUsers().then( function ( users ) {
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;
