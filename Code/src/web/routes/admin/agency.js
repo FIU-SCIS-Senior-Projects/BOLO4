@@ -155,6 +155,14 @@ module.exports.postEditForm = function ( req, res, next ) {
     parseFormData( req ).then( function ( formDTO ) {
         var agencyDTO = agencyService.formatDTO( formDTO.fields );
         var atts = getAgencyAttachments( formDTO.fields );
+        var formFields = validateFields(formDTO.fields);
+        
+        if(formFields == false){
+          req.flash(GFERR, 'No field can be left empty. This information is required');
+          res.redirect('back');
+          throw new FormError();
+        }
+
         var result = agencyService.updateAgency( agencyDTO, atts );
         return Promise.all([ result, formDTO ]);
     }).then( function ( pData ) {

@@ -256,6 +256,14 @@ module.exports.postEditDetails = function ( req, res ) {
     parseFormData( req ).then( function ( formDTO ) {
         formDTO.fields.tier = formDTO.fields.role;
         var userDTO = userService.formatDTO( formDTO.fields );
+        var formFields = validateFields(formDTO.fields);
+
+        if(formFields == false){
+          req.flash(GFERR, 'No field can be left empty. This information is required');
+          res.redirect('back');
+          throw new FormError();
+        }
+
         return userService.updateUser( id, userDTO );
     }, function ( error ) {
         console.error( 'Error at /users/:id/edit-details >>> ', error.message );
@@ -268,7 +276,7 @@ module.exports.postEditDetails = function ( req, res ) {
     })
     .catch( function ( error ) {
         console.error( 'Error at /users/:id/edit-details >>> ', error.message );
-        req.flash( FERR, 'Unknown error occurred, please try again.' );
+        req.flash( FERR, 'Error occurred, please try again. All fields are required.' );
         res.redirect( 'back' );
     });
 };
