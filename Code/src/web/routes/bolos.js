@@ -10,6 +10,7 @@ var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
 var PDFDocument     = require('pdfkit');
+var open            = require('open');
 
 var fs              = require('fs');
 var bodyParser      = require('body-parser');
@@ -615,8 +616,31 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
     }).then(function(user) {
         data.user = user;
-        generatePDF(data);
+        //generatePDF(data);
         res.render( 'bolo-details', data );
+
+    }).catch( function ( error ) {
+        next( error );
+    });
+});
+
+router.get('/bolo/details/pdf/:id', function ( req, res, next ) {
+    var data = {};
+    console.log(req.params.id);
+
+
+    boloService.getBolo( req.params.id ).then( function ( bolo ) {
+        data.bolo = bolo;     
+    return agencyService.getAgency( bolo.agency );
+
+    }).then( function ( agency ) {
+        data.agency = agency;
+        return userService.getByUsername(data.bolo.authorUName);
+
+    }).then(function(user) {
+        data.user = user;
+        generatePDF(data);
+        res.render( 'bolo-pdf-suite', data );
 
     }).catch( function ( error ) {
         next( error );
