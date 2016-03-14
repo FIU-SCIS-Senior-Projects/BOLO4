@@ -381,6 +381,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
         boloDTO.authorFName = req.user.fname;
         boloDTO.authorLName = req.user.lname;
         boloDTO.authorUName = req.user.username;
+        //boloDTO.agencyName = req.user.agencyName;
 
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
@@ -408,9 +409,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
 
         if(formDTO.fields.option === "submit"){
             var result = boloService.createBolo( boloDTO, attDTOs );
-
             return Promise.all([result, formDTO]);
-
         }
 
     }).then( function ( pData ) {
@@ -606,7 +605,7 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
 
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
-        data.bolo = bolo;     
+        data.bolo = bolo;
     return agencyService.getAgency( bolo.agency );
 
     }).then( function ( agency ) {
@@ -615,7 +614,6 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
     }).then(function(user) {
         data.user = user;
-        //generatePDF(data);
         res.render( 'bolo-details', data );
 
     }).catch( function ( error ) {

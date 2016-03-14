@@ -31,7 +31,7 @@ function AgencyService ( AgencyRepository ) {
  */
 AgencyService.prototype.createAgency = function ( agencyData, attachments) {
     var agency = new Agency(agencyData);
-    var validatename = true;
+    var validatename = 0;
     var context = this;
     if (!agency.isValid()) {
         //TODO: promise should be returned but it is awaiting correct implemenation of isValid() function
@@ -51,11 +51,11 @@ AgencyService.prototype.createAgency = function ( agencyData, attachments) {
 
                 agencies.forEach(function(currentagency) {
                     if(currentagency.data.name === agency.name ){
-                        validatename = false;
+                        validatename++;
                     }
                 });
 
-                if(validatename === true){
+                if(validatename<2){
 
                     return context.AgencyRepository.insert(agency, attachments)
                     .then(function (value) {
@@ -86,7 +86,7 @@ AgencyService.prototype.createAgency = function ( agencyData, attachments) {
 AgencyService.prototype.updateAgency = function ( agencyData, attachments ) {
     var context = this;
     var updated = new Agency( agencyData);
-    var validatename = true;
+    var validatename = 0;
 
     if ( ! updated.isValid() ) {
         throw new Error( "Invalid agency data" );
@@ -96,11 +96,11 @@ AgencyService.prototype.updateAgency = function ( agencyData, attachments ) {
 
                 agencies.forEach(function(currentagency) {
                     if(currentagency.data.name === updated.name ){
-                        validatename = false;
+                        validatename++;
                     }
                 });
 
-                if(validatename === true){
+                if(validatename<2){
 
                     return context.AgencyRepository.getAgency( updated.data.id )
                     .then( function ( original ) {
