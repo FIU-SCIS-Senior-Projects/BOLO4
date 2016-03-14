@@ -170,6 +170,8 @@ module.exports.postEditForm = function ( req, res, next ) {
         req.flash( GFMSG, 'Agency details update successful.' );
         res.redirect( '/admin/agency' );
     }).catch( function ( error ) {
+        req.flash(GFERR, 'Agency Creation unsuccessful ' + error);
+        res.redirect('back');
         next( error );
     });
 };

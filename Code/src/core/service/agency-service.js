@@ -85,30 +85,46 @@ AgencyService.prototype.createAgency = function ( agencyData, attachments) {
  */
 AgencyService.prototype.updateAgency = function ( agencyData, attachments ) {
     var context = this;
-    var updated = new Agency( agencyData );
+    var updated = new Agency( agencyData);
+    var validatename = true;
 
     if ( ! updated.isValid() ) {
         throw new Error( "Invalid agency data" );
     }
 
-    return context.AgencyRepository.getAgency( updated.data.id )
-    .then( function ( original ) {
+     return context.AgencyRepository.getAgencies().then(function (agencies){   
 
-        var atts = _.assign( {}, original.data.attachments );
-        original.diff( updated ).forEach( function ( key ) {
-            original.data[key] = updated.data[key];
+                agencies.forEach(function(currentagency) {
+                    if(currentagency.data.name === updated.name ){
+                        validatename = false;
+                    }
+                });
+
+                if(validatename === true){
+
+                    return context.AgencyRepository.getAgency( updated.data.id )
+                    .then( function ( original ) {
+
+                        var atts = _.assign( {}, original.data.attachments );
+                        original.diff( updated ).forEach( function ( key ) {
+                            original.data[key] = updated.data[key];
+                        });
+
+                        original.data.attachments = atts;
+
+                        return context.AgencyRepository.update( original, attachments );
+                    })
+                    .then( function ( updated ) {
+                        return updated;
+                    })
+                    .catch( function ( error ) {
+                        return Promise.reject( { success: false, error: error.message } );
+                    });
+                }
+                else{
+                    return Promise.reject(new Error("Agency Name already registered"));
+                }
         });
-
-        original.data.attachments = atts;
-
-        return context.AgencyRepository.update( original, attachments );
-    })
-    .then( function ( updated ) {
-        return updated;
-    })
-    .catch( function ( error ) {
-        return Promise.reject( { success: false, error: error.message } );
-    });
 };
 
 /**
