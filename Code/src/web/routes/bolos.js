@@ -10,7 +10,6 @@ var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
 var PDFDocument     = require('pdfkit');
-var open            = require('open');
 
 var fs              = require('fs');
 var bodyParser      = require('body-parser');
@@ -167,7 +166,7 @@ router.get( '/bolo/agency/:id', function ( req, res, next ) {
     });
 });
 
-// list archive bolos
+// list archived bolos
 router.get( '/bolo/archive', function ( req, res, next ) {
 
     var page = parseInt( req.query.page ) || 1;

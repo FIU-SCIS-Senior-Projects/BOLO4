@@ -31,32 +31,46 @@ function AgencyService ( AgencyRepository ) {
  */
 AgencyService.prototype.createAgency = function ( agencyData, attachments) {
     var agency = new Agency(agencyData);
+    var validatename = true;
     var context = this;
     if (!agency.isValid()) {
         //TODO: promise should be returned but it is awaiting correct implemenation of isValid() function
         // return Promise.reject(new Error("ERROR: Invalid agency data."));
         Promise.reject(new Error("ERROR: Invalid agency data."));
-
     }
 
     console.log('agency id is ' + agency.agency_id);
-     return context.findAgencyById(agency.agency_id, agency.name).then(function (results) {
+    return context.findAgencyById(agency.agency_id, agency.name).then(function (results) {
         console.log("num of results are " + results);
         if (results > 0) {
             return Promise.reject(new Error("ERROR: Agency ID already registered"));
         }
-
         else {
             console.log('in the else');
-            return context.AgencyRepository.insert(agency, attachments)
+            return context.AgencyRepository.getAgencies().then(function (agencies){   
 
-                .then(function (value) {
-                    console.log(value);
-                    return value;
-                })
-                .catch(function (error) {
-                    throw new Error('Unable to create Agency.');
+                agencies.forEach(function(currentagency) {
+                    if(currentagency.data.name === agency.name ){
+                        validatename = false;
+                    }
                 });
+
+                if(validatename === true){
+
+                    return context.AgencyRepository.insert(agency, attachments)
+                    .then(function (value) {
+                        console.log(value);
+                            return value;
+                        })
+                        .catch(function (error) {
+                            throw new Error('Unable to create Agency.');
+                        });
+                }
+                else{
+                    return Promise.reject(new Error("ERROR: Agency Name already registered"));
+                }
+            });
+
         }
     });
 
