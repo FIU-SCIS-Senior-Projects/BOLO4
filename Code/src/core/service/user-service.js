@@ -131,8 +131,9 @@ UserService.prototype.getAgencySubscribers = function ( agencyID ) {
  */
 UserService.prototype.resetPassword = function ( id, password ) {
     var context = this;
-
     return context.userRepository.getById( id ).then( function ( user ) {
+        user.resetPasswordToken = '';
+        user.resetPasswordExpires = null;
         user.password = password;
         user.hashPassword();
         return context.userRepository.update( user );
@@ -268,4 +269,16 @@ UserService.formatDTO = function ( dto ) {
  */
 UserService.prototype.formatDTO = function ( dto ) {
     return UserService.formatDTO( dto );
+};
+
+UserService.prototype.sendEmail = function ( email ) {
+    return this.userRepository.sendEmail( email );
+};
+
+UserService.prototype.getByEmail = function ( email ) {
+    return this.userRepository.getByEmail( email );
+};
+
+UserService.prototype.getByToken = function ( email ) {
+    return this.userRepository.getByToken( email );
 };
