@@ -120,7 +120,7 @@ db_wrapper.find = function (selector) {
         context.db.find( selector, function ( err, body ) {
             if ( !err ) {
                 console.log(body);
-                resolve( body )
+                resolve( body );
             }
             reject( err );
         });

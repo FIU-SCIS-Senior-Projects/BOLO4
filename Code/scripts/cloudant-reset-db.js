@@ -167,6 +167,12 @@ var USERS_DESIGN_DOC = {
         },
         "notifications": {
             "map": "function (doc) { if ( 'user' === doc.Type ) { for ( var i = 0; i < doc.notifications.length; i++ ) { emit( doc.notifications[i], doc.email ); } } }"
+        },
+        "by_email": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.email, null ); }"
+        },
+        "by_token": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.resetPasswordToken, null ); }"
         }
     },
 
@@ -243,10 +249,10 @@ function createIndex(dbname){
 
         var db = cloudant.db.use(dbname);
 
-    db.index(agency_id, function (err, body) {
-        if (err) reject(err);
-        resolve(body);
-    });
+        db.index(agency_id, function (err, body) {
+            if (err) reject(err);
+            resolve(body);
+        });
     });
 }
 

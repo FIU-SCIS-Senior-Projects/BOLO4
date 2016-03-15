@@ -207,3 +207,36 @@ CloudantUserRepository.prototype.remove = function ( id ) {
         });
 };
 
+CloudantUserRepository.prototype.sendEmail = function ( email ) {
+  //todo
+};
+
+CloudantUserRepository.prototype.getByEmail = function ( email ) {
+    return db.view( 'users', 'by_email', {
+        'key': email,
+        'include_docs': true
+    })
+    .then( function ( found ) {
+        if ( !found.rows.length ) { return null; }
+        return fromCloudant( found.rows[0].doc );
+    })
+    .catch( function ( error ) {
+        var msg = error.reason || error.mesage || error;
+        throw new Error( "Unable to retrive user data: " + msg );
+    });
+};
+
+CloudantUserRepository.prototype.getByToken = function ( token ) {
+    return db.view( 'users', 'by_token', {
+        'key': token,
+        'include_docs': true
+    })
+    .then( function ( found ) {
+        if ( !found.rows.length ) { return null; }
+        return fromCloudant( found.rows[0].doc );
+    })
+    .catch( function ( error ) {
+        var msg = error.reason || error.mesage || error;
+        throw new Error( "Unable to retrive user data: " + msg );
+    });
+};
