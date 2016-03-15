@@ -80,7 +80,8 @@ router.post( '/login',
             login_redirect = req.session.login_redirect;
             req.session.login_redirect = null;
         }
-        res.redirect( login_redirect || '/' );
+        console.log("Session:" + login_redirect);
+        res.redirect( '/bolo' || '/' );
     }
 );
 

@@ -166,7 +166,7 @@ router.get( '/bolo/agency/:id', function ( req, res, next ) {
     });
 });
 
-// list archive bolos
+// list archived bolos
 router.get( '/bolo/archive', function ( req, res, next ) {
 
     var page = parseInt( req.query.page ) || 1;
@@ -381,6 +381,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
         boloDTO.authorFName = req.user.fname;
         boloDTO.authorLName = req.user.lname;
         boloDTO.authorUName = req.user.username;
+        boloDTO.agencyName = req.user.agencyName;
 
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
@@ -408,9 +409,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
 
         if(formDTO.fields.option === "submit"){
             var result = boloService.createBolo( boloDTO, attDTOs );
-
             return Promise.all([result, formDTO]);
-
         }
 
     }).then( function ( pData ) {
@@ -606,6 +605,28 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
 
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
+        data.bolo = bolo;
+    return agencyService.getAgency( bolo.agency );
+
+    }).then( function ( agency ) {
+        data.agency = agency;
+        return userService.getByUsername(data.bolo.authorUName);
+
+    }).then(function(user) {
+        data.user = user;
+        res.render( 'bolo-details', data );
+
+    }).catch( function ( error ) {
+        next( error );
+    });
+});
+
+router.get('/bolo/details/pdf/:id', function ( req, res, next ) {
+    var data = {};
+    console.log(req.params.id);
+
+
+    boloService.getBolo( req.params.id ).then( function ( bolo ) {
         data.bolo = bolo;     
     return agencyService.getAgency( bolo.agency );
 
@@ -616,7 +637,7 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
     }).then(function(user) {
         data.user = user;
         generatePDF(data);
-        res.render( 'bolo-details', data );
+        res.render( 'bolo-pdf-suite', data );
 
     }).catch( function ( error ) {
         next( error );

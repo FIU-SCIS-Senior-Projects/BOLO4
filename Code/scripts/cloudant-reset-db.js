@@ -17,6 +17,9 @@ var bolo_indexer = function (doc) {
     if (typeof(doc.agency) !== 'undefined') {
         index("agency", doc.agency);
     }
+    if (typeof(doc.agencyName) !== 'undefined') {
+        index("agencyName", doc.agency);
+    }
     if (typeof(doc.author) !== 'undefined') {
         index("author", doc.author);
     }

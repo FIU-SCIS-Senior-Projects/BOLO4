@@ -46,6 +46,7 @@ function Bolo( data ) {
         createdOn       : null,
         lastUpdatedOn   : null,
         agency          : null,
+        agencyName      : '',
         author          : '',
         category        : '',
         firstName       : '',
