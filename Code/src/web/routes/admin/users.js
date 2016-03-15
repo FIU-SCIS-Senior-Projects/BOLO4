@@ -85,9 +85,9 @@ module.exports.postCreateForm = function ( req, res ) {
             req.flash( 'form-errors', validationErrors );
             throw new FormError();
         }
-        
-        if(formFields == false){
-          req.flash(GFERR, 'No field can be left empty. This information is required');
+
+        if(formFields === false){
+          req.flash( FERR, 'Error saving new user, please try again. Every field is required.' );
           res.redirect('back');
           throw new FormError();
         }
@@ -95,6 +95,7 @@ module.exports.postCreateForm = function ( req, res ) {
         formDTO.fields.tier = formDTO.fields.role;
         formDTO.fields.agency = formDTO.fields.agency || req.user.agency;
         formDTO.fields.notifications = [ formDTO.fields.agency ];
+
         var userDTO = userService.formatDTO( formDTO.fields );
 
         return userService.registerUser( userDTO );
@@ -119,7 +120,6 @@ module.exports.postCreateForm = function ( req, res ) {
     .catch( function ( error ) {
         /** @todo inform of duplicate registration errors */
         console.error( 'Error at /users/create >>> ', error.message );
-        req.flash( FERR, 'Error saving new user, please try again. Every field is required.' );
         res.redirect( 'back' );
     });
 };
@@ -132,8 +132,8 @@ module.exports.postCreateForm = function ( req, res ) {
 module.exports.getList = function ( req, res ) {
     var data = {
       'currentAgency': req.user.agency,
+      'currentUser':req.user
     };
-
     userService.getUsers().then( function ( users ) {
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;
