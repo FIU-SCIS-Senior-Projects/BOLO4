@@ -15,7 +15,7 @@ block content
 
     include ./partials/global-alerts.jade
 
-    div.container-fluid#boloDetails
+    div.container-fluid#boloPage
         div.row
             - var att_route = '/agency/' + agency.id + '/img';
             div.col-xs-2#logo
@@ -30,22 +30,21 @@ block content
               p
                 em #{agency.phone}
             div.col-xs-2#badge
-              img( src=att_route + '/shield' alt="")
+              img( src=att_route + '/shield' alt="" )
         div.text-center
           h1.text-danger.strong #{bolo.data.category}
         | &nbsp;
         | &nbsp;
         div.row
-            div.col-xs-5#featured
+            div.col-xs-4#featured
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
                   img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
                 else
                   img( src="/img/nopic.png" alt="", width=400 )
-                form.form-horizontal
-                +form_labels_row("Created", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
-                a(href='/bolo/details/pics/' + bolo.data.id) Additional images
-            div.col-xs-7
+
+
+            div.col-xs-8#boloDetails
                 form.form-horizontal
                 +form_labels_row("Bolo ID", bolo.data.id )
                 if bolo.data.firstName.length || bolo.data.lastName.length
@@ -88,24 +87,31 @@ block content
                   +form_labels_row("Tattoos/Scars", bolo.data.tattoos,bolo.data.tattoos?"":"hidden")
                 else
                   +form_labels_row("Tattoos/Scars", "N/A" )
-    form.form-horizontal
-    | &nbsp;
-    p Additional Info:
-    if bolo.data.additional.length
-      p #{bolo.data.additional}
-    else
-      | &nbsp;
-    | &nbsp;
-    if bolo.data.video_url.length
-      p.strong Video Link:
-      p #{bolo.data.video_url}
-    | &nbsp;
-    p Summary:
-    if bolo.data.additional.length
-      p #{bolo.data.summary}
-    else
-      | &nbsp;
-    if bolo.data.authorFName != null || bolo.data.authorLName != null
-      p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
-      p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName}
-      p.strong Please contact the agency should clarification be required.
+        div.row
+            div.col-xs-8
+                form.form-horizontal
+                    +form_labels_row("Created", bolo.data.createdOn, bolo.data.createdOn ? "" : "hidden")
+        div.row
+            div.col-xs-4
+                a(href='/bolo/details/pics/' + bolo.data.id) Additional images
+        form.form-horizontal
+        | &nbsp;
+        p Additional Info:
+        if bolo.data.additional.length
+          p #{bolo.data.additional}
+        else
+          | &nbsp;
+        | &nbsp;
+        if bolo.data.video_url.length
+          p.strong Video Link:
+          p #{bolo.data.video_url}
+        | &nbsp;
+        p Summary:
+        if bolo.data.additional.length
+          p #{bolo.data.summary}
+        else
+          | &nbsp;
+        if bolo.data.authorFName != null || bolo.data.authorLName != null
+          p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
+          p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName}
+          p.strong Please contact the agency should clarification be required.

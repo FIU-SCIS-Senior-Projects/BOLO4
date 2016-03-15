@@ -201,7 +201,7 @@ router.post('/bolo/archive/purge',function(req,res) {
             {
                 //third level of auth
                 var tier = req.user.roleName();
-                if (tier === 'ADMINISTRATOR') {
+                if (tier === 'ROOT') {
                     authorized = true;
                     if (range == 1){
                         min_mins = 1051200;
@@ -262,6 +262,7 @@ router.post('/bolo/archive/purge',function(req,res) {
 
 router.get( '/bolo/search/results', function ( req, res ) {
 
+
     console.log(req.query.bookmark );
     var query_string = req.query.valid;
     console.log(query_string);
@@ -281,7 +282,8 @@ router.get( '/bolo/search/results', function ( req, res ) {
 
             data.previous_bookmark = data.bookmark || {};
             data.bookmark = results.bookmark;
-
+            console.log("current: " + data.bookmark);
+            console.log("previous: " + data.previous_bookmark);
         data.bolos = results.bolos;
         res.render( 'bolo-search-results', data );
     })

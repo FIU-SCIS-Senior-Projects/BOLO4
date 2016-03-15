@@ -48,7 +48,9 @@ block content
                     .actions
                         a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
                         a.btn.btn-default( href="/bolo/details/" + bolo.id role="button" ) Details
-                        a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
+                        a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" onclick="return confirm('Are you sure you want to archive this bolo?')"
+                        ) Archive
+
 
     .row.text-center
         - var route = '/bolo'
