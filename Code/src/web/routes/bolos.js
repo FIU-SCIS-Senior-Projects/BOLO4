@@ -381,7 +381,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
         boloDTO.authorFName = req.user.fname;
         boloDTO.authorLName = req.user.lname;
         boloDTO.authorUName = req.user.username;
-        //boloDTO.agencyName = req.user.agencyName;
+        boloDTO.agencyName = req.user.agencyName;
 
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
