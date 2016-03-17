@@ -3,21 +3,12 @@ include ../includes/mixins.jade
 div.col-xs-12.col-sm-6.col-md-3
 
     div.thumbnail
-        script.
-            function updateStatus() {
-                console.log(bolo.id);
-                //var data = !{JSON.stringify(bolo)}
-               // console.log(data);
-                $.ajax({
-                    url: '/bolo/update/',// + data.data.id,
-                    type: 'POST',
-                    data: {status: $(".status #bolo.id").val()}
-                })
-            }
+
         div.status
-            .form-group
+            form( action="/bolo/update/" + bolo.id method="post" ).form-group
+                input( type="hidden" name="id" value=bolo.id )
                 label.control-label( for=bolo.id )
-                select.form-control(id=bolo.id name="Status" onchange="updateStatus()")
+                select.form-control(id=bolo.id name="status" onchange="this.form.submit()")
                     each val in bolo_status
                         if bolo.status == val
                             +option( val,true )

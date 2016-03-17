@@ -438,41 +438,33 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
 
 router.post( '/bolo/update/:id', function ( req, res, next ) {
     console.log("posted to bolo/update/:id");
-    console.log(req.params.id);
-    console.log(req.body.status);
+    var bolo_id = req.params.id;
+    var bolo_status = req.body.status;
     var data = {
         'form_errors': req.flash( 'form-errors' )
     };
-/*
-    getAllBoloData( req.params.id ).then( function(boloData)   {
+
+    getAllBoloData( bolo_id ).then( function(boloData)   {
 
         _.extend(data, boloData);
 
         var auth = new BoloAuthorize( data.bolo, data.author, req.user );
 
         if ( auth.authorizedToEdit() ) {
-            data.bolo.status = "In Custody";
+            data.bolo.status = bolo_status;
             var temp = moment().format( config.const.DATE_FORMAT);
             data.bolo.lastUpdatedOn = temp.toString();
             console.log(data.bolo.lastUpdatedOn);
             var att = [];
             boloService.updateBolo(data.bolo, att).then(function(bolo){
-                var page = parseInt( req.query.page ) || 1;
-                var limit = config.const.BOLOS_PER_PAGE;
-                var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
 
-                data = {
-                    'paging': { 'first': 1, 'current': page }
-                };
+                res.redirect('/bolo');
 
-                boloService.getBolos( limit, skip ).then( function ( results ) {
-                    data.bolos = results.bolos;
-                    data.paging.last = Math.ceil( results.total / limit );
-                    res.render( 'bolo-list', data );
+
                 }).catch( function ( error ) {
                     next( error );
                 });
-            });
+
         }
     }).catch( function ( error ) {
         if ( ! /unauthorized/i.test( error.message ) ) throw error;
@@ -486,7 +478,6 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
     }).catch( function ( error ) {
         next( error );
     });
-    */
 });
 // render the bolo edit form
 router.get( '/bolo/edit/:id', function ( req, res, next ) {
