@@ -247,8 +247,6 @@ CloudantAgencyRepository.prototype.searchAgencies = function (query_string) {
 
 CloudantAgencyRepository.prototype.findAgencyById = function (id, name) {
 
-
-
     console.log("find id repo call");
     console.log(name);
     //TODO: implement to index for both name and id
@@ -264,6 +262,7 @@ CloudantAgencyRepository.prototype.findAgencyById = function (id, name) {
        for (var i = 0; i < id_result.docs.length; i++) {
            console.log('  Doc id: %s', id_result.docs[i]._id);
        }
+       return id_result.docs.length;
    });
 
 };

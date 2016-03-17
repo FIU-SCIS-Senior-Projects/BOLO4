@@ -9,7 +9,8 @@ var Promise         = require('promise');
 var router          = require('express').Router();
 var util            = require('util');
 var uuid            = require('node-uuid');
-var PDFDocument     = require ('pdfkit');
+var PDFDocument     = require('pdfkit');
+
 var fs              = require('fs');
 var bodyParser      = require('body-parser');
 var _bodyparser     = bodyParser.urlencoded({ 'extended': true });
@@ -31,6 +32,7 @@ var GFMSG           = config.const.GFMSG;
 
 var parseFormData       = formUtil.parseFormData;
 var cleanTemporaryFiles = formUtil.cleanTempFiles;
+
 
 /**
  * Send email notification of a new bolo.
@@ -73,7 +75,6 @@ function sendBoloNotificationEmail ( bolo, template ) {
  */
 function getAllBoloData ( id ) {
     var data = {};
-console.log("called get all bolo data");
     return boloService.getBolo( id ).then( function ( bolo ) {
         data.bolo = bolo;
 
@@ -124,7 +125,8 @@ router.get( '/bolo', function ( req, res, next ) {
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
 
     var data = {
-        'paging': { 'first': 1, 'current': page }
+        'paging': { 'first': 1, 'current': page },
+        'agencies': []
     };
 
     boloService.getBolos( limit, skip ).then( function ( results ) {
@@ -164,7 +166,7 @@ router.get( '/bolo/agency/:id', function ( req, res, next ) {
     });
 });
 
-// list archive bolos
+// list archived bolos
 router.get( '/bolo/archive', function ( req, res, next ) {
 
     var page = parseInt( req.query.page ) || 1;
@@ -195,7 +197,7 @@ router.post('/bolo/archive/purge',function(req,res) {
     //2nd level of auth
     userService.authenticate(username, pass)
         .then(function (account) {
-            var min_mins = 0;
+            var min_hours = 0;
             if (account)
             {
                 //third level of auth
@@ -203,13 +205,20 @@ router.post('/bolo/archive/purge',function(req,res) {
                 if (tier === 'ADMINISTRATOR') {
                     authorized = true;
                     if (range == 1){
-                        min_mins = 1051200;
+                        min_hours = 8760;
                     }
                     else if(range == 2){
 
-                        min_mins = 0;
+                        min_hours = 744;
                     }
+                    else if(range == 3){
 
+                        min_hours = 168;
+                    }
+                    else if(range == 4){
+
+                        min_hours = 24;
+                    }
                     var now  = moment().format( config.const.DATE_FORMAT);
                     var then = "";
                     boloService.getArchiveBolosForPurge().then(function(bolos){
@@ -221,8 +230,8 @@ router.post('/bolo/archive/purge',function(req,res) {
 
                             var ms = moment(now,config.const.DATE_FORMAT).diff(moment(then,config.const.DATE_FORMAT));
                             var d = moment.duration(ms);
-                            var minutes = parseInt(d.asMinutes());
-                            if(minutes > min_mins){
+                            var hours = parseInt(d.asHours());
+                            if(hours > min_hours){
 
                                  promises.push(boloService.removeBolo(curr.id));
 
@@ -303,7 +312,7 @@ router.post( '/bolo/search', function ( req, res, next ) {
 
     parseFormData( req, attachmentFilter ).then( function ( formDTO )
     {
-
+        console.log(formDTO.fields);
         var query_obj = formDTO.fields;
         var query_string = '';
         var key = '';
@@ -358,11 +367,8 @@ router.get( '/bolo/create', function ( req, res ) {
 
 
 // process bolo creation user form input
-// if the user slected preview mode, a view of the current form is rendered.
-router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
-
+router.post( '/bolo/create', function ( req, res, next ) {
     parseFormData( req, attachmentFilter ).then( function ( formDTO ) {
-
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
@@ -375,8 +381,8 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
         boloDTO.authorFName = req.user.fname;
         boloDTO.authorLName = req.user.lname;
         boloDTO.authorUName = req.user.username;
-        boloDTO.lastUpdatedBy.firstName = req.user.fname;
-        boloDTO.lastUpdatedBy.lastName = req.user.lname;
+        boloDTO.agencyName = req.user.agencyName;
+
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
@@ -396,15 +402,14 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             var bolo = boloService.previewBolo(boloDTO);
             preview.bolo = bolo;
             preview.agency = bolo.agency;
+
             return Promise.all([preview, formDTO]);
 
         }
 
         if(formDTO.fields.option === "submit"){
             var result = boloService.createBolo( boloDTO, attDTOs );
-
             return Promise.all([result, formDTO]);
-
         }
 
     }).then( function ( pData ) {
@@ -422,7 +427,7 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
                 pData[0].agency_city = response.data.city;
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
-                pData[0].agency_phone = response.data.phone;
+                pData[0].agency_phone = response.data.phone; 
                 res.render( 'bolo-preview-details', pData[0] );
             });
         }
@@ -475,8 +480,6 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         var attDTOs = [];
 
         boloDTO.lastUpdatedOn = moment().format( config.const.DATE_FORMAT );
-        boloDTO.lastUpdatedBy.firstName = req.user.fname;
-        boloDTO.lastUpdatedBy.lastName = req.user.lname;
 
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
@@ -519,10 +522,10 @@ router.get( '/bolo/archive/:id', function ( req, res, next ) {
         if ( auth.authorizedToArchive() ) {
             boloService.activate( data.bolo.id, false );
         }
-    }).then( function ( response ) {
+    }).then(setTimeout(function ( response ){
         req.flash( GFMSG, 'Successfully archived BOLO.' );
-        res.redirect( '/bolo/archive' );
-    }).catch( function ( error ) {
+        res.redirect( 'back' );
+    },1000)).catch( function ( error ) {
         if ( ! /unauthorized/i.test( error.message ) ) throw error;
 
         req.flash( GFERR,
@@ -611,8 +614,30 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
     }).then(function(user) {
         data.user = user;
-        generatePDF(data);
         res.render( 'bolo-details', data );
+
+    }).catch( function ( error ) {
+        next( error );
+    });
+});
+
+router.get('/bolo/details/pdf/:id', function ( req, res, next ) {
+    var data = {};
+    console.log(req.params.id);
+
+
+    boloService.getBolo( req.params.id ).then( function ( bolo ) {
+        data.bolo = bolo;     
+    return agencyService.getAgency( bolo.agency );
+
+    }).then( function ( agency ) {
+        data.agency = agency;
+        return userService.getByUsername(data.bolo.authorUName);
+
+    }).then(function(user) {
+        data.user = user;
+        generatePDF(data);
+        res.render( 'bolo-pdf-suite', data );
 
     }).catch( function ( error ) {
         next( error );
@@ -630,102 +655,105 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
     }).catch( function ( error ) {
         next( error );
     });
-
-    /**
-     * Generates PDF from bolo / agency information
-     */
-    function generatePDF(data) {
-        var doc = new PDFDocument();
-        var someData = {};
-        doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.bolo.id + ".pdf"));
-        doc.fontSize(8);
-        doc.fillColor('red');
-        doc.text("UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE", 120, 15)
-            .moveDown(0.25);
-        doc.fillColor('black');
-        doc.text(data.agency.name)
-            .moveDown(0.25);
-        doc.text(data.agency.address)
-            .moveDown(0.25);
-        doc.text(data.agency.city + ", " + data.agency.state + ", " + data.agency.zip)
-            .moveDown(0.25);
-        doc.text(data.agency.phone)
-            .moveDown(0.25);
-        doc.fontSize(20);
-        doc.fillColor('red');
-        doc.text(data.bolo.category, 120, 115, {align: 'center'})
-            .moveDown();
-
-
-        doc.fillColor('black');
-        doc.fontSize(11);
-        doc.font('Times-Roman')
-            .text("Name: " + data.bolo['firstName'] + " " + data.bolo['lastName'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Race: " + data.bolo['race'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("DOB: " + data.bolo['dob'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("License#: " + data.bolo['dlNumber'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Height: " + data.bolo['height'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Weight: " + data.bolo['weight'] + "lbs", 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Address: " + data.bolo['address'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Sex: " + data.bolo['sex'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Hair Color: " + data.bolo['hairColor'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Tattoos/Scars: " + data.bolo['tattoos'], 350)
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Additional: ", 15, 465)
-            .moveDown(0.25);
-        doc.font('Times-Roman')
-            .text(data.bolo['additional'], {width: 200})
-            .moveDown();
-        doc.font('Times-Roman')
-            .text("Summary: ", 15)
-            .moveDown(0.25);
-        doc.font('Times-Roman')
-            .text(data.bolo['summary'], {width: 200})
-            .moveDown(5);
-        doc.font('Times-Roman')
-            .text("Any Agency having questions regarding this document may contact: "
-                + data.bolo.authorFName
-                + " "
-                + data.bolo.authorLName, 15);
-        boloService.getAttachment(data.bolo.id, 'featured').then(function (attDTO) {
-            someData.featured = attDTO.data;
-            doc.image(someData.featured, 15, 150, {width: 300, height: 300});
-            return agencyService.getAttachment(data.agency.data.id, 'logo')
-        }).then(function (logoDTO) {
-            someData.logo = logoDTO.data;
-            doc.image(someData.logo, 15, 15, {height: 100});
-            return agencyService.getAttachment(data.agency.data.id, 'shield')
-        }).then(function (shieldDTO) {
-            someData.shield = shieldDTO.data;
-            doc.image(someData.shield, 500, 15, {height: 100});
-            doc.end();
-        })
-    }
 });
+
+
+/**
+ * Generates PDF from bolo / agency information
+ */
+function generatePDF(data){
+  var doc = new PDFDocument();
+  var someData = {};
+  doc.pipe(fs.createWriteStream('src/web/public/pdf/' + data.bolo.id + ".pdf"));
+  doc.fontSize(8);
+  doc.fillColor('red');
+  doc.text("UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE", 120,15)
+    .moveDown(0.25);
+  doc.fillColor('black');
+  doc.text(data.agency.name)
+    .moveDown(0.25);
+  doc.text(data.agency.address)
+    .moveDown(0.25);
+  doc.text(data.agency.city+ ", " + data.agency.state + ", " + data.agency.zip)
+    .moveDown(0.25);
+  doc.text(data.agency.phone)
+    .moveDown(0.25);
+  doc.fontSize(20);
+  doc.fillColor('red');
+  doc.text(data.bolo.category,120,115,{align: 'center'})
+    .moveDown();
+
+
+  doc.fillColor('black');
+  doc.fontSize(11);
+  doc.font('Times-Roman')
+    .text("Name: "  + data.bolo['firstName'] + " " + data.bolo['lastName'], 350)
+    .moveDown();
+  doc.font('Times-Roman')
+     .text("Race: "  + data.bolo['race'], 350)
+     .moveDown();
+  doc.font('Times-Roman')
+     .text("DOB: "  + data.bolo['dob'], 350)
+     .moveDown();
+  doc.font('Times-Roman')
+    .text("License#: "  + data.bolo['dlNumber'], 350)
+    .moveDown();
+   doc.font('Times-Roman')
+      .text("Height: "  + data.bolo['height'], 350)
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Weight: "  + data.bolo['weight'] + "lbs", 350)
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Address: "  + data.bolo['address'], 350)
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Sex: "  + data.bolo['sex'], 350)
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Hair Color: "  + data.bolo['hairColor'], 350)
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Tattoos/Scars: "  + data.bolo['tattoos'], 350)
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Additional: ",  15,465)
+      .moveDown(0.25);
+   doc.font('Times-Roman')
+      .text(data.bolo['additional'], {width : 200})
+      .moveDown();
+   doc.font('Times-Roman')
+      .text("Summary: ", 15  )
+      .moveDown(0.25);
+   doc.font('Times-Roman')
+      .text(data.bolo['summary'], {width : 200})
+      .moveDown(5);
+   doc.font('Times-Roman')
+      .text("Any Agency having questions regarding this document may contact: "
+      + data.bolo.authorFName
+      + " "
+      + data.bolo.authorLName,  15);
+   boloService.getAttachment(data.bolo.id, 'featured').then(function (attDTO){
+      someData.featured = attDTO.data;
+      doc.image(someData.featured, 15, 150, {width: 300, height:300});
+      return agencyService.getAttachment(data.agency.data.id, 'logo')
+   }).then( function(logoDTO){
+      someData.logo = logoDTO.data;
+      doc.image(someData.logo, 15, 15, {height: 100});
+      return agencyService.getAttachment(data.agency.data.id, 'shield')
+   }).then(function(shieldDTO){
+      someData.shield = shieldDTO.data;
+      doc.image(someData.shield, 500, 15, {height: 100});
+      doc.end();
+   });
+}
+
 // handle requests for bolo attachments
 function getAttachment ( req, res ) {
     boloService.getAttachment(req.params.boloid, req.params.attname)
         .then(function (attDTO) {
             res.type(attDTO.content_type);
+          //  console.log(attDTO.data + " A:OIJF:OIAEJRO:IJE:ROIJW:EOIRJWE:OIR");
             res.send(attDTO.data);
         });
 }

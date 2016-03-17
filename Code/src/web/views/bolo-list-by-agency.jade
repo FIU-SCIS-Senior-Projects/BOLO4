@@ -4,12 +4,12 @@ extends layout
 block jumbo
     .jumbotron
         .container
-            div.row
+            div#wrapper.row
                 div.col-xs-2.col-md-10
                     p Active BOLOs
                 div.col-xs-2
                     .dropdown
-                        button.dropbtn(onclick='myFunction()') Filter by agency
+                        button.dropbtn.pull-right(onclick='myFunction()') Filter by agency
                           |   
                           #myDropdown.dropdown-content
                             a.btn.btn-default(href = "/bolo/", type="button") View all
@@ -50,7 +50,7 @@ block content
                         .actions
                             a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
                             a.btn.btn-default( href="/bolo/details/" + bolo.id role="button" ) Details
-                            a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
+                            a.btn.btn-warning( href="/bolo/archive/" + bolo.id onClick = "return confirm('Are you sure you want to archive this BOLO?');") Archive
 
     .row.text-center
         - var route = '/bolo'
