@@ -55,7 +55,7 @@ AgencyService.prototype.createAgency = function ( agencyData, attachments) {
                     }
                 });
 
-                if(validatename<2){
+                if(validatename<1){
 
                     return context.AgencyRepository.insert(agency, attachments)
                     .then(function (value) {
