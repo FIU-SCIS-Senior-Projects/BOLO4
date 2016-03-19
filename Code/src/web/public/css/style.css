@@ -22,7 +22,6 @@ html, body {
     height: 155px; /* .push must be the same height as .footer */
 }
 
-
 /** Custom Styles **/
 #wrap > .container {
     margin-bottom: 48px;
@@ -172,7 +171,6 @@ a.thumbnail.active {
     border-color: #008cba;
 }
 
-
 @media(max-width: 360px) {
     #boloPage .control-label {
 
@@ -189,7 +187,6 @@ a.thumbnail.active {
 
 }
 
-
 @media(min-width: 360px) {
     #boloPage .control-label {
 
@@ -204,9 +201,7 @@ a.thumbnail.active {
         font-size: 30%;
     }
 
-
 }
-
 
 @media(min-width: 470px) {
     #boloPage .control-label {
@@ -222,9 +217,7 @@ a.thumbnail.active {
         font-size: 50%;
     }
 
-
 }
-
 
 @media(min-width: 575px) {
     #boloPage .control-label {
@@ -240,9 +233,7 @@ a.thumbnail.active {
         font-size: 72%;
     }
 
-
 }
-
 
 @media(min-width: 630px) {
     #boloPage .control-label {
