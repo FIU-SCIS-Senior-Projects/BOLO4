@@ -43,7 +43,7 @@ config.const = config.constants = {
     'GFMSG'             : 'Flash Subject - Global Message',
 
     /* BOLO Page Settings */
-    'BOLOS_PER_PAGE'    : 4,
+    'BOLOS_PER_PAGE'    : 24,
 
     'pdf_view_path' : path.resolve( __dirname, './views/pdf-view' ),
     /* http://momentjs.com/docs/#/displaying/ */
