@@ -7,8 +7,8 @@ var util            = require('util');
 var validate        = require('validate.js');
 
 var config          = require('../config.js');
-var userService     = new config.UserService( new config.UserRepository() );
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
+var userService     = new config.UserService( new config.UserRepository(), agencyService);
 var emailService    = config.EmailService;
 
 var formUtil        = require('../lib/form-util');
@@ -211,4 +211,3 @@ function postSubscribeNotifications ( req, res ) {
         res.redirect( 'back' );
     });
 }
-

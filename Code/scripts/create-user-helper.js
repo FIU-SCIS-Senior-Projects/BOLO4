@@ -15,8 +15,9 @@ var UserRepository  = require( path.join( core, 'adapters/persistence/cloudant-u
 var AgencyService     = require( path.join( core, 'service/agency-service' ) );
 var AgencyRepository  = require( path.join( core, 'adapters/persistence/cloudant-agency-repository' ) );
 /** This is the main module we will be using **/
-var userService = new UserService( new UserRepository() );
 var agencyService = new AgencyService( new AgencyRepository() );
+var userService = new UserService( new UserRepository(), agencyService );
+
 
 
 // /** Light sanity check **/

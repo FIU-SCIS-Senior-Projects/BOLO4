@@ -5,8 +5,8 @@ var _               = require('lodash');
 var Promise         = require('promise');
 
 var config          = require('../../config');
-var userService     = new config.UserService( new config.UserRepository() );
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
+var userService     = new config.UserService( new config.UserRepository(), agencyService );
 
 var formUtil        = require('../../lib/form-util');
 var passwordUtil    = require('../../lib/password-util');
@@ -156,16 +156,17 @@ module.exports.getDetails = function ( req, res, next ) {
       'currentAgency':req.user.agency
     };
 
-    console.log("shit\n", req);
-
-    userService.getUser( req.params.id ).then( function ( user ) {
+    return userService.getUser( req.params.id )
+    .then( function ( user ) {
         data.user = user;
-        return agencyService.getAgency( user.agency );
-    }).then( function ( agency ) {
-        data.agency = agency;
-        res.render( 'user-details', data );
-    }).catch( function ( error ) {
-        req.flash( FERR, 'Unable to get user information, please try again.' );
+        return agencyService.getAgency( user.agency )
+        .then( function ( agency ) {
+            data.agency = agency;
+            res.render( 'user-details', data );
+        });
+    })
+    .catch( function ( error ) {
+        req.flash( FERR, 'Unable to get user information, please try again.' );        
         next( error );
     });
 };

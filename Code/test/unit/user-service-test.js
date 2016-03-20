@@ -12,12 +12,13 @@ var src = path.resolve( __dirname, '../../src' );
 var User = require( path.join( src, 'core/domain/user' ) );
 var UserService = require( path.join( src, 'core/service/user-service' ) );
 var UserFixture = require( '../lib/user-entity-fixture' );
-
+var AgencyFixture = require( '../lib/agency-entity-fixture' );
 
 describe( 'user service module', function () {
 
     var userService;
     var mockUserRepo;
+    var mockAgencyService;
     var user;
 
     var defaultStubMethod = function () {
@@ -34,7 +35,12 @@ describe( 'user service module', function () {
             'getByUsername': defaultStubMethod,
             'getById': defaultStubMethod
         };
-        userService = new UserService( mockUserRepo );
+
+        mockAgencyService = {
+            'getAgency':defaultStubMethod
+        };
+
+        userService = new UserService( mockUserRepo, mockAgencyService );
         user = UserFixture.create();
     });
 
@@ -139,13 +145,18 @@ describe( 'user service module', function () {
 
     describe( 'registering new users', function () {
         var storedUser;
-
+        var agency;
         beforeEach( function () {
             storedUser = UserFixture.create({ 'id': 'abc123' });
+            agency = AgencyFixture.create();
 
             sinon.stub( mockUserRepo, 'insert' )
                 .withArgs( sinon.match.instanceOf( User ) )
                 .returns( Promise.resolve( storedUser ) );
+
+            sinon.stub( mockAgencyService, 'getAgency', function ( id ) {
+                return Promise.resolve ( agency );
+            });
         });
 
         it( 'promises a User object for valid registrations', function () {

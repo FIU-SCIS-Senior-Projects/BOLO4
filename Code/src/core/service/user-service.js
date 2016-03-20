@@ -4,11 +4,6 @@
 var _                 = require('lodash');
 var Promise           = require('promise');
 var User              = require('../domain/user');
-var AgencyRepository  = require( '../adapters/persistence/cloudant-agency-repository');
-var AgencyService     = require( "./agency-service");
-
-var agencyService = new AgencyService( new AgencyRepository() );
-
 
 /** @module core/ports */
 module.exports = UserService;
@@ -24,8 +19,9 @@ module.exports = UserService;
  * @param {StrageAdapter|UserRepository} - Oobject implementing the User
  * Repository Storage Port Interface.
  */
-function UserService ( userRepository ) {
+function UserService ( userRepository , agencyService) {
     this.userRepository = userRepository;
+    this.agencyService = agencyService;
 }
 
 /**
@@ -87,7 +83,7 @@ UserService.prototype.getRoleNames = function () {
 UserService.prototype.registerUser = function ( userDTO ) {
     var context = this;
 
-      return agencyService.getAgency(userDTO.agency).then(function(response){
+      return context.agencyService.getAgency(userDTO.agency).then(function(response){
         userDTO.agencyName = response.name;
 
         var newuser = new User( userDTO );
