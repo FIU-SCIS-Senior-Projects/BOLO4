@@ -15,12 +15,11 @@ var fs              = require('fs');
 var bodyParser      = require('body-parser');
 var _bodyparser     = bodyParser.urlencoded({ 'extended': true });
 
-
 var config          = require('../config');
 
-var userService     = new config.UserService( new config.UserRepository() );
-var boloService     = new config.BoloService( new config.BoloRepository() );
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
+var userService     = new config.UserService( new config.UserRepository(), agencyService);
+var boloService     = new config.BoloService( new config.BoloRepository() );
 var emailService    = config.EmailService;
 
 var BoloAuthorize   = require('../lib/authorization.js').BoloAuthorize;
@@ -427,7 +426,7 @@ router.post( '/bolo/create', function ( req, res, next ) {
                 pData[0].agency_city = response.data.city;
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
-                pData[0].agency_phone = response.data.phone; 
+                pData[0].agency_phone = response.data.phone;
                 res.render( 'bolo-preview-details', pData[0] );
             });
         }
@@ -627,7 +626,7 @@ router.get('/bolo/details/pdf/:id', function ( req, res, next ) {
 
 
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
-        data.bolo = bolo;     
+        data.bolo = bolo;
     return agencyService.getAgency( bolo.agency );
 
     }).then( function ( agency ) {
