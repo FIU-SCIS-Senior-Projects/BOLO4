@@ -5,8 +5,8 @@ var _               = require('lodash');
 var Promise         = require('promise');
 
 var config          = require('../../config');
-var userService     = new config.UserService( new config.UserRepository() );
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
+var userService     = new config.UserService( new config.UserRepository(), agencyService );
 
 var formUtil        = require('../../lib/form-util');
 var passwordUtil    = require('../../lib/password-util');
@@ -85,9 +85,9 @@ module.exports.postCreateForm = function ( req, res ) {
             req.flash( 'form-errors', validationErrors );
             throw new FormError();
         }
-        
-        if(formFields == false){
-          req.flash(GFERR, 'No field can be left empty. This information is required');
+
+        if(formFields === false){
+          req.flash( FERR, 'Error saving new user, please try again. Every field is required.' );
           res.redirect('back');
           throw new FormError();
         }
@@ -95,6 +95,7 @@ module.exports.postCreateForm = function ( req, res ) {
         formDTO.fields.tier = formDTO.fields.role;
         formDTO.fields.agency = formDTO.fields.agency || req.user.agency;
         formDTO.fields.notifications = [ formDTO.fields.agency ];
+
         var userDTO = userService.formatDTO( formDTO.fields );
 
         return userService.registerUser( userDTO );
@@ -119,7 +120,6 @@ module.exports.postCreateForm = function ( req, res ) {
     .catch( function ( error ) {
         /** @todo inform of duplicate registration errors */
         console.error( 'Error at /users/create >>> ', error.message );
-        req.flash( FERR, 'Error saving new user, please try again. Every field is required.' );
         res.redirect( 'back' );
     });
 };
@@ -132,8 +132,8 @@ module.exports.postCreateForm = function ( req, res ) {
 module.exports.getList = function ( req, res ) {
     var data = {
       'currentAgency': req.user.agency,
+      'currentUser':req.user
     };
-
     userService.getUsers().then( function ( users ) {
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;
@@ -156,16 +156,17 @@ module.exports.getDetails = function ( req, res, next ) {
       'currentAgency':req.user.agency
     };
 
-    console.log("shit\n", req);
-
-    userService.getUser( req.params.id ).then( function ( user ) {
+    return userService.getUser( req.params.id )
+    .then( function ( user ) {
         data.user = user;
-        return agencyService.getAgency( user.agency );
-    }).then( function ( agency ) {
-        data.agency = agency;
-        res.render( 'user-details', data );
-    }).catch( function ( error ) {
-        req.flash( FERR, 'Unable to get user information, please try again.' );
+        return agencyService.getAgency( user.agency )
+        .then( function ( agency ) {
+            data.agency = agency;
+            res.render( 'user-details', data );
+        });
+    })
+    .catch( function ( error ) {
+        req.flash( FERR, 'Unable to get user information, please try again.' );        
         next( error );
     });
 };
@@ -256,6 +257,14 @@ module.exports.postEditDetails = function ( req, res ) {
     parseFormData( req ).then( function ( formDTO ) {
         formDTO.fields.tier = formDTO.fields.role;
         var userDTO = userService.formatDTO( formDTO.fields );
+        var formFields = validateFields(formDTO.fields);
+
+        if(formFields == false){
+          req.flash(GFERR, 'No field can be left empty. This information is required');
+          res.redirect('back');
+          throw new FormError();
+        }
+
         return userService.updateUser( id, userDTO );
     }, function ( error ) {
         console.error( 'Error at /users/:id/edit-details >>> ', error.message );
@@ -268,7 +277,7 @@ module.exports.postEditDetails = function ( req, res ) {
     })
     .catch( function ( error ) {
         console.error( 'Error at /users/:id/edit-details >>> ', error.message );
-        req.flash( FERR, 'Unknown error occurred, please try again.' );
+        req.flash( FERR, 'Error occurred, please try again. All fields are required.' );
         res.redirect( 'back' );
     });
 };

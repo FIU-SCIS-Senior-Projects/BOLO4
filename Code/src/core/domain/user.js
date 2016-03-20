@@ -79,6 +79,7 @@ function User ( data ) {
         'password'      : null,
         'tier'          : 1,
         'agency'        : null,
+        'agencyName'    : '',
         'badge'         : '',
         'sectunit'      : '',
         'ranktitle'     : '',

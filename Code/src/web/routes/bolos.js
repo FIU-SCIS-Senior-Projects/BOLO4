@@ -14,12 +14,11 @@ var fs              = require('fs');
 var bodyParser      = require('body-parser');
 var _bodyparser     = bodyParser.urlencoded({ 'extended': true });
 
-
 var config          = require('../config');
 
-var userService     = new config.UserService( new config.UserRepository() );
-var boloService     = new config.BoloService( new config.BoloRepository() );
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
+var userService     = new config.UserService( new config.UserRepository(), agencyService);
+var boloService     = new config.BoloService( new config.BoloRepository() );
 var emailService    = config.EmailService;
 
 var BoloAuthorize   = require('../lib/authorization.js').BoloAuthorize;
@@ -165,7 +164,7 @@ router.get( '/bolo/agency/:id', function ( req, res, next ) {
     });
 });
 
-// list archive bolos
+// list archived bolos
 router.get( '/bolo/archive', function ( req, res, next ) {
 
     var page = parseInt( req.query.page ) || 1;
@@ -380,6 +379,8 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
         boloDTO.authorUName = req.user.username;
         boloDTO.lastUpdatedBy.firstName = req.user.fname;
         boloDTO.lastUpdatedBy.lastName = req.user.lname;
+        boloDTO.agencyName = req.user.agencyName;
+
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
@@ -405,9 +406,7 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
 
         if(formDTO.fields.option === "submit"){
             var result = boloService.createBolo( boloDTO, attDTOs );
-
             return Promise.all([result, formDTO]);
-
         }
 
     }).then( function ( pData ) {
@@ -656,8 +655,30 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
     }).then(function(user) {
         data.user = user;
-        generatePDF(data);
         res.render( 'bolo-details', data );
+
+    }).catch( function ( error ) {
+        next( error );
+    });
+});
+
+router.get('/bolo/details/pdf/:id', function ( req, res, next ) {
+    var data = {};
+    console.log(req.params.id);
+
+
+    boloService.getBolo( req.params.id ).then( function ( bolo ) {
+        data.bolo = bolo;
+    return agencyService.getAgency( bolo.agency );
+
+    }).then( function ( agency ) {
+        data.agency = agency;
+        return userService.getByUsername(data.bolo.authorUName);
+
+    }).then(function(user) {
+        data.user = user;
+        generatePDF(data);
+        res.render( 'bolo-pdf-suite', data );
 
     }).catch( function ( error ) {
         next( error );

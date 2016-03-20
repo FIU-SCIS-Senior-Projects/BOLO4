@@ -1,10 +1,9 @@
 /* jshint node: true */
 'use strict';
 
-var _ = require('lodash');
-var Promise = require('promise');
-var User = require('../domain/user');
-
+var _                 = require('lodash');
+var Promise           = require('promise');
+var User              = require('../domain/user');
 
 /** @module core/ports */
 module.exports = UserService;
@@ -20,8 +19,9 @@ module.exports = UserService;
  * @param {StrageAdapter|UserRepository} - Oobject implementing the User
  * Repository Storage Port Interface.
  */
-function UserService ( userRepository ) {
+function UserService ( userRepository , agencyService) {
     this.userRepository = userRepository;
+    this.agencyService = agencyService;
 }
 
 /**
@@ -82,25 +82,30 @@ UserService.prototype.getRoleNames = function () {
  */
 UserService.prototype.registerUser = function ( userDTO ) {
     var context = this;
-    var newuser = new User( userDTO );
 
-    if ( userDTO.tier && typeof userDTO.tier === 'string' ) {
-        newuser.tier = User[newuser.tier] || newuser.tier;
-    }
+      return context.agencyService.getAgency(userDTO.agency).then(function(response){
+        userDTO.agencyName = response.name;
 
-    if ( ! newuser.isValid() ) {
-        throw new Error( 'User registration invalid' );
-    }
-
-    return context.userRepository.getByUsername( newuser.username )
-    .then( function ( existingUser ) {
-        if ( existingUser ) {
-            throw new Error(
-                'User already registered: ' + existingUser.username
-            );
+        var newuser = new User( userDTO );
+        if ( userDTO.tier && typeof userDTO.tier === 'string' ) {
+            newuser.tier = User[newuser.tier] || newuser.tier;
         }
-        newuser.hashPassword();
-        return context.userRepository.insert( newuser );
+
+        if ( ! newuser.isValid() ) {
+            throw new Error( 'User registration invalid' );
+        }
+
+        return context.userRepository.getByUsername( newuser.username )
+        .then( function ( existingUser ) {
+            if ( existingUser ) {
+                throw new Error(
+                    'User already registered: ' + existingUser.username
+                );
+            }
+
+            newuser.hashPassword();
+            return context.userRepository.insert( newuser );
+        });
     });
 };
 

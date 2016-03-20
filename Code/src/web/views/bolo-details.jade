@@ -5,15 +5,29 @@ extends layout
 block jumbo
   .jumbotron
     .container
-      div.row
+      div#wrapper.row
         div.col-xs-2.col-md-10
            p BOLO Details
         div.col-xs-2
-           a.btn.btn-default( href='/pdf/' + bolo.id  + '.pdf') View as PDF
+           a.btn.btn-default.pull-right( href="/bolo/details/pdf/" + bolo.id ) Generate PDF
 
 block content
 
     include ./partials/global-alerts.jade
+    div.col-xs-12
+        button#renderPDF.pull-left(
+        type='submit'
+        style='margin-bottom:25px;'
+        ) Render As PDF
+
+    script.
+        $("#renderPDF").click(function (e) {
+        e.preventDefault();
+            var local_data = !{JSON.stringify(bolo)};
+            console.log(local_data);
+            $.post('/bolo/viewPDF/:id', {bolo_data: local_data});
+
+        });
 
     div.container-fluid#boloPage
         div.row

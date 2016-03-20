@@ -43,8 +43,7 @@ block content
         p.lead No active BOLOs at this time.
 
     .row
-        each bolo in bolos
-            -var boloid = bolo.id
+        for bolo in bolos
                 include ./partials/bolo-thumbnail.jade
                     .actions
                         a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit

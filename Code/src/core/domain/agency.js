@@ -36,6 +36,7 @@ var schema = {
 var required = Object.keys( schema ).filter( function ( key ) {
     return schema[key].required;
 });
+
 /**
  * Create a new Agency object.
  *
@@ -71,17 +72,38 @@ Agency.prototype.same = function ( other ) {
  *
  * @returns {bool} true if passes validation, false otherwise
  */
-Agency.prototype.isValid = function () {
-    // TODO Pending Implementation
-    Agency.prototype.isValid = function () {
-        var data = this.data;
-        var result = required.filter( function ( key ) {
-            return ( data[key] && typeof data[key] === schema[key].type );
-        });
+ Agency.prototype.isValid = function () {
+    var result = true;
+    var data = this.data;
+    var namecheck = typeof data.name;
+    var citycheck = typeof data.city;
+    var statecheck = typeof data.state;
+    var isactivecheck = typeof data.isActive;
+    var idcheck = typeof data.agency_id;
+    
+    if(schema.name.type === namecheck){
+        console.log("valid name");
+    }
+    else{ result = false;}
+    if(schema.city.type === citycheck){
+        console.log("valid city");
+    }
+    else{ result = false;}
+    if(schema.state.type === statecheck){
+        console.log("valid state");
+    }
+    else{ result = false;}
+    if(schema.isActive.type === isactivecheck){
+     console.log("valid isActive");
+    }
+    else{ result = false;}
+    if(schema.agency_id.type=== idcheck){
+        console.log("valid ID");
+    }
+    else{ result = false;}
 
-        return ( result.length === required.length );
-    };
-};
+    return result;
+ };
 
 /**
  * Returns an array of keys differing from the source user object.
