@@ -15,8 +15,9 @@ var UserRepository  = require( path.join( core, 'adapters/persistence/cloudant-u
 var AgencyService     = require( path.join( core, 'service/agency-service' ) );
 var AgencyRepository  = require( path.join( core, 'adapters/persistence/cloudant-agency-repository' ) );
 /** This is the main module we will be using **/
-var userService = new UserService( new UserRepository() );
 var agencyService = new AgencyService( new AgencyRepository() );
+var userService = new UserService( new UserRepository(), agencyService );
+
 
 
 // /** Light sanity check **/
@@ -28,8 +29,8 @@ var agencyService = new AgencyService( new AgencyRepository() );
 //     return;
 // }
 
-agencyService.searchAgencies("name:Pinecrest").then( function ( results ) {
-        var agencies = results.agencies;
+agencyService.searchAgencies("name:Pinecrest").then( function ( response ) {
+        var agencies = response.agencies;
         var rootDTO = userService.formatDTO({
             "username": "root",
             "password": "Password1!",
@@ -92,6 +93,7 @@ agencyService.searchAgencies("name:Pinecrest").then( function ( results ) {
 
     })
     .catch( function ( error ) {
+        console.log(error);
         next( error );
     });
 

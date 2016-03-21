@@ -7,6 +7,7 @@ jsdoc
 coverage
 manifest.yml
 .vscode
+.DS_Store
 #
 # Node.js Ignores
 #

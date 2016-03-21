@@ -15,12 +15,12 @@ block admin-content
             +alert_error_array( ferrs.confirmation )
 
     form( action="/admin/users/create" enctype="multipart/form-data" method="post" )
-        +input_text( "username", "Username (required)", "", true, "" )
-        +input_text( "email", "Email (required)", "", true, "" )
-        +input_text( "fname", "First Name", "", false, "" )
-        +input_text( "lname", "Last Name", "", false,  "" )
-        +input_text( "password", "Password (required)", "", true,  "", "password" )
-        +input_text( "confirm", "Repeat Password (required)", "", true,  "", "password" )
+        +input_text( "username", "Username ", "", true, "" )
+        +input_text( "email", "Email", "", true, "" )
+        +input_text( "fname", "First Name", "", true, "" )
+        +input_text( "lname", "Last Name", "", true,  "" )
+        +input_text( "password", "Password", "", true,  "", "password" )
+        +input_text( "confirm", "Repeat Password", "", true,  "", "password" )
 
         if ( roles )
             .form-group
@@ -44,9 +44,9 @@ block admin-content
           else 
             option #{user.agency.name}
 
-        +input_text( "badge", "Badge No.", "", false,  "" )
-        +input_text( "sectunit", "Section / Unit", "", false,  "" )
-        +input_text( "ranktitle", "Rank / Title", "", false,  "" )
+        +input_text( "badge", "Badge No.", "", true,  "" )
+        +input_text( "sectunit", "Section / Unit", "", true,  "" )
+        +input_text( "ranktitle", "Rank / Title", "", true,  "" )
 
         .form-group
             button.btn.btn-primary( type="submit" value="save" ) Submit

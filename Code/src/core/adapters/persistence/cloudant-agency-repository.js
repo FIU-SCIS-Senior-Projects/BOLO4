@@ -245,21 +245,26 @@ CloudantAgencyRepository.prototype.searchAgencies = function (query_string) {
 };
 
 
-CloudantAgencyRepository.prototype.findAgencyById = function (id) {
+CloudantAgencyRepository.prototype.findAgencyById = function (id, name) {
 
     console.log("find id repo call");
+    console.log(name);
     //TODO: implement to index for both name and id
-    // var selector = {selector:{"$or":[{agency_id:id},{name:agency_name}]}};
+    //var selector = {selector:{"$or":[{agency_id:id},{name:name}]}};
 
-    var selector = {selector:{agency_id:id}};
-   return db.find(selector).then( function (result ) {
+   var selector = {selector:{agency_id:id}};
+   var selector1 = {selector:{name:name}};
+   var result = 0;
 
-       console.log('Found %d documents with agency id: ' + id, result.docs.length);
-       for (var i = 0; i < result.docs.length; i++) {
-           console.log('  Doc id: %s', result.docs[i]._id);
+   return db.find(selector).then( function (id_result ) {
+
+       console.log('Found %d documents with agency id: ' + id, id_result.docs.length);
+       for (var i = 0; i < id_result.docs.length; i++) {
+           console.log('  Doc id: %s', id_result.docs[i]._id);
        }
-       return result.docs.length;
+       return id_result.docs.length;
    });
+
 };
 
 CloudantAgencyRepository.prototype.delete = function ( id ) {

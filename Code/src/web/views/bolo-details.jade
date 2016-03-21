@@ -5,26 +5,15 @@ extends layout
 block jumbo
   .jumbotron
     .container
-          p BOLO Details
-          a.btn.btn-default( href='/pdf/' + bolo.id  + '.pdf') View as PDF
+      div#wrapper.row
+        div.col-xs-2.col-md-10
+           p BOLO Details
+        div.col-xs-2
+           a.btn.btn-default.pull-right( href="/bolo/details/pdf/" + bolo.id ) Generate PDF
 
 block content
 
     include ./partials/global-alerts.jade
-    div.col-xs-12
-        button#renderPDF.pull-left(
-        type='submit'
-        style='margin-bottom:25px;'
-        ) Render As PDF
-
-    script.
-        $("#renderPDF").click(function (e) {
-        e.preventDefault();
-            var local_data = !{JSON.stringify(bolo)};
-            console.log(local_data);
-            $.post('/bolo/viewPDF/:id', {bolo_data: local_data});
-
-        });
 
     div.container-fluid
         div.row
@@ -50,11 +39,12 @@ block content
             div.col-xs-12.col-md-5
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
-                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
+                  img(src="/bolo/asset/" + bolo.data.id + "/featured" alt="", width=400)
                 else
                   img( src="/img/nopic.png" alt="", width=400 )
                 form.form-horizontal
-                +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
+                +form_labels_row("Created", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
+                a(href='/bolo/details/pics/' + bolo.data.id) Additional images
             div.col-xs-12.col-md-7
                 form.form-horizontal
                 +form_labels_row("Bolo ID", bolo.data.id )
@@ -115,6 +105,6 @@ block content
       p #{bolo.data.summary}
     else
       | &nbsp;
-    if bolo.data.authorFName != null || bolo.data.authorLName != null
-      p.strong This BOLO was created by #{bolo.data.authorFName} #{bolo.data.authorLName}.
+    if (bolo.data.authorFName != null || bolo.data.authorLName != null) && user 
+      p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
       p.strong Please contact the agency should clarification be required. 

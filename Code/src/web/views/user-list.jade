@@ -11,20 +11,24 @@ block admin-content
         table.table.table-striped
             thead
                 tr
+                    if(currentUser.tier > 3)
+                      th Agency                                              
                     th Username
                     th Name
                     th Email
                     th Role
                     th
             tbody
-                each user in users
-                  if(user.tier <= 3)
-                    tr
-                        td #{user.username}
-                        td #{user.fname} #{user.lname}
-                        td #{user.email}
-                        td #{user.roleName()}
-                        td: a.text-large(href="/admin/users/" + user.id)
+                each userInTable in users
+                  if(userInTable.agency == currentUser.agency && userInTable.tier <= currentUser.tier || currentUser.tier > 3)
+                    tr 
+                        if(currentUser.tier > 3)
+                          td #{userInTable.agencyName}
+                        td #{userInTable.username}
+                        td #{userInTable.fname} #{userInTable.lname}
+                        td #{userInTable.email}
+                        td #{userInTable.roleName()}
+                        td: a.text-large(href="/admin/users/" + userInTable.id)
                             span.glyphicon.glyphicon-cog( aria-hidden="true" )
 
     a.btn.btn-default(href="/admin/users/create") Add New User
