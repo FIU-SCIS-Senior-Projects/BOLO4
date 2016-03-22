@@ -39,18 +39,15 @@ AgencyService.prototype.createAgency = function ( agencyData, attachments) {
         Promise.reject(new Error("ERROR: Invalid agency data."));
     }
 
-    console.log('agency id is ' + agency.agency_id);
     return context.findAgencyById(agency.agency_id, agency.name).then(function (results) {
-        console.log("num of results are " + results);
         if (results > 0) {
             return Promise.reject(new Error("ERROR: Agency ID already registered"));
         }
         else {
-            console.log('in the else');
-            return context.AgencyRepository.getAgencies().then(function (agencies){   
+            return context.AgencyRepository.getAgencies().then(function (agencies){
 
                 agencies.forEach(function(currentagency) {
-                    if(currentagency.data.name === agency.name ){
+                    if(currentagency.data.name === agency.data.name ){
                         validatename++;
                     }
                 });
@@ -59,7 +56,6 @@ AgencyService.prototype.createAgency = function ( agencyData, attachments) {
 
                     return context.AgencyRepository.insert(agency, attachments)
                     .then(function (value) {
-                        console.log(value);
                             return value;
                         })
                         .catch(function (error) {
@@ -92,7 +88,7 @@ AgencyService.prototype.updateAgency = function ( agencyData, attachments ) {
         throw new Error( "Invalid agency data" );
     }
 
-     return context.AgencyRepository.getAgencies().then(function (agencies){   
+     return context.AgencyRepository.getAgencies().then(function (agencies){
 
                 agencies.forEach(function(currentagency) {
                     if(currentagency.data.name === updated.name ){
@@ -121,7 +117,7 @@ AgencyService.prototype.updateAgency = function ( agencyData, attachments ) {
                         return updated;
                     })
                     .catch( function ( error ) {
-                        return Promise.reject( { success: false, error: error.message } );
+                        return Promise.reject( new Error("Agency does not exist.") );
                     });
                 }
                 else{
@@ -151,7 +147,6 @@ AgencyService.prototype.searchAgencies = function(query_string){
 
 AgencyService.prototype.findAgencyById = function(id, name){
 
-    console.log("find by id service call");
     var result = this.AgencyRepository.findAgencyById(id, name);
     return result;
 

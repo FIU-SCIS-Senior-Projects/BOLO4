@@ -100,7 +100,7 @@ describe( 'Cloudant Agency Repository', function () {
             });
         });
 
-        it( 'does not clobber sttached images on update', function () {
+        it( 'does not clobber attached images on update', function () {
             /* arrange */
             var agencyWithAttachment = imageFactory.create( 'shield' )
             .then( function ( imageFixturePath ) {
@@ -236,4 +236,47 @@ describe( 'Cloudant Agency Repository', function () {
             });
         });
     }); /* end describe: #getAttachment method */
-});
+    describe( '#getAgency method', function () {
+        it( 'promises to return an agency specified by id', function () {
+            /* arrange */
+            var originalAgencyPromise = agencyRepository.insert( agency )
+            .then( function ( insertedAgency ) {
+                cache[insertedAgency.id] = insertedAgency;
+                agency = insertedAgency;
+                return insertedAgency;
+            });
+
+            /* act */
+            var response = originalAgencyPromise
+            .then( function ( currentAgency ) {
+                return agencyRepository.getAgency( currentAgency.id );
+            });
+
+            /* assert */
+            return response
+            .then( function ( agencyResp ) {
+                expect( agencyResp.name ).to.equal( agency.name );
+                expect( agencyResp.address ).to.equal( agency.address );
+                expect( agencyResp.city ).to.equal( agency.city );
+                expect( agencyResp.state ).to.equal( agency.state );
+                expect( agencyResp.zip ).to.equal( agency.zip );
+                expect( agencyResp.phone ).to.equal( agency.phone );
+            });
+        });
+        it( 'promises to reject by error if the agency specified by id does not exist', function () {
+            /* act */
+            agency.id = "test123";
+            var response = agencyRepository.getAgency( agency.id );
+
+            /* assert */
+            return response
+            .then(function ( agencyResp ) {
+                expect( agencyResp ).to.be.undefined;
+            }, function ( agencyResp ) {
+                expect( agencyResp ).to.be.instanceOf( Error )
+                .and.to.match( /does not exist/ );
+            });
+        });
+
+    });
+  });
