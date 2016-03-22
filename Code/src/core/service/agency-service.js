@@ -97,10 +97,13 @@ AgencyService.prototype.updateAgency = function ( agencyData, attachments ) {
                 agencies.forEach(function(currentagency) {
                     if(currentagency.data.name === updated.name ){
                         validatename++;
+                        if(currentagency.data.id === updated.id){
+                            validatename--;
+                        }
                     }
                 });
 
-                if(validatename<2){
+                if(validatename<1){
 
                     return context.AgencyRepository.getAgency( updated.data.id )
                     .then( function ( original ) {
