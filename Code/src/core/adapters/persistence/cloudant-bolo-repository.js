@@ -348,8 +348,8 @@ CloudantBoloRepository.prototype.searchBolos = function (limit, query_string, bo
                 flag = false;
                 for (i = 0; i < bolos.length - 1; i++) {
 
-                    var date_one = bolos[i].createdOn;
-                    var date_two = bolos[i + 1].createdOn;
+                    var date_one = bolos[i].lastUpdatedOn;
+                    var date_two = bolos[i + 1].lastUpdatedOn;
                     var order = date_one > date_two ? 1 : date_one < date_two ? -1 : 0;
                     if (order === -1) {
                         var swap = bolos[i + 1];

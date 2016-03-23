@@ -73,36 +73,18 @@ Agency.prototype.same = function ( other ) {
  * @returns {bool} true if passes validation, false otherwise
  */
  Agency.prototype.isValid = function () {
-    var result = true;
     var data = this.data;
     var namecheck = typeof data.name;
     var citycheck = typeof data.city;
     var statecheck = typeof data.state;
     var isactivecheck = typeof data.isActive;
     var idcheck = typeof data.agency_id;
-    
-    if(schema.name.type === namecheck){
-        console.log("valid name");
-    }
-    else{ result = false;}
-    if(schema.city.type === citycheck){
-        console.log("valid city");
-    }
-    else{ result = false;}
-    if(schema.state.type === statecheck){
-        console.log("valid state");
-    }
-    else{ result = false;}
-    if(schema.isActive.type === isactivecheck){
-     console.log("valid isActive");
-    }
-    else{ result = false;}
-    if(schema.agency_id.type=== idcheck){
-        console.log("valid ID");
-    }
-    else{ result = false;}
 
-    return result;
+    return schema.name.type === namecheck &&
+      schema.city.type === citycheck &&
+      schema.state.type === statecheck &&
+      schema.isActive.type === isactivecheck &&
+      schema.agency_id.type === idcheck;
  };
 
 /**
