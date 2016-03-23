@@ -2,7 +2,11 @@ extends admin-layout
 include includes/mixins
 
 block jumbo-desc
-    p Admin Portal: User Directory
+    div#wrapper.row
+        div.col-xs-2.col-md-10
+            p Admin Portal: User Directory
+        div.col-xs-2
+            button.btn.btn-default.pull-right() Sort by agency
 
 block admin-content
     p.lead Total Users: #{users.length}
