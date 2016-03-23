@@ -1,14 +1,20 @@
+div.col-xs-12.col-sm-6.col-md-3
+    div.thumbnail
+        div.status
+            if(bolo.status)
+                h2 #{bolo.status}
+        div.boloImageContainer
+        
+            div.boloImageCenterer
+                if bolo.images.featured
+                    img( src="/bolo/asset/" + bolo.id + "/featured" alt=bolo.images.featured  )
+                else
+                    img( src="/img/nopic.png" alt="no image"  )
 
-div.thumbnail
+        div.category
+            h4.strong(style = "text-align: center;") #{bolo.category}
 
-    if bolo.images.featured
-        img( src="/bolo/asset/" + bolo.id + "/featured" alt=bolo.images.featured style="height:300px" )
-    else
-        img( src="/img/nopic.png" alt="no image" style="height: 300px" )
-
-    div.caption
-        h3 #{bolo.category} 
-            if bolo.status
-                small.text-danger #{bolo.status}
-        p <b>Updated</b> #{bolo.lastUpdatedOn}
-        p <b>Created</b> #{bolo.authorFName} #{bolo.authorLName}
+        div.caption
+            p <b>Updated:</b> #{bolo.lastUpdatedOn}
+            p <b>Created On:</b> #{bolo.createdOn}
+            p <b>Posted By:</b> #{bolo.agencyName}

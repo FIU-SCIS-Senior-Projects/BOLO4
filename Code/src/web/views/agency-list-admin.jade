@@ -2,7 +2,7 @@ extends ./admin-layout.jade
 
 
 block jumbo-desc
-    p Agency Management Directory
+    p Admin Portal: Agency Management Directory
 
 
 block admin-content
@@ -13,15 +13,17 @@ block admin-content
     table.table.table-striped
         thead
             tr
+                th ID
                 th Name
                 th City
                 th State
                 th Zip
                 th.hidden-xs Phone
-                th 
+                th
         tbody
             for agency in agencies
                 tr
+                    td  #{agency.agency_id}
                     td  #{agency.name}
                     td  #{agency.city}
                     td  #{agency.state}

@@ -3,12 +3,20 @@
 
 var _ = require('lodash');
 var fs = require('fs');
+var path = require('path');
 var Promise = require('promise');
+
 var uuid = require('node-uuid');
 
 var db = require('../../lib/cloudant-promise').db.use('bolo');
 var Bolo = require('../../domain/bolo.js');
 var DOCTYPE = 'bolo';
+
+var ImageService = require('../../service/image-service');
+var imageService = new ImageService();
+
+var config          = require('../../../web/config');
+
 
 /**
  * Transform the bolo doc to a suitable format for the Bolo entity object.
@@ -45,7 +53,7 @@ function boloToCloudant(bolo) {
 
     doc.Type = DOCTYPE;
 
-    if ( doc.id ) {
+    if (doc.id) {
         doc._id = doc.id;
         delete doc.id;
     }
@@ -78,23 +86,23 @@ function attachmentsFromCloudant(attachments) {
  * @returns {Promise|Object} - Promise resolving to the transformed DTO
  * @private
  */
-function attachmentsToCloudant( dto ) {
-    var readFile = Promise.denodeify( fs.readFile );
+function attachmentsToCloudant(dto) {
+    var readFile = Promise.denodeify(fs.readFile);
 
-    if ( ! dto ) return null;
-
-    return readFile( dto.path ).then( function ( buffer ) {
+    if (!dto) return null;
+    console.log(dto.path);
+    return readFile(dto.path).then(function (buffer) {
         return {
             'name': dto.name,
             'content_type': dto.content_type,
             'data': buffer
         };
-    }).catch( function ( error ) {
-        throw new Error( 'attachmentsToCloudant: ', error );
+    }).catch(function (error) {
+        throw new Error('attachmentsToCloudant: ', error);
     });
 }
 
-function createUUID () {
+function createUUID() {
     return uuid.v4().replace(/-/g, '');
 }
 
@@ -122,24 +130,48 @@ function CloudantBoloRepository() {
  * @param {Array|Object} - Optional array of attachment DTOs containing the
  * 'name', 'content_type', and 'path' keys.
  */
-CloudantBoloRepository.prototype.insert = function ( bolo, attachments ) {
-    var newdoc = boloToCloudant( bolo );
+CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
+    var newdoc = boloToCloudant(bolo);
     newdoc._id = createUUID();
 
-    var atts = _.map( attachments, attachmentsToCloudant );
+    var atts = _.map(attachments, attachmentsToCloudant);
+    return Promise.all(atts).then(function (attDTOs) {
+        if (attDTOs.length) {
+            var need_comp_attDTOs = [];
+            for (var i = 0; i < attDTOs.length; i++) {
+                if (attDTOs[i].data.length > config.const.MAX_IMG_SIZE) {
 
-    return Promise.all( atts ).then( function ( attDTOs ) {
-        if ( attDTOs.length ) {
-            return db.insertMultipart(newdoc, attDTOs, newdoc._id);
-        } else {
+                    Array.prototype.push.apply(need_comp_attDTOs,attDTOs.splice(i));
+
+                }
+
+            }
+
+            if (need_comp_attDTOs.length) {
+
+            var comp_atts = _.map(need_comp_attDTOs, imageService.compressImageFromBuffer);
+
+            return Promise.all(comp_atts).then(function (comp_attDTOs) {
+
+                Array.prototype.push.apply(comp_attDTOs,attDTOs);
+              
+                return db.insertMultipart(newdoc, comp_attDTOs, newdoc._id);
+            })
+        }
+            else  return db.insertMultipart(newdoc, attDTOs, newdoc._id);
+        }
+        else {
             return db.insert(newdoc, newdoc._id);
         }
-    }).then( function ( response ) {
-        if ( !response.ok ) throw new Error( response.resaon );
-        return boloFromCloudant( newdoc );
-    }).catch( function ( error ) {
-        throw new Error( 'Unable to create new document: ' + error.message );
-    });
+
+
+        })
+            .then(function (response) {
+                if (!response.ok) throw new Error(response.reason);
+                return boloFromCloudant(newdoc);
+            }).catch(function (error) {
+                throw new Error('Unable to create new document: ' + error.message);
+            });
 };
 
 
@@ -148,15 +180,15 @@ CloudantBoloRepository.prototype.insert = function ( bolo, attachments ) {
  *
  * @param {Bolo} - the bolo to update
  */
-CloudantBoloRepository.prototype.update = function ( bolo, attachments ) {
+CloudantBoloRepository.prototype.update = function (bolo, attachments) {
     var context = this;
-    var newdoc = boloToCloudant( bolo );
+    var newdoc = boloToCloudant(bolo);
 
-    var atts = _.map( attachments, attachmentsToCloudant );
-    var preWorkPromises = [ db.get( newdoc._id ), Promise.all( atts )];
+    var atts = _.map(attachments, attachmentsToCloudant);
+    var preWorkPromises = [db.get(newdoc._id), Promise.all(atts)];
 
-    return Promise.all( preWorkPromises ).then( function ( prereqs ) {
-        var doc     = prereqs[0],
+    return Promise.all(preWorkPromises).then(function (prereqs) {
+        var doc = prereqs[0],
             attDTOs = prereqs[1];
 
         var blacklist = [
@@ -164,26 +196,26 @@ CloudantBoloRepository.prototype.update = function ( bolo, attachments ) {
             'author', 'authorFname', 'authorLName', 'authorUName', 'images'
         ];
 
-        _( newdoc ).omit( blacklist ).each( function ( val, key ) {
+        _(newdoc).omit(blacklist).each(function (val, key) {
             doc[key] = val;
         }).run();
 
-        if ( newdoc.images_deleted ) {
-            doc._attachments = _.omit( doc._attachments, newdoc.images_deleted );
-            doc.images = _.omit( doc.images, newdoc.images_deleted );
+        if (newdoc.images_deleted) {
+            doc._attachments = _.omit(doc._attachments, newdoc.images_deleted);
+            doc.images = _.omit(doc.images, newdoc.images_deleted);
         }
 
-        if ( attDTOs.length ) {
-            _.extend( doc.images, newdoc.images );
-            return db.insertMultipart( doc, attDTOs, newdoc._id );
+        if (attDTOs.length) {
+            _.extend(doc.images, newdoc.images);
+            return db.insertMultipart(doc, attDTOs, newdoc._id);
         } else {
-            return db.insert( doc );
+            return db.insert(doc);
         }
-    }).then(function ( response ) {
-        if ( !response.ok ) throw new Error( 'Unable to update BOLO' );
-        return context.getBolo( response.id );
-    }).catch(function ( error ) {
-        throw new Error( 'Unable to update bolo doc: ' + error.message );
+    }).then(function (response) {
+        if (!response.ok) throw new Error('Unable to update BOLO');
+        return context.getBolo(response.id);
+    }).catch(function (error) {
+        throw new Error('Unable to update bolo doc: ' + error.message);
     });
 };
 
@@ -203,7 +235,7 @@ CloudantBoloRepository.prototype.activate = function (id, activate) {
         .catch(function (error) {
             return new Error(
                 'Failed to activate/inactivate BOLO: ' + error.error + ' / ' + error.reason
-                );
+            );
         });
 };
 
@@ -224,12 +256,12 @@ CloudantBoloRepository.prototype.delete = function (id) {
         .catch(function (error) {
             return new Error(
                 'Failed to delete BOLO: ' + error.error + ' / ' + error.reason
-                );
+            );
         });
 };
 
 
-CloudantBoloRepository.prototype.getBolos = function ( limit, skip ) {
+CloudantBoloRepository.prototype.getBolos = function (limit, skip) {
     var opts = {
         'include_docs': true,
         'limit': limit,
@@ -237,16 +269,83 @@ CloudantBoloRepository.prototype.getBolos = function ( limit, skip ) {
         'descending': true
     };
 
-    return db.view( 'bolo', 'all_active', opts ).then( function ( result ) {
-        var bolos = _.map( result.rows, function ( row ) {
-            return boloFromCloudant( row.doc );
+    return db.view('bolo', 'all_active', opts).then(function (result) {
+        var bolos = _.map(result.rows, function (row) {
+            return boloFromCloudant(row.doc);
         });
-        return { 'bolos': bolos, total: result.total_rows };
+        return {'bolos': bolos, total: result.total_rows};
     });
 };
 
+CloudantBoloRepository.prototype.getBolosByAgency = function (id, limit, skip) {
 
-CloudantBoloRepository.prototype.getArchiveBolos = function ( limit, skip ) {
+    var opts = {
+        'include_docs': true,
+        'limit': limit,
+        'skip': skip,
+        'descending': true,
+    };
+
+    return db.view('bolo', 'all_active', opts).then(function (result) {
+        var bolos = _.map(result.rows, function (row) {
+            return boloFromCloudant(row.doc);
+        });
+
+        bolos.agency = id ;
+
+        return {'bolos': bolos, total: result.total_rows};
+    });
+};
+
+CloudantBoloRepository.prototype.searchBolos = function (limit, query_string, bookmark) {
+    var query_obj =
+    {
+        q: query_string,
+        limit: limit,
+        bookmark: bookmark,
+        include_docs: true
+
+    };
+
+    console.log(JSON.stringify(query_obj));
+
+    return db.search('bolo', 'bolos', query_obj).then(function (result) {
+
+            console.log('Showing %d out of a total %d bolos found', result.rows.length, result.total_rows);
+            for (var i = 0; i < result.rows.length; i++) {
+                console.log('Document id: %s', result.rows[i].id);
+            }
+            var bolos = _.map(result.rows, function (row) {
+
+                return boloFromCloudant(row.doc);
+            });
+            var flag = true;
+            while (flag === true) {
+                flag = false;
+                for (i = 0; i < bolos.length - 1; i++) {
+
+                    var date_one = bolos[i].createdOn;
+                    var date_two = bolos[i + 1].createdOn;
+                    var order = date_one > date_two ? 1 : date_one < date_two ? -1 : 0;
+                    if (order === -1) {
+                        var swap = bolos[i + 1];
+                        bolos[i + 1] = bolos[i];
+                        bolos[i] = swap;
+                        flag = true;
+                    }
+                }
+            }
+            return {'bolos': bolos, total: result.total_rows, returned: result.rows.length, bookmark: result.bookmark};
+
+        })
+        .catch(function (error) {
+            return new Error(
+                'Failed to find bolo : ' + error.error + ' / ' + error.reason
+            );
+        });
+};
+
+CloudantBoloRepository.prototype.getArchiveBolos = function (limit, skip) {
     var opts = {
         'include_docs': true,
         'limit': limit,
@@ -254,15 +353,29 @@ CloudantBoloRepository.prototype.getArchiveBolos = function ( limit, skip ) {
         'descending': true
     };
 
-    return db.view( 'bolo', 'all_archive', opts ).then( function ( result ) {
-        var bolos = _.map( result.rows, function ( row ) {
-            return boloFromCloudant( row.doc );
+    return db.view('bolo', 'all_archive', opts).then(function (result) {
+        var bolos = _.map(result.rows, function (row) {
+            return boloFromCloudant(row.doc);
         });
-        return { bolos: bolos, total: result.total_rows };
+        return {bolos: bolos, total: result.total_rows};
     });
 };
 
+CloudantBoloRepository.prototype.getArchiveBolosForPurge = function () {
 
+    var opts = {
+        'include_docs': true
+
+    };
+    return db.view('bolo', 'all_archive',opts).then(function (result) {
+        var bolos = [];
+        for (var i = 0; i < result.rows.length; i++) {
+
+            bolos.push({id: result.rows[i].id, lastUpdatedOn: result.rows[i].key});
+        }
+        return {bolos: bolos, total: result.total_rows};
+    });
+};
 CloudantBoloRepository.prototype.getBolo = function (id) {
     return db.get(id)
         .then(function (bolo_doc) {

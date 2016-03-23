@@ -4,10 +4,38 @@ extends layout
 block jumbo
     .jumbotron
         .container
-            h1 Be On the Lookout
-            p Browse Active BOLOs
+            div#wrapper.row
+                div.col-xs-2.col-md-10
+                    p Active BOLOs
+                div.col-xs-2
+                    .dropdown
+                        button.dropbtn.pull-right(onclick='myFunction()') Filter by agency
+                          |   
+                          #myDropdown.dropdown-content
+                            a.btn.btn-default(href = "/bolo/", type="button") View all
+                            for agency in agencies
+                                a.btn.btn-default(href="/bolo/agency/" + agency.id, name = "agencyID", value = agency.id, type="button") #{agency.name}
 
+            script.
+                function myFunction() {
+                    document.getElementById("myDropdown").classList.toggle("show");
+                }
+                   
+                window.onclick = function(event) {
+                  if (!event.target.matches('.dropbtn')) {
 
+                    var dropdowns = document.getElementsByClassName("dropdown-content");
+                    var i;
+                    for (i = 0; i < dropdowns.length; i++) {
+                      var openDropdown = dropdowns[i];
+                      if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                      }
+                    }
+                  }
+                }
+
+                    
 block content
     include ./partials/global-alerts.jade
 
@@ -16,13 +44,14 @@ block content
 
     .row
         for bolo in bolos
-            div.col-sm-6.col-md-4
                 include ./partials/bolo-thumbnail.jade
                     .actions
                         a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
                         a.btn.btn-default( href="/bolo/details/" + bolo.id role="button" ) Details
-                        a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
+                        a.btn.btn-warning( href="/bolo/archive/" + bolo.id onClick = "return confirm('Are you sure you want to archive this BOLO?');") Archive
 
     .row.text-center
         - var route = '/bolo'
         include ./partials/paging.jade
+
+

@@ -9,7 +9,8 @@ var LocalStrategy = require('passport-local').Strategy;
 
 var config = require('../config');
 var userRepository = new config.UserRepository();
-var userService = new config.UserService( userRepository );
+var agencyService  = new config.AgencyService( new config.AgencyRepository() );
+var userService = new config.UserService( userRepository , agencyService);
 
 var _csrf = csrf({ 'cookie': true });
 var _bodyparser = bodyParser.urlencoded({ 'extended': true });
@@ -80,7 +81,8 @@ router.post( '/login',
             login_redirect = req.session.login_redirect;
             req.session.login_redirect = null;
         }
-        res.redirect( login_redirect || '/' );
+        console.log("Session:" + login_redirect);
+        res.redirect( '/bolo' || '/' );
     }
 );
 

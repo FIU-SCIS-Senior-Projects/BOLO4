@@ -1,29 +1,26 @@
 include ./includes/mixins.jade
+include ../routes/bolos.js
 extends ./layout.jade
-
 
 block jumbo
     .jumbotron
         .container
-            h1 Be On the Lookout
-            p Publish a New BOLO
-
+            p Create a BOLO
 
 block content
     include ./partials/global-alerts.jade
-
     include ./partials/bolo-options.jade
-
-    form#create-bolo-form(action="/bolo/create" enctype="multipart/form-data" method="post")
-        input( type="hidden" name="status" value="New" )
+    
+    form#create-bolo-form(action= "/bolo/create" enctype="multipart/form-data" method="post")
+        input( type = "hidden" name="status" value="new")
         +select_options( "category", "Category", categories, true, "" )
 
         +input_text( "firstName", "First Name", "", false, "" )
         +input_text( "lastName", "Last Name", "", false,  "" )
-        +input_text( "dob", "Date of Birth (DD/MM/YYYY )", "DD/MM/YYYY", "" )
+        +input_text( "dob", "Date of Birth (MM/DD/YYYY )", "MM/DD/YYYY", "" )
         +input_text( "dlNumber", "Drivers License Number", "", false, "" )
         +select_options( "race", "Race", races, false, "" )
-        +select_options( "sex", "Sex", ["Male", "Female"], false, "" )
+        +select_options( "sex", "Sex", sex, false, "" )
         +input_text( "height", "Height - Feet-Inches (e.g. 05-09)", "e.g. 05-09", false, "" )
         +input_text( "weight", "Weight - Pounds", "", false, "" )
         +select_options( "hairColor", "Hair Color", hair_colors, false, "" )
@@ -47,6 +44,8 @@ block content
         +input_textarea( "summary", "Summary", "", false, "" )
 
         .form-group
-            button.btn.btn-primary( type="submit" value="save" ) Publish
-            button.btn.btn-default( type="submit" disabled=true value="preview" ) Preview
-            button.btn.btn-default( type="submit" disabled=true value="pdf" ) PDF
+            button.btn.btn-default( name = "option" type = "submit" value = "submit") SUBMIT
+            button.btn.btn-default( name = "option" type = "submit" value = "preview" ) PREVIEW
+            button.btn.btn-default( name = "option" type="button" value="pdf" ) PDF
+            
+                      
