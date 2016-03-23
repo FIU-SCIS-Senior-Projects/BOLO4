@@ -50,7 +50,6 @@ function Bolo( data ) {
         agencyName      : '',
         author          : '',
         category        : '',
-        agencyName      : '',
         firstName       : '',
         lastName        : '',
         dob             : '',
