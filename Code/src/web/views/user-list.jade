@@ -6,7 +6,7 @@ block jumbo-desc
         div.col-xs-2.col-md-10
             p Admin Portal: User Directory
         div.col-xs-2
-            button.btn.btn-default.pull-right() Sort by agency
+            a.btn.btn-default.pull-right(href="/admin/users/sorted") Sort by agency
 
 block admin-content
     p.lead Total Users: #{users.length}

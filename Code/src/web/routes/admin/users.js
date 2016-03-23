@@ -148,6 +148,31 @@ module.exports.getList = function ( req, res ) {
     });
 };
 
+module.exports.getSortedList = function ( req, res ) {
+    var data = {
+      'currentAgency': req.user.agency,
+      'currentUser':req.user
+    };
+    userService.getUsers().then( function ( users ) {
+
+        users.sort(function(a, b) {
+             return a.data.agencyName > b.data.agencyName;
+        });
+
+        data.users = users.filter( function ( oneUser ) {
+            return oneUser.id !== req.user.id;
+        });
+        console.log(data);
+        res.render( 'user-list', data);
+    })
+    .catch( function ( error ) {
+        console.error( 'Error at /users >>> ', error.message );
+        req.flash( FERR, 'Unable to retrieve user directory, please try ' +
+                'again or contact the system administrator' );
+        res.redirect( 'back' );
+    });
+};
+
 /**
  * Responds with account information for a specified user.
  */
