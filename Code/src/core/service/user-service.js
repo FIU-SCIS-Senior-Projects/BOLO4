@@ -118,6 +118,7 @@ UserService.prototype.getUsers = function () {
     return this.userRepository.getAll();
 };
 
+// connection between this and payload function
 UserService.prototype.getAgencySubscribers = function ( agencyID ) {
     return this.userRepository.getByAgencySubscription( agencyID );
 };

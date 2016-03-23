@@ -25,7 +25,12 @@ config.AgencyRepository = require( path.join( core, 'adapters/persistence/clouda
 config.UserService      = require( path.join( core, 'service/user-service' ) );
 config.UserRepository   = require( path.join( core, 'adapters/persistence/cloudant-user-repository' ) );
 
-config.EmailService     = require( path.join( core, 'adapters/email/sendgrid-email-service' ) );
+/*
+* developing code
+*/
+config.EmailService     = require( path.join( core, 'service/email-service' ) );
+config.EmailBoundry    = require( path.join( core, 'adapters/email/sendgrid-email-adapter' ) );
+
 config.CommonService    = require( path.join( core, 'service/common-service' ) );
 
 
@@ -107,4 +112,3 @@ config.validation = {
         }
     }
 };
-
