@@ -153,16 +153,39 @@ module.exports.getSortedList = function ( req, res ) {
       'currentAgency': req.user.agency,
       'currentUser':req.user
     };
+
+    var type = req.params.id;
+    console.log(type);
     userService.getUsers().then( function ( users ) {
 
-        users.sort(function(a, b) {
-             return a.data.agencyName > b.data.agencyName;
-        });
+        console.log(users);
+
+        if(type === "name"){
+            users.sort(function(a, b) {
+                 return a.data.lname > b.data.lname;
+            });
+        }
+        if(type === "agency"){
+            users.sort(function(a, b) {
+                 return a.data.agencyName > b.data.agencyName;
+            });
+        }
+        if(type === "username"){
+            users.sort(function(a, b) {
+                 return a.data.username > b.data.username;
+            });
+        }
+        if(type === "role"){
+            users.sort(function(a, b) {
+                 return a.data.tier < b.data.tier;
+            });
+        }
+
+
 
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;
         });
-        console.log(data);
         res.render( 'user-list', data);
     })
     .catch( function ( error ) {
