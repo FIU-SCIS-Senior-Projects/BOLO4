@@ -32,7 +32,7 @@ describe( 'cloudant user repository', function () {
         user = UserFixture.create();
     });
 
-    it( 'inserts a user', function () {
+    it.skip( 'inserts a user', function () {
         /* act */
         var userPromise = userRepository.insert( user );
 
@@ -45,7 +45,7 @@ describe( 'cloudant user repository', function () {
             });
     });
 
-    it( 'gets all users', function () {
+    it.skip( 'gets all users', function () {
         /* arrange */
         var other = UserFixture.create();
         other.data.username = 'otherman';
@@ -72,7 +72,7 @@ describe( 'cloudant user repository', function () {
         });
     });
 
-    it( 'gets a single user by id', function () {
+    it.skip( 'gets a single user by id', function () {
         /* act */
         var userPromise = userRepository.getById( insertedUserID );
 
@@ -104,7 +104,7 @@ describe( 'cloudant user repository', function () {
             });
     });
 
-    it( 'removes a user', function () {
+    it.skip( 'removes a user', function () {
         /* act */
         var responsePromise = userRepository.remove( insertedUserID );
 
