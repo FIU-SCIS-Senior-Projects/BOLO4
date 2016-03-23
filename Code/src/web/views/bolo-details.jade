@@ -14,20 +14,6 @@ block jumbo
 block content
 
     include ./partials/global-alerts.jade
-    div.col-xs-12
-        button#renderPDF.pull-left(
-        type='submit'
-        style='margin-bottom:25px;'
-        ) Render As PDF
-
-    script.
-        $("#renderPDF").click(function (e) {
-        e.preventDefault();
-            var local_data = !{JSON.stringify(bolo)};
-            console.log(local_data);
-            $.post('/bolo/viewPDF/:id', {bolo_data: local_data});
-
-        });
 
     div.container-fluid#boloPage
         div.row
