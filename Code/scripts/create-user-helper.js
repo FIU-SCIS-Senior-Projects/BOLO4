@@ -38,7 +38,8 @@ agencyService.searchAgencies("name:Pinecrest").then( function ( response ) {
             "lname" : "User",
             "email": "root@example.com",
             "tier": 4,
-            "agency": agencies[0].id
+            "agency": agencies[0].id, 
+            "agencyName" : agencies[0].name
         });
 
         var adminDTO = userService.formatDTO({
@@ -48,7 +49,8 @@ agencyService.searchAgencies("name:Pinecrest").then( function ( response ) {
             "lname" : "User",
             "email": "admin@example.com",
             "tier": 3,
-            "agency": agencies[0].id
+            "agency": agencies[0].id, 
+            "agencyName" : agencies[0].name
         });
 
         var superDTO = userService.formatDTO({
@@ -58,7 +60,8 @@ agencyService.searchAgencies("name:Pinecrest").then( function ( response ) {
             "lname" : "User",
             "email": "super@example.com",
             "tier": 2,
-            "agency": agencies[0].id
+            "agency": agencies[0].id, 
+            "agencyName" : agencies[0].name
         });
 
         var officerDTO = userService.formatDTO({
@@ -68,7 +71,8 @@ agencyService.searchAgencies("name:Pinecrest").then( function ( response ) {
             "lname" : "User",
             "email": "officer@example.com",
             "tier": 1,
-            "agency": agencies[0].id
+            "agency": agencies[0].id, 
+            "agencyName" : agencies[0].name
         });
         console.log(
             "Attempting to create users..."
