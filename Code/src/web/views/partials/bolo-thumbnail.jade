@@ -1,8 +1,19 @@
+include ./bolo-options.jade
+include ../includes/mixins.jade
 div.col-xs-12.col-sm-6.col-md-3
+
     div.thumbnail
+
         div.status
-            if(bolo.status)
-                h2 #{bolo.status}
+            form( action="/bolo/update/" + bolo.id method="post" ).form-group
+                input( type="hidden" name="id" value=bolo.id )
+                label.control-label( for=bolo.id )
+                select.form-control(id=bolo.id name="status" onchange="this.form.submit()")
+                    each val in bolo_status
+                        if bolo.status == val
+                            +option( val,true )
+                        else
+                            +option( val,false )
         div.boloImageContainer
         
             div.boloImageCenterer
