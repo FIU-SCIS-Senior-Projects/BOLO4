@@ -2,7 +2,24 @@ extends admin-layout
 include includes/mixins
 
 block jumbo-desc
-    p User Directory
+    div#wrapper.row
+        div.col-xs-2.col-md-10
+            p Admin Portal: User Directory
+        div.col-xs-2.dropdown
+            button.btn.btn-default.dropdown-toggle(type = "button" data-toggle="dropdown") Sort
+                span.caret
+            ul.dropdown-menu
+                -var dimensions = "width: 210px; margin: 0 auto;"
+                -var route = "/admin/users/sorted/"
+                -var option1 = "agency"
+                -var option2 = "name"
+                -var option3 = "username"
+                -var option4 = "role"
+                a.btn.btn-default(href=route + option1 style=dimensions) Sort by agency
+                a.btn.btn-default(href=route + option2 style=dimensions) Sort by name
+                a.btn.btn-default(href=route + option3 style=dimensions) Sort by username
+                a.btn.btn-default(href=route + option4 style=dimensions) Sort by role
+
 
 block admin-content
     p.lead Total Users: #{users.length}
@@ -11,19 +28,24 @@ block admin-content
         table.table.table-striped
             thead
                 tr
+                    if(currentUser.tier > 3)
+                      th Agency                                              
                     th Username
                     th Name
                     th Email
                     th Role
-                    th 
+                    th
             tbody
-                each user in users
-                    tr
-                        td #{user.username}
-                        td #{user.fname} #{user.lname}
-                        td #{user.email}
-                        td #{user.roleName()}
-                        td: a.text-large(href="/admin/users/" + user.id)
+                each userInTable in users
+                  if(userInTable.agency == currentUser.agency && userInTable.tier <= currentUser.tier || currentUser.tier > 3)
+                    tr 
+                        if(currentUser.tier > 3)
+                          td #{userInTable.agencyName}
+                        td #{userInTable.username}
+                        td #{userInTable.fname} #{userInTable.lname}
+                        td #{userInTable.email}
+                        td #{userInTable.roleName()}
+                        td: a.text-large(href="/admin/users/" + userInTable.id)
                             span.glyphicon.glyphicon-cog( aria-hidden="true" )
 
     a.btn.btn-default(href="/admin/users/create") Add New User

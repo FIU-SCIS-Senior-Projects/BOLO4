@@ -1,0 +1,101 @@
+include includes/mixins
+extends layout
+
+
+block jumbo
+  .jumbotron
+    .container
+          p BOLO Details Preview
+          a.btn.btn-default( type = "button" value = "back" onClick="history.go(-1);return true;") Back to Create BOLO
+
+block content
+    include ./partials/global-alerts.jade
+    div.container-fluid
+        div.row
+            - var att_route = '/agency/' + bolo.data.agency + '/img';
+            div.col-xs-12.col-md-2
+              img( src=att_route + '/logo' alt="", width=150, height=175 )
+            div.col-xs-12.col-md-7
+              p.text-danger.strong #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
+              p.strong #{agency_name} Police Department
+              p
+                em #{agency_address}
+              p
+                em #{agency_city}, #{agency_state}. #{agency_zip}
+              p
+                em #{agency_phone}
+            div.col-xs-12.col-md-2
+              img( src=att_route + '/shield' alt="", width=150, height=180)
+        div.text-center
+          h1.text-danger.strong #{bolo.data.category}
+        | &nbsp;
+        | &nbsp;
+        div.row
+            div.col-xs-12.col-md-5
+                img( src="/img/nopic.png" alt="", width=400 )
+                form.form-horizontal
+                +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
+            div.col-xs-12.col-md-7
+                form.form-horizontal
+                +form_labels_row("Bolo ID", "XYZ000" )
+                if bolo.data.authorFName != null || bolo.data.authorLName != null
+                  +form_labels_row("Author", bolo.data.authorFName + " " +  bolo.data.authorLName )
+                else
+                  +form_labels_row("Author", "N/A")
+                if bolo.data.firstName.length || bolo.data.lastName.length
+                  +form_labels_row("Name", bolo.data.firstName + " " +  bolo.data.lastName)
+                else
+                  +form_labels_row("Name", "N/A" )
+                if bolo.data.race != "Select an option..."
+                  +form_labels_row("Race", bolo.data.race, bolo.data.race?"":"hidden")
+                else
+                  +form_labels_row("Race", "N/A" )
+                if bolo.data.dob.length
+                  +form_labels_row("DOB", bolo.data.dob, bolo.data.dob?"":"hidden")
+                else
+                  +form_labels_row("DOB", "N/A" )
+                if bolo.data.dlNumber.length
+                  +form_labels_row("License #", bolo.data.dlNumber, bolo.data.dlNumber?"":"hidden")
+                else
+                  +form_labels_row("License #", "N/A" )
+                if bolo.data.height.length
+                  +form_labels_row("Height", bolo.data.height, bolo.data.height?"":"hidden")
+                else
+                  +form_labels_row("Height", "N/A" )
+                if bolo.data.weight.length
+                  +form_labels_row("Weight", bolo.data.weight + "lbs", bolo.data.weight?"":"hidden")
+                else
+                  +form_labels_row("Weight", "N/A" )
+                if bolo.data.address.length
+                  +form_labels_row("Address", bolo.data.address, bolo.data.address?"":"hidden")
+                else
+                  +form_labels_row("Address", "N/A" )
+                if bolo.data.sex != "Select an option..."
+                  +form_labels_row("Sex", bolo.data.sex, bolo.data.sex?"":"hidden")
+                else
+                  +form_labels_row("Sex", "N/A" )
+                if bolo.data.hairColor != "Select an option..."
+                  +form_labels_row("Hair Color", bolo.data.hairColor, bolo.data.hairColor?"":"hidden")
+                else
+                  +form_labels_row("Hair Color", "N/A" )
+                if bolo.data.tattoos.length
+                  +form_labels_row("Tattoos/Scars", bolo.data.tattoos,bolo.data.tattoos?"":"hidden")
+                else
+                  +form_labels_row("Tattoos/Scars", "N/A" )
+    form.form-horizontal
+    | &nbsp;
+    p.strong Additional Info:
+    if bolo.data.additional.length
+      p #{bolo.data.additional}
+    else
+      | &nbsp;
+    | &nbsp;
+    if bolo.data.video_url.length
+      p.strong Video Link:
+      p #{bolo.data.video_url}
+    | &nbsp;
+    p.strong Summary:
+    if bolo.data.additional.length
+      p #{bolo.data.summary}
+    else
+      | &nbsp;

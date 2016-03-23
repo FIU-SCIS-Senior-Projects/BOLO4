@@ -1,0 +1,29 @@
+//
+   Created by Ed on 1/24/2016.
+
+extends layout
+
+
+block jumbo
+    .jumbotron
+        .container
+            p BOLO Search Results
+
+
+block content
+    include ./partials/global-alerts.jade
+
+    if bolos && 0 === bolos.length
+        p.lead No bolos were found matching the specified criteria.
+
+    .row
+        for bolo in bolos
+                include ./partials/bolo-thumbnail.jade
+                    .actions
+                        a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit
+                        a.btn.btn-default( href="/bolo/details/" + bolo.id role="button" ) Details
+                        a.btn.btn-warning( href="/bolo/archive/" + bolo.id role="button" ) Archive
+
+    .row.text-center
+        - var route = '/bolo/search/results'
+        include ./partials/search-paging.jade

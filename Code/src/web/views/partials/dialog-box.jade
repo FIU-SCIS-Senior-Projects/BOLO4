@@ -1,0 +1,41 @@
+
+div#dialog(style='display:none;')
+    h1 Authenticate Purge
+    form#purgeform(name='purgeform')
+        label(for='password') Password:
+        input#password.txtfield(type='password', name='password', tabindex='1')
+
+    script.
+        $(document).ready(function () {
+            $("#dialog").dialog({
+                autoOpen: false,
+                modal: true,
+                buttons: {
+                    "Confirm": function () {
+                        $.ajax({
+                            url: '/bolo/archive/purge',
+                            type: 'POST',
+                            data: {password: $("#password").val(), range: $("#purgeRange option:selected").val()},
+                            dataType: 'json',
+                            success: function(data){
+                                console.log('redirect');
+                                if (typeof data.redirect == 'string')
+                                    window.location = data.redirect;
+                    }})
+                        $(this).dialog("close");
+                    },
+                    "Cancel": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        });
+
+        $("#purge").click(function (e) {
+
+            $("#dialog").dialog("open");
+
+        });
+
+
+

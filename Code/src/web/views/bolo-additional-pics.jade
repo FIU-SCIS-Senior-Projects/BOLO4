@@ -1,0 +1,13 @@
+extends layout
+
+
+block jumbo
+	.jumbotron
+		.container
+			p Additional Images
+
+
+block content
+	each name, uuid in bolo.images
+		img( src="/bolo/asset/" + bolo.id + "/" + uuid )
+					

@@ -3,7 +3,7 @@ include ./includes/mixins.jade
 
 
 block jumbo-desc
-    p Agency Update
+    p Admin Portal: Agency Update
 
 
 block admin-content
@@ -24,7 +24,7 @@ block admin-content
 
     form( action=( route + form_action ) enctype="multipart/form-data" method="post" )
         input( name="id" type="hidden" value=agency.id )
-
+        input( name="agency_id" type="hidden" value=agency.agency_id)
         +input_text( "name", "Agency Name", "", false, agency.name)
         +input_text( "address", "Address", "", false, agency.address )
         +input_text( "city", "City", "", false, agency.city )
@@ -63,4 +63,3 @@ block admin-content
 
 
     .row
-

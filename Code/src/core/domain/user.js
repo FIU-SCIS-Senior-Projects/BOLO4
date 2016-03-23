@@ -42,7 +42,8 @@ var required = Object.keys( schema ).filter( function ( key ) {
 var EnumRoles = Object.create( null, {
     'OFFICER'       : { 'value': 1, 'writable': false, 'enumerable': true },
     'SUPERVISOR'    : { 'value': 2, 'writable': false, 'enumerable': true },
-    'ADMINISTRATOR' : { 'value': 3, 'writable': false, 'enumerable': true }
+    'ADMINISTRATOR' : { 'value': 3, 'writable': false, 'enumerable': true },
+    'ROOT'          : { 'value': 4, 'writable': false, 'enumerable': true }
 });
 
 for ( var role in EnumRoles ) {
@@ -78,6 +79,7 @@ function User ( data ) {
         'password'      : null,
         'tier'          : 1,
         'agency'        : null,
+        'agencyName'    : '',
         'badge'         : '',
         'sectunit'      : '',
         'ranktitle'     : '',
@@ -174,4 +176,3 @@ User.prototype.diff = function ( other ) {
         return source.data[key] !== other.data[key];
     });
 };
-

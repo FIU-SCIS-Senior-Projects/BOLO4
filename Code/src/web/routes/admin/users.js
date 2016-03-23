@@ -5,8 +5,8 @@ var _               = require('lodash');
 var Promise         = require('promise');
 
 var config          = require('../../config');
-var userService     = new config.UserService( new config.UserRepository() );
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
+var userService     = new config.UserService( new config.UserRepository(), agencyService );
 
 var formUtil        = require('../../lib/form-util');
 var passwordUtil    = require('../../lib/password-util');
@@ -17,6 +17,34 @@ var FMSG = config.const.GFMSG;
 var parseFormData = formUtil.parseFormData;
 var cleanTemporaryFiles = formUtil.cleanTempFiles;
 var FormError = formUtil.FormError;
+
+var BoloAuthorize   = require('../../lib/authorization.js').BoloAuthorize;
+
+/**
+ * Validating whther or not the fields in the form have been left empty.
+ * If one of the fields has been left empty, validateFields will return false.
+ */
+function validateFields (fields){
+  var fieldValidator = true;
+
+  if(fields.fname == ""){
+    fieldValidator = false;
+  }
+  if(fields.lname == ""){
+    fieldValidator = false;
+  }
+  if(fields.badge== ""){
+    fieldValidator = false;
+  }
+  if(fields.sectunit == ""){
+    fieldValidator = false;
+  }
+  if(fields.ranktitle == ""){
+    fieldValidator = false;
+  }
+
+  return fieldValidator;
+}
 
 
 /**
@@ -45,6 +73,8 @@ module.exports.postCreateForm = function ( req, res ) {
     };
 
     parseFormData( req ).then( function ( formDTO ) {
+
+        var formFields = validateFields(formDTO.fields);
         var validationErrors = passwordUtil.validatePassword(
             formDTO.fields.password, formDTO.fields.confirm
         );
@@ -56,9 +86,16 @@ module.exports.postCreateForm = function ( req, res ) {
             throw new FormError();
         }
 
+        if(formFields === false){
+          req.flash( FERR, 'Error saving new user, please try again. Every field is required.' );
+          res.redirect('back');
+          throw new FormError();
+        }
+
         formDTO.fields.tier = formDTO.fields.role;
         formDTO.fields.agency = formDTO.fields.agency || req.user.agency;
         formDTO.fields.notifications = [ formDTO.fields.agency ];
+
         var userDTO = userService.formatDTO( formDTO.fields );
 
         return userService.registerUser( userDTO );
@@ -83,7 +120,6 @@ module.exports.postCreateForm = function ( req, res ) {
     .catch( function ( error ) {
         /** @todo inform of duplicate registration errors */
         console.error( 'Error at /users/create >>> ', error.message );
-        req.flash( FERR, 'Error saving new user, please try again.' );
         res.redirect( 'back' );
     });
 };
@@ -94,9 +130,59 @@ module.exports.postCreateForm = function ( req, res ) {
  * @todo implement sorting, filtering, and paging
  */
 module.exports.getList = function ( req, res ) {
-    var data = {};
-
+    var data = {
+      'currentAgency': req.user.agency,
+      'currentUser':req.user
+    };
     userService.getUsers().then( function ( users ) {
+        data.users = users.filter( function ( oneUser ) {
+            return oneUser.id !== req.user.id;
+        });
+        res.render( 'user-list', data);
+    })
+    .catch( function ( error ) {
+        console.error( 'Error at /users >>> ', error.message );
+        req.flash( FERR, 'Unable to retrieve user directory, please try ' +
+                'again or contact the system administrator' );
+        res.redirect( 'back' );
+    });
+};
+
+module.exports.getSortedList = function ( req, res ) {
+    var data = {
+      'currentAgency': req.user.agency,
+      'currentUser':req.user
+    };
+
+    var type = req.params.id;
+    console.log(type);
+    userService.getUsers().then( function ( users ) {
+
+        console.log(users);
+
+        if(type === "name"){
+            users.sort(function(a, b) {
+                 return a.data.lname > b.data.lname;
+            });
+        }
+        if(type === "agency"){
+            users.sort(function(a, b) {
+                 return a.data.agencyName > b.data.agencyName;
+            });
+        }
+        if(type === "username"){
+            users.sort(function(a, b) {
+                 return a.data.username > b.data.username;
+            });
+        }
+        if(type === "role"){
+            users.sort(function(a, b) {
+                 return a.data.tier < b.data.tier;
+            });
+        }
+
+
+
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;
         });
@@ -114,16 +200,21 @@ module.exports.getList = function ( req, res ) {
  * Responds with account information for a specified user.
  */
 module.exports.getDetails = function ( req, res, next ) {
-    var data = {};
+    var data = {
+      'currentAgency':req.user.agency
+    };
 
-    userService.getUser( req.params.id ).then( function ( user ) {
+    return userService.getUser( req.params.id )
+    .then( function ( user ) {
         data.user = user;
-        return agencyService.getAgency( user.agency );
-    }).then( function ( agency ) {
-        data.agency = agency;
-        res.render( 'user-details', data );
-    }).catch( function ( error ) {
-        req.flash( FERR, 'Unable to get user information, please try again.' );
+        return agencyService.getAgency( user.agency )
+        .then( function ( agency ) {
+            data.agency = agency;
+            res.render( 'user-details', data );
+        });
+    })
+    .catch( function ( error ) {
+        req.flash( FERR, 'Unable to get user information, please try again.' );        
         next( error );
     });
 };
@@ -214,6 +305,14 @@ module.exports.postEditDetails = function ( req, res ) {
     parseFormData( req ).then( function ( formDTO ) {
         formDTO.fields.tier = formDTO.fields.role;
         var userDTO = userService.formatDTO( formDTO.fields );
+        var formFields = validateFields(formDTO.fields);
+
+        if(formFields == false){
+          req.flash(GFERR, 'No field can be left empty. This information is required');
+          res.redirect('back');
+          throw new FormError();
+        }
+
         return userService.updateUser( id, userDTO );
     }, function ( error ) {
         console.error( 'Error at /users/:id/edit-details >>> ', error.message );
@@ -226,7 +325,7 @@ module.exports.postEditDetails = function ( req, res ) {
     })
     .catch( function ( error ) {
         console.error( 'Error at /users/:id/edit-details >>> ', error.message );
-        req.flash( FERR, 'Unknown error occurred, please try again.' );
+        req.flash( FERR, 'Error occurred, please try again. All fields are required.' );
         res.redirect( 'back' );
     });
 };
@@ -246,4 +345,3 @@ module.exports.getDelete = function ( req, res ) {
         }
     );
 };
-

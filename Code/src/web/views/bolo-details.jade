@@ -1,128 +1,117 @@
-extends ./layout.jade
+include includes/mixins
+extends layout
 
 
 block jumbo
-    .jumbotron
-        .container
-            h1 Be On the Lookout
-            p Detailed BOLO Information
-
+  .jumbotron
+    .container
+      div#wrapper.row
+        div.col-xs-2.col-md-10
+           p BOLO Details
+        div.col-xs-2
+           a.btn.btn-default.pull-right( href="/bolo/details/pdf/" + bolo.id ) Generate PDF
 
 block content
 
-    - var img_src = '/bolo/asset' + bolo.id
+    include ./partials/global-alerts.jade
 
-    .row
-        include ./partials/global-alerts.jade
-
-    .row
-        .col-md-7
-            h3 #{bolo.category} 
-                if bolo.status
-                    small.text-danger #{bolo.status}
-
-            table.table
-                tr: td( colspan="2" ): h4 Suspect
-
-                tr.no-border
-                    td First Name
-                    td #{bolo.firstName|| "N/A"}
-
-                tr.no-border
-                    td Last Name
-                    td #{bolo.lastName || "N/A"}
-
-                tr.no-border
-                    td Sex
-                    td #{bolo.sex || "N/A"}
-
-                tr.no-border
-                    td Race
-                    td #{bolo.race || "N/A"}
-
-                tr.no-border
-                    td Height
-                    td #{bolo.height || "N/A"}
-
-                tr.no-border
-                    td Weight
-                    td #{bolo.weight || "N/A"}
-
-                tr.no-border
-                    td Hair Color
-                    td #{bolo.hairColor || "N/A"}
-
-                tr.no-border
-                    td Address
-                    td #{bolo.address || "N/A"}
-
-                tr.no-border
-                    td Tattoos
-                    td #{bolo.tattoos || "N/A"}
-
-                tr.no-border
-                    td Drivers License
-                    td #{bolo.dlNumber || "N/A"}
-
-                tr.no-border
-                    td Date Of Birth
-                    td #{bolo.dob || "N/A"}
+    div.container-fluid#boloPage
+        div.row
+            - var att_route = '/agency/' + agency.id + '/img';
+            div.col-xs-2#logo
+              img( src=att_route + '/logo' alt="" )
+            div.col-xs-8
+              p.text-danger #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
+              p.strong #{agency.name} Police Department
+              p
+                em #{agency.address}
+              p
+                em #{agency.city}, #{agency.state}. #{agency.zip}
+              p
+                em #{agency.phone}
+            div.col-xs-2#badge
+              img( src=att_route + '/shield' alt="" )
+        div.text-center
+          h1.text-danger.strong #{bolo.data.category}
+        | &nbsp;
+        | &nbsp;
+        div.row
+            div.col-xs-4#featured
+                if Object.keys( bolo.attachments ).length
+                  - var keys = Object.keys( bolo.data.attachments )
+                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
+                else
+                  img( src="/img/nopic.png" alt="", width=400 )
 
 
-            table.table
-                tr: td( colspan="2"): h4 Summary
-                tr.no-border: td( colspan="2" ) #{bolo.summary || "N/A"}
-
-
-            table.table
-                tr: td( colspan="2"): h4 Additional Information
-                tr.no-border: td( colspan="2" ) #{bolo.additional || "N/A"}
-
-
-            table.table
-                tr: td( colspan="2"): h4 Media
-
-                tr.no-border
-                    td Video URL
-                    td #{bolo.video_url || "N/A"}
-
-                tr.no-border
-                    td Images
-                    td
-                        each name, uuid in bolo.images
-                            a( href="/bolo/asset/" + bolo.id + "/" + uuid target="_blank" ) #{name}
-                            br
-
-        .col-md-5
-            h3 General
-            table.table
-                tr
-                    td Agency
-                    td: a( href="/agency/" + agency.id ) #{agency.name}
-
-                tr.no-border
-                    td Author
-                    td #{bolo.authorFName} #{bolo.authorLName}
-                tr.no-border
-                    td Created
-                    td #{bolo.createdOn}
-
-                tr.no-border
-                    td Updated
-                    td #{bolo.lastUpdatedOn}
-
-                tr.no-border
-                    td UUID
-                    td #{bolo.id}
-
-                tr
-                    td
-                    td
-
-
-            if ( bolo.images.featured )
-                - var f_src = "/bolo/asset/" + bolo.id + "/featured";
-                h3 FEATURE IMAGE
-                .details-image
-                    a( href=f_src target="_blank" )
-                        img( src=f_src alt=bolo.images.featured )
+            div.col-xs-8#boloDetails
+                form.form-horizontal
+                +form_labels_row("Bolo ID", bolo.data.id )
+                if bolo.data.firstName.length || bolo.data.lastName.length
+                  +form_labels_row("Name", bolo.data.firstName + " " +  bolo.data.lastName)
+                else
+                  +form_labels_row("Name", "N/A" )
+                if bolo.data.race != "Select an option..."
+                  +form_labels_row("Race", bolo.data.race, bolo.data.race?"":"hidden")
+                else
+                  +form_labels_row("Race", "N/A" )
+                if bolo.data.dob.length
+                  +form_labels_row("DOB", bolo.data.dob, bolo.data.dob?"":"hidden")
+                else
+                  +form_labels_row("DOB", "N/A" )
+                if bolo.data.dlNumber.length
+                  +form_labels_row("License #", bolo.data.dlNumber, bolo.data.dlNumber?"":"hidden")
+                else
+                  +form_labels_row("License #", "N/A" )
+                if bolo.data.height.length
+                  +form_labels_row("Height", bolo.data.height, bolo.data.height?"":"hidden")
+                else
+                  +form_labels_row("Height", "N/A" )
+                if bolo.data.weight.length
+                  +form_labels_row("Weight", bolo.data.weight + "lbs", bolo.data.weight?"":"hidden")
+                else
+                  +form_labels_row("Weight", "N/A" )
+                if bolo.data.address.length
+                  +form_labels_row("Address", bolo.data.address, bolo.data.address?"":"hidden")
+                else
+                  +form_labels_row("Address", "N/A" )
+                if bolo.data.sex != "Select an option..."
+                  +form_labels_row("Sex", bolo.data.sex, bolo.data.sex?"":"hidden")
+                else
+                  +form_labels_row("Sex", "N/A" )
+                if bolo.data.hairColor != "Select an option..."
+                  +form_labels_row("Hair Color", bolo.data.hairColor, bolo.data.hairColor?"":"hidden")
+                else
+                  +form_labels_row("Hair Color", "N/A" )
+                if bolo.data.tattoos.length
+                  +form_labels_row("Tattoos/Scars", bolo.data.tattoos,bolo.data.tattoos?"":"hidden")
+                else
+                  +form_labels_row("Tattoos/Scars", "N/A" )
+        div.row
+            div.col-xs-8
+                form.form-horizontal
+                    +form_labels_row("Created", bolo.data.createdOn, bolo.data.createdOn ? "" : "hidden")
+        div.row
+            div.col-xs-4
+                a(href='/bolo/details/pics/' + bolo.data.id) Additional images
+        form.form-horizontal
+        | &nbsp;
+        p Additional Info:
+        if bolo.data.additional.length
+          p #{bolo.data.additional}
+        else
+          | &nbsp;
+        | &nbsp;
+        if bolo.data.video_url.length
+          p.strong Video Link:
+          p #{bolo.data.video_url}
+        | &nbsp;
+        p Summary:
+        if bolo.data.additional.length
+          p #{bolo.data.summary}
+        else
+          | &nbsp;
+        if bolo.data.authorFName != null || bolo.data.authorLName != null
+          p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
+          p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName}
+          p.strong Please contact the agency should clarification be required.

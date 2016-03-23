@@ -7,7 +7,6 @@ jsdoc
 coverage
 manifest.yml
 .vscode
-
 #
 # Node.js Ignores
 #
@@ -46,7 +45,7 @@ node_modules
 
 # Local environment variables
 .env
-
+#.env.example
 
 #
 # Eclipse (IBM Online Editor) Ignores

@@ -15,8 +15,16 @@ var GFMSG   = config.const.GFMSG;
 module.exports = router;
 
 
-router.use( '/admin*', function ( req, res, next ) {
-    if ( req.user.tier === User.ADMINISTRATOR ) {
+router.use( '/admin/agency', function ( req, res, next ) {
+    if ( req.user.tier === User.ROOT ) {
+        next();
+    } else {
+        res.render( 'unauthorized' );
+    }
+});
+
+router.use( '/admin/users', function ( req, res, next ) {
+    if ( req.user.tier === User.ROOT || req.user.tier === User.ADMINISTRATOR) {
         next();
     } else {
         res.render( 'unauthorized' );
@@ -27,6 +35,7 @@ router.use( '/admin*', function ( req, res, next ) {
 var pre = '/admin/users';
 router.use( SETNAV( 'admin-users' ) );
 router.get(  pre                            , users.getList );
+router.get(  pre + '/sorted/:id'            , users.getSortedList);
 router.get(  pre + '/create'                , users.getCreateForm );
 router.post( pre + '/create'                , users.postCreateForm );
 router.get(  pre + '/:id'                   , users.getDetails );
@@ -59,5 +68,10 @@ function SETNAV ( title ) {
 }
 
 function getIndex ( req, res ) {
-    res.render( 'admin' );
+  if ( req.user.tier === User.ROOT || req.user.tier === User.ADMINISTRATOR) {
+      res.render( 'admin' );
+  } else {
+      res.render( 'unauthorized' );
+  }
+
 }

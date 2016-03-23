@@ -4,8 +4,6 @@
 /* Module Dependencies */
 var fs = require('fs');
 var Promise = require('promise');
-
-
 /** @module core/ports */
 
 /**

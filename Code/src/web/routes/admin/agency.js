@@ -28,20 +28,50 @@ function isImage ( fileDTO ) {
 function getAgencyAttachments ( fields ) {
     var result = [];
     var fileDTO;
+    var validateShield = false;
+    var validateLogo = false;
 
     if ( fields.logo_upload && isImage( fields.logo_upload  ) ) {
         fileDTO = _.assign( {}, fields.logo_upload );
         fileDTO.name = 'logo';
         result.push( fileDTO );
+        validateLogo = true;
     }
 
     if ( fields.shield_upload && isImage( fields.shield_upload ) ) {
         fileDTO = _.assign( {}, fields.shield_upload );
         fileDTO.name = 'shield';
         result.push( fileDTO );
+        validateShield = true;
     }
 
     return ( result.length ) ? result : null;
+}
+
+/**
+ * Validating whther or not the fields in the form have been left empty.
+ * If one of the fields has been left empty, validateFields will return false.
+ */
+function validateFields (fields){
+  var fieldValidator = true;
+
+  if(fields.name == ""){
+    fieldValidator = false;
+  }
+  if(fields.address == ""){
+    fieldValidator = false;
+  }
+  if(fields.city == ""){
+    fieldValidator = false;
+  }
+  if(fields.zip == ""){
+    fieldValidator = false;
+  }
+  if(fields.phone == ""){
+    fieldValidator = false;
+  }
+
+  return fieldValidator;
 }
 
 
@@ -73,15 +103,35 @@ module.exports.postCreateForm = function ( req, res, next ) {
     parseFormData( req ).then( function ( formDTO ) {
         var agencyDTO = agencyService.formatDTO( formDTO.fields );
         var atts = getAgencyAttachments( formDTO.fields );
+        var formFields = validateFields(formDTO.fields);
+        
+        if(formFields == false){
+          req.flash(GFERR, 'No field can be left empty. This information is required');
+          res.redirect('back');
+          throw new FormError();
+        }
+        if(atts == null){
+          req.flash(GFERR, 'Images not uploaded. Logo and Shield are required');
+          res.redirect('back');
+          throw new FormError();
+        }
+        var atts = getAgencyAttachments( formDTO.fields );
         var result = agencyService.createAgency( agencyDTO, atts );
         return Promise.all( [ result, formDTO ] );
     })
-    .then(function (pData) {
-        if (pData[1].files.length) cleanTemporaryFiles(pData[1].files);
-        req.flash( GFMSG, 'Agency registration successful.' );
-        res.redirect('/admin/agency');
+    .then(function (pData,error) {
+        if(error)
+        throw error;
+
+        else {
+            if (pData[1].files.length) cleanTemporaryFiles(pData[1].files);
+            req.flash(GFMSG, 'Agency registration successful.');
+            res.redirect('/admin/agency');
+        }
     }).catch( function ( error ) {
-        next( error );
+        req.flash(GFERR, 'Agency Creation unsuccessful ' + error);
+        res.redirect('back');
+        throw new FormError();
     });
 };
 
@@ -105,6 +155,14 @@ module.exports.postEditForm = function ( req, res, next ) {
     parseFormData( req ).then( function ( formDTO ) {
         var agencyDTO = agencyService.formatDTO( formDTO.fields );
         var atts = getAgencyAttachments( formDTO.fields );
+        var formFields = validateFields(formDTO.fields);
+        
+        if(formFields == false){
+          req.flash(GFERR, 'No field can be left empty. This information is required');
+          res.redirect('back');
+          throw new FormError();
+        }
+
         var result = agencyService.updateAgency( agencyDTO, atts );
         return Promise.all([ result, formDTO ]);
     }).then( function ( pData ) {
@@ -112,6 +170,8 @@ module.exports.postEditForm = function ( req, res, next ) {
         req.flash( GFMSG, 'Agency details update successful.' );
         res.redirect( '/admin/agency' );
     }).catch( function ( error ) {
+        req.flash(GFERR, 'Agency Creation unsuccessful ' + error);
+        res.redirect('back');
         next( error );
     });
 };

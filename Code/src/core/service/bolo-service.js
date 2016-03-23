@@ -44,6 +44,16 @@ BoloService.prototype.createBolo = function ( boloDTO, attachments ) {
     });
 };
 
+BoloService.prototype.previewBolo = function ( boloDTO) {
+    var bolo = new Bolo( boloDTO );
+
+    if ( ! bolo.isValid() ) {
+        Promise.reject( new Error( "Invalid bolo data" ) );
+    }
+
+    return bolo;
+};
+
 /**
  * Update BOLO data.
  *
@@ -73,14 +83,28 @@ BoloService.prototype.getBolos = function ( limit, skip ) {
     return this.boloRepository.getBolos( limit, skip );
 };
 
+/**
+ * Retrieve a collection of bolos from a specific agency
+ */
+BoloService.prototype.getBolosByAgency = function ( id, limit, skip ) {
+    return this.boloRepository.getBolosByAgency( id, limit, skip );
+};
+
 BoloService.prototype.getArchiveBolos = function ( limit, skip ) {
     return this.boloRepository.getArchiveBolos( limit, skip );
 };
-
+BoloService.prototype.getArchiveBolosForPurge = function () {
+    return this.boloRepository.getArchiveBolosForPurge();
+};
 BoloService.prototype.activate = function ( id, activate ) {
     return this.boloRepository.activate( id, activate );
 };
+BoloService.prototype.searchBolos = function(limit,query_string,bookmark){
 
+    var result = this.boloRepository.searchBolos(limit,query_string,bookmark);
+    return result;
+
+};
 BoloService.prototype.removeBolo = function ( id ) {
     return this.boloRepository.delete( id );
 };
