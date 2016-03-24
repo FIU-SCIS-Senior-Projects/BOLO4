@@ -2,7 +2,24 @@ extends admin-layout
 include includes/mixins
 
 block jumbo-desc
-    p Admin Portal: User Directory
+    div#wrapper.row
+        div.col-xs-2.col-md-10
+            p Admin Portal: User Directory
+        div.col-xs-2.dropdown
+            button.btn.btn-default.dropdown-toggle(type = "button" data-toggle="dropdown") Sort
+                span.caret
+            ul.dropdown-menu
+                -var dimensions = "width: 210px; margin: 0 auto;"
+                -var route = "/admin/users/sorted/"
+                -var option1 = "agency"
+                -var option2 = "name"
+                -var option3 = "username"
+                -var option4 = "role"
+                a.btn.btn-default(href=route + option1 style=dimensions) Sort by agency
+                a.btn.btn-default(href=route + option2 style=dimensions) Sort by name
+                a.btn.btn-default(href=route + option3 style=dimensions) Sort by username
+                a.btn.btn-default(href=route + option4 style=dimensions) Sort by role
+
 
 block admin-content
     p.lead Total Users: #{users.length}

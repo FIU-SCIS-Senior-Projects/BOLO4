@@ -37,12 +37,13 @@ block content
         | &nbsp;
         div.row
             div.col-xs-4#featured
+                p.text-center.text-danger.strong #{bolo.data.status}
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
                   img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
                 else
                   img( src="/img/nopic.png" alt="", width=400 )
-
+                p.strong Created: #{bolo.data.createdOn}
 
             div.col-xs-8#boloDetails
                 form.form-horizontal
@@ -89,8 +90,6 @@ block content
                   +form_labels_row("Tattoos/Scars", "N/A" )
         div.row
             div.col-xs-8
-                form.form-horizontal
-                    +form_labels_row("Created", bolo.data.createdOn, bolo.data.createdOn ? "" : "hidden")
         div.row
             div.col-xs-4
                 a(href='/bolo/details/pics/' + bolo.data.id) Additional images
@@ -113,5 +112,6 @@ block content
           | &nbsp;
         if bolo.data.authorFName != null || bolo.data.authorLName != null
           p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
-          p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName}
+          if bolo.data.lastUpdatedOn != bolo.data.createdOn
+            p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName} on #{bolo.data.lastUpdatedOn}
           p.strong Please contact the agency should clarification be required.
