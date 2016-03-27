@@ -314,6 +314,14 @@ CloudantBoloRepository.prototype.getBolosByAgency = function (id, limit, skip) {
         var bolos = _.map(result.rows, function (row) {
             return boloFromCloudant(row.doc);
         });
+        var index = 0;
+
+        bolos.forEach(function(bolo){
+            if(bolo.data.agency !== id){
+                delete bolos[index];
+            }
+            index++;
+        });
 
         bolos.agency = id ;
 
