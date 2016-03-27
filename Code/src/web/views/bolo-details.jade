@@ -18,8 +18,8 @@ block content
     div.container-fluid#boloPage
         div.row
             - var att_route = '/agency/' + agency.id + '/img';
-            div.col-xs-2#logo
-              img( src=att_route + '/logo' alt="" )
+            div.col-xs-2
+              img#logo.img-fluid( src=att_route + '/logo' alt="")
             div.col-xs-8
               p.text-danger #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
               p.strong #{agency.name} Police Department
@@ -29,20 +29,20 @@ block content
                 em #{agency.city}, #{agency.state}. #{agency.zip}
               p
                 em #{agency.phone}
-            div.col-xs-2#badge
-              img( src=att_route + '/shield' alt="" )
+            div.col-xs-2
+              img#badge.img-fluid( src=att_route + '/shield' alt="" )
         div.text-center
           h1.text-danger.strong #{bolo.data.category}
         | &nbsp;
         | &nbsp;
         div.row
-            div.col-xs-4#featured
+            div.col-xs-4
                 p.text-center.text-danger.strong #{bolo.data.status}
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
-                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
+                  img#featured.img-fluid(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
                 else
-                  img( src="/img/nopic.png" alt="", width=400 )
+                  img#featured.img-fluid( src="/img/nopic.png" alt="", width=400 )
                 p.strong Created: #{bolo.data.createdOn}
 
             div.col-xs-8#boloDetails
