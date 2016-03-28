@@ -35,6 +35,7 @@ router.use( '/admin/users', function ( req, res, next ) {
 var pre = '/admin/users';
 router.use( SETNAV( 'admin-users' ) );
 router.get(  pre                            , users.getList );
+router.get(  pre + '/sorted/:id'            , users.getSortedList);
 router.get(  pre + '/create'                , users.getCreateForm );
 router.post( pre + '/create'                , users.postCreateForm );
 router.get(  pre + '/:id'                   , users.getDetails );

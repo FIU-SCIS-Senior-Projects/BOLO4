@@ -15,12 +15,12 @@ block content
 
     include ./partials/global-alerts.jade
 
-    div.container-fluid
+    div.container-fluid#boloPage
         div.row
             - var att_route = '/agency/' + agency.id + '/img';
-            div.col-xs-12.col-md-2
-              img( src=att_route + '/logo' alt="", width=150, height=175 )
-            div.col-xs-12.col-md-7
+            div.col-xs-2
+              img#logo.img-fluid( src=att_route + '/logo' alt="")
+            div.col-xs-8
               p.text-danger #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
               p.strong #{agency.name} Police Department
               p
@@ -29,23 +29,23 @@ block content
                 em #{agency.city}, #{agency.state}. #{agency.zip}
               p
                 em #{agency.phone}
-            div.col-xs-12.col-md-2
-              img( src=att_route + '/shield' alt="", width=150, height=180)
+            div.col-xs-2
+              img#badge.img-fluid( src=att_route + '/shield' alt="" )
         div.text-center
           h1.text-danger.strong #{bolo.data.category}
         | &nbsp;
         | &nbsp;
         div.row
-            div.col-xs-12.col-md-5
+            div.col-xs-4
+                p.text-center.text-danger.strong #{bolo.data.status}
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
-                  img(src="/bolo/asset/" + bolo.data.id + "/featured" alt="", width=400)
+                  img#featured.img-fluid(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
                 else
-                  img( src="/img/nopic.png" alt="", width=400 )
-                form.form-horizontal
-                +form_labels_row("Created", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
-                a(href='/bolo/details/pics/' + bolo.data.id) Additional images
-            div.col-xs-12.col-md-7
+                  img#featured.img-fluid( src="/img/nopic.png" alt="", width=400 )
+                p.strong Created: #{bolo.data.createdOn}
+
+            div.col-xs-8#boloDetails
                 form.form-horizontal
                 +form_labels_row("Bolo ID", bolo.data.id )
                 if bolo.data.firstName.length || bolo.data.lastName.length
@@ -88,23 +88,30 @@ block content
                   +form_labels_row("Tattoos/Scars", bolo.data.tattoos,bolo.data.tattoos?"":"hidden")
                 else
                   +form_labels_row("Tattoos/Scars", "N/A" )
-    form.form-horizontal
-    | &nbsp;
-    p Additional Info:
-    if bolo.data.additional.length
-      p #{bolo.data.additional}
-    else
-      | &nbsp;
-    | &nbsp;
-    if bolo.data.video_url.length
-      p.strong Video Link:
-      p #{bolo.data.video_url}
-    | &nbsp;
-    p Summary:
-    if bolo.data.additional.length
-      p #{bolo.data.summary}
-    else
-      | &nbsp;
-    if (bolo.data.authorFName != null || bolo.data.authorLName != null) && user 
-      p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
-      p.strong Please contact the agency should clarification be required. 
+        div.row
+            div.col-xs-8
+        div.row
+            div.col-xs-4
+                a(href='/bolo/details/pics/' + bolo.data.id) Additional images
+        form.form-horizontal
+        | &nbsp;
+        p Additional Info:
+        if bolo.data.additional.length
+          p #{bolo.data.additional}
+        else
+          | &nbsp;
+        | &nbsp;
+        if bolo.data.video_url.length
+          p.strong Video Link:
+          p #{bolo.data.video_url}
+        | &nbsp;
+        p Summary:
+        if bolo.data.additional.length
+          p #{bolo.data.summary}
+        else
+          | &nbsp;
+        if bolo.data.authorFName != null || bolo.data.authorLName != null
+          p.strong This BOLO was created by #{user.data.sectunit}  #{user.data.ranktitle} #{bolo.data.authorFName} #{bolo.data.authorLName}.
+          if bolo.data.lastUpdatedOn != bolo.data.createdOn
+            p.strong Last updated by #{bolo.data.lastUpdatedBy.firstName} #{bolo.data.lastUpdatedBy.lastName} on #{bolo.data.lastUpdatedOn}
+          p.strong Please contact the agency should clarification be required.

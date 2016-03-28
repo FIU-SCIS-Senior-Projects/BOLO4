@@ -34,33 +34,45 @@ agencyService.searchAgencies("name:Pinecrest").then( function ( response ) {
         var rootDTO = userService.formatDTO({
             "username": "root",
             "password": "Password1!",
+            "fname" : "Root",
+            "lname" : "User",
             "email": "root@example.com",
             "tier": 4,
-            "agency": agencies[0].id
+            "agency": agencies[0].id, 
+            "agencyName" : agencies[0].name
         });
 
         var adminDTO = userService.formatDTO({
             "username": "admin",
             "password": "Password1!",
+            "fname" : "Admin",
+            "lname" : "User",
             "email": "admin@example.com",
             "tier": 3,
-            "agency": agencies[0].id
+            "agency": agencies[0].id, 
+            "agencyName" : agencies[0].name
         });
 
         var superDTO = userService.formatDTO({
             "username": "super",
             "password": "Password1!",
+            "fname" : "Supervisor",
+            "lname" : "User",
             "email": "super@example.com",
             "tier": 2,
-            "agency": agencies[0].id
+            "agency": agencies[0].id, 
+            "agencyName" : agencies[0].name
         });
 
         var officerDTO = userService.formatDTO({
             "username": "officer",
             "password": "Password1!",
+            "fname" : "Officer",
+            "lname" : "User",
             "email": "officer@example.com",
             "tier": 1,
-            "agency": agencies[0].id
+            "agency": agencies[0].id, 
+            "agencyName" : agencies[0].name
         });
         console.log(
             "Attempting to create users..."

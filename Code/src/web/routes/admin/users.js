@@ -148,6 +148,54 @@ module.exports.getList = function ( req, res ) {
     });
 };
 
+module.exports.getSortedList = function ( req, res ) {
+    var data = {
+      'currentAgency': req.user.agency,
+      'currentUser':req.user
+    };
+
+    var type = req.params.id;
+    console.log(type);
+    userService.getUsers().then( function ( users ) {
+
+        console.log(users);
+
+        if(type === "name"){
+            users.sort(function(a, b) {
+                 return a.data.lname > b.data.lname;
+            });
+        }
+        if(type === "agency"){
+            users.sort(function(a, b) {
+                 return a.data.agencyName > b.data.agencyName;
+            });
+        }
+        if(type === "username"){
+            users.sort(function(a, b) {
+                 return a.data.username > b.data.username;
+            });
+        }
+        if(type === "role"){
+            users.sort(function(a, b) {
+                 return a.data.tier < b.data.tier;
+            });
+        }
+
+
+
+        data.users = users.filter( function ( oneUser ) {
+            return oneUser.id !== req.user.id;
+        });
+        res.render( 'user-list', data);
+    })
+    .catch( function ( error ) {
+        console.error( 'Error at /users >>> ', error.message );
+        req.flash( FERR, 'Unable to retrieve user directory, please try ' +
+                'again or contact the system administrator' );
+        res.redirect( 'back' );
+    });
+};
+
 /**
  * Responds with account information for a specified user.
  */

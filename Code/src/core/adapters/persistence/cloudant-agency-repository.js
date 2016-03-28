@@ -182,6 +182,9 @@ CloudantAgencyRepository.prototype.getAgency = function (id) {
     return db.get(id)
         .then(function (agency_doc) {
             return agencyFromCloudant(agency_doc);
+        })
+        .catch( function ( error ) {
+            return Promise.reject( new Error("Agency does not exist.") );
         });
 };
 
@@ -247,8 +250,6 @@ CloudantAgencyRepository.prototype.searchAgencies = function (query_string) {
 
 CloudantAgencyRepository.prototype.findAgencyById = function (id, name) {
 
-    console.log("find id repo call");
-    console.log(name);
     //TODO: implement to index for both name and id
     //var selector = {selector:{"$or":[{agency_id:id},{name:name}]}};
 
@@ -281,7 +282,7 @@ CloudantAgencyRepository.prototype.delete = function ( id ) {
     })
     .catch( function ( error ) {
         return new Error(
-            'Failed to delete BOLO: ' + error.error + ' / ' + error.reason
+            'Failed to delete Agency: ' + error.error + ' / ' + error.reason
         );
     });
 };
