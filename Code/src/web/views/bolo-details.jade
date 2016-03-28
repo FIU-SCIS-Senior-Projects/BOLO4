@@ -40,7 +40,7 @@ block content
                 p.text-center.text-danger.strong #{bolo.data.status}
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
-                  img(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
+                  img(src="/bolo/asset/" + bolo.data.id + "/featured" alt="", width=400)
                 else
                   img( src="/img/nopic.png" alt="", width=400 )
                 p.strong Created: #{bolo.data.createdOn}
@@ -92,6 +92,7 @@ block content
             div.col-xs-8
         div.row
             div.col-xs-4
+              if Object.keys( bolo.attachments ).length
                 a(href='/bolo/details/pics/' + bolo.data.id) Additional images
         form.form-horizontal
         | &nbsp;
@@ -106,8 +107,9 @@ block content
           p #{bolo.data.video_url}
         | &nbsp;
         p Summary:
-        if bolo.data.additional.length
+        if bolo.data.summary.length
           p #{bolo.data.summary}
+          p - - -
         else
           | &nbsp;
         if bolo.data.authorFName != null || bolo.data.authorLName != null
