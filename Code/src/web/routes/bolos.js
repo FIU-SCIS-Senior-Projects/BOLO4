@@ -772,6 +772,7 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
                 + data.bolo.authorFName
                 + " "
                 + data.bolo.authorLName, 15);
+
         boloService.getAttachment(data.bolo.id, 'featured').then(function (attDTO) {
             someData.featured = attDTO.data;
             doc.image(someData.featured, 15, 150, {width: 300, height: 300});
