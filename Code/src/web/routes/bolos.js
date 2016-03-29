@@ -400,7 +400,10 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             var bolo = boloService.previewBolo(boloDTO);
             preview.bolo = bolo;
             preview.agency = bolo.agency;
-            preview.image = fi.path;
+            preview.image = "none";
+            if(formDTO.fields.featured_image){
+                preview.image = fi.path;
+            }
             return Promise.all([preview, formDTO]);
 
         }
@@ -429,10 +432,16 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
 
                 var readFile = Promise.denodeify(fs.readFile);
 
-                readFile(pData[0].image).then( function(buffer){
-                    pData[0].buffer = buffer.toString('base64');
-                    res.render( 'bolo-preview-details', pData[0] );
-                });
+                if(pData[0].image === "none"){
+                    pData[0].buffer;
+                    res.render('bolo-preview-details', pData[0]);
+                }
+                else{
+                    readFile(pData[0].image).then( function(buffer){
+                        pData[0].buffer = buffer.toString('base64');
+                        res.render( 'bolo-preview-details', pData[0] );
+                    });
+                }
             });
         }
 

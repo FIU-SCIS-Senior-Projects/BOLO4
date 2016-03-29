@@ -32,8 +32,10 @@ block content
         | &nbsp;
         div.row
             div.col-xs-12.col-md-5
-                p
-                img( src='data:image/jpg;base64,#{buffer}' width=400 )
+                if(buffer)
+                  img( src='data:image/jpg;base64,#{buffer}' width=400 )
+                else
+                  img( src="/img/nopic.png" alt="", width=400 )
                 form.form-horizontal
                 +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
             div.col-xs-12.col-md-7
