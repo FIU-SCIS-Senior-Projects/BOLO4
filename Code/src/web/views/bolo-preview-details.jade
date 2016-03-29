@@ -32,7 +32,8 @@ block content
         | &nbsp;
         div.row
             div.col-xs-12.col-md-5
-                img( src="/img/nopic.png" alt="", width=400 )
+                p
+                img( src='data:image/jpg;base64,#{buffer}' width=400 )
                 form.form-horizontal
                 +form_labels_row("Created on", bolo.data.createdOn, bolo.data.createdOn?"":"hidden")
             div.col-xs-12.col-md-7
@@ -95,7 +96,7 @@ block content
       p #{bolo.data.video_url}
     | &nbsp;
     p.strong Summary:
-    if bolo.data.additional.length
+    if bolo.data.summary.length
       p #{bolo.data.summary}
     else
       | &nbsp;

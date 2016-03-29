@@ -90,7 +90,6 @@ function attachmentsToCloudant(dto) {
     var readFile = Promise.denodeify(fs.readFile);
 
     if (!dto) return null;
-    console.log(dto.path);
     return readFile(dto.path).then(function (buffer) {
         return {
             'name': dto.name,
@@ -133,6 +132,8 @@ function CloudantBoloRepository() {
 CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
     var newdoc = boloToCloudant(bolo);
     newdoc._id = createUUID();
+
+    console.log(attachments);
 
     var atts = _.map(attachments, attachmentsToCloudant);
     return Promise.all(atts).then(function (attDTOs) {
