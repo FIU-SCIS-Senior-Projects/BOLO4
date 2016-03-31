@@ -133,8 +133,6 @@ CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
     var newdoc = boloToCloudant(bolo);
     newdoc._id = createUUID();
 
-    console.log(attachments);
-
     var atts = _.map(attachments, attachmentsToCloudant);
     return Promise.all(atts).then(function (attDTOs) {
         if (attDTOs.length) {
