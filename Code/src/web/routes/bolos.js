@@ -332,7 +332,7 @@ router.post( '/bolo/search', function ( req, res, next ) {
             key = Object.keys(query_obj)[i];
             value = query_obj[Object.keys(query_obj)[i]];
         console.log(key+':'+value);
-            if (key !== "status" && key !== 'matchFields' && value !== "" ) {
+            if (key !== "status" && key !== 'matchFields' && value !== "" && value != 'N/A' ) {
                 if(expression === true) {
                     query_string += MATCH_EXPR;
                     expression = false;
