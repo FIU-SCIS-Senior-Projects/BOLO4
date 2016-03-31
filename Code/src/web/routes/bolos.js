@@ -296,8 +296,17 @@ router.get( '/bolo/search', function ( req, res ) {
     var data = {
         'form_errors': req.flash( 'form-errors' )
     };
+    data.agencies = [];
+    agencyService.getAgencies().then( function ( agencies ) {
+        for(var i in agencies)
+        {
+            var agency = agencies[i];
+            data.agencies.push(agency.data.name);
+        }
 
-    res.render( 'bolo-search-form', data );
+        res.render( 'bolo-search-form', data );
+    });
+
 });
 
 // process bolo search user form input
@@ -307,6 +316,7 @@ router.post( '/bolo/search', function ( req, res, next ) {
     {
 
         var query_obj = formDTO.fields;
+        console.log(query_obj);
         var query_string = '';
         var key = '';
         var value = '';
