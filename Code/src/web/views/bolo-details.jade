@@ -96,17 +96,19 @@ block content
                 a(href='/bolo/details/pics/' + bolo.data.id) Additional images
         form.form-horizontal
         | &nbsp;
-        p Additional Info:
+        p.strong Additional Info:
         if bolo.data.additional.length
           p #{bolo.data.additional}
         else
           | &nbsp;
         | &nbsp;
         if bolo.data.video_url.length
-          p.strong Video Link:
-          p #{bolo.data.video_url}
+          p.strong Video Link: 
+          a(href=bolo.data.video_url) #{bolo.data.video_url}
+          p
+          | &nbsp;
         | &nbsp;
-        p Summary:
+        p.strong Summary:
         if bolo.data.summary.length
           p #{bolo.data.summary}
           p - - -

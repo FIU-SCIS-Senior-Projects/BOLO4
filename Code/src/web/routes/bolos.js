@@ -401,6 +401,8 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             preview.bolo = bolo;
             preview.agency = bolo.agency;
             preview.image = "none";
+            preview.ranktitle = req.user.ranktitle;
+            preview.sectunit = req.user.sectunit;
             if(formDTO.fields.featured_image){
                 preview.image = fi.path;
             }
@@ -447,7 +449,7 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
 
     }).catch( function ( error ) {
          next( error );
-       });
+    });
 
 });
 
