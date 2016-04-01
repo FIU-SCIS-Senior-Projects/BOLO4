@@ -29,7 +29,7 @@ config.UserRepository   = require( path.join( core, 'adapters/persistence/clouda
 * developing code
 */
 config.EmailService     = require( path.join( core, 'service/email-service' ) );
-config.EmailBoundry    = require( path.join( core, 'adapters/email/sendgrid-email-adapter' ) );
+//config.EmailBoundry    = require( path.join( core, 'adapters/email/sendgrid-email-adapter' ) );
 
 config.CommonService    = require( path.join( core, 'service/common-service' ) );
 
@@ -64,6 +64,7 @@ config.const = config.constants = {
 
 };
 
+
 /**
  * This configuration is a good candidate for a system admin controlled
  * system configuation property.
@@ -74,10 +75,7 @@ config.const = config.constants = {
 config.email = {
     'from'              : 'bolo.flyer@gmail.com',
     'fromName'          : 'BOLO Flier Creator',
-
-    'template_path'     : path.resolve( __dirname, './views/email' ),
-
-
+    'template_path'     : path.resolve( __dirname, './views/email' )
 };
 
 

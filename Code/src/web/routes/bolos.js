@@ -19,7 +19,7 @@ var config          = require('../config');
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
 var userService     = new config.UserService( new config.UserRepository(), agencyService);
 var boloService     = new config.BoloService( new config.BoloRepository() );
-var emailService    = config.EmailService;
+var emailService    = new config.EmailService();
 
 var BoloAuthorize   = require('../lib/authorization.js').BoloAuthorize;
 
@@ -34,12 +34,28 @@ var cleanTemporaryFiles = formUtil.cleanTempFiles;
 /**
  * Send email notification of a new bolo.
  */
+
 function sendBoloNotificationEmail ( bolo, template ) {
-    return userService.getAgencySubscribers( bolo.agency )
+    return userService.getUsers()
     .then( function ( users ) {
-        var subscribers = users.map( function( user ) {
+      console.log("HERE IS TEST FOR USERS:");
+      console.log(users);
+
+        var subscribers = users.filter( function( user ) {
+          // iterate throuh array
+          if(user.notifications){
+            var notificationLength = user.notifications.length
+            for(var i = 0; i < notificationLength; i++){
+              console.log(user.notifications[i]);
+              return bolo.agencyName === user.notifications[i];
+            }
+          }
+        }).map(function(user){
             return user.email;
         });
+
+        console.log("HERE IS TEST FOR SUBSCRIBERS:");
+        console.log(subscribers);
 
         var tmp = config.email.template_path + '/' + template + '.jade';
         var tdata = {

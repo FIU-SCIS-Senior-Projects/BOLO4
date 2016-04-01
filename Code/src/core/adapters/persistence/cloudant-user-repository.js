@@ -207,6 +207,7 @@ CloudantUserRepository.prototype.remove = function ( id ) {
         });
 };
 
+
 CloudantUserRepository.prototype.getByEmail = function ( email ) {
     return db.view( 'users', 'by_email', {
         'key': email,

@@ -1,41 +1,52 @@
 /* jshint node: true */
-// 'use strict';
-// var _ = require('lodash');
-//
-// //var sendgrid  = require('../adapters/email/sendgrid-email-service.js');
-// var Promise = require('promise');
-// var User = require('../domain/user.js');
-//
-//
-// /** @module core/ports */
-// module.exports = EmailService;
-//
-//
-// /**
-//  * {EmailService}.
-//  *
-//  * @class
-//  * @classdesc Provides an API for client adapters to interact with user facing
-//  * functionality.
-//  */
-//  var payload   = {
-//    to      : 'to@example.com',
-//    from    : 'from@other.com',
-//    subject : 'Saying Hi',
-//    //text    : 'This is my first email through SendGrid'
-//    files: [ {filename: 'boloReport.pdf',
-//             contentType: 'application/pdf',
-//             content: (new Buffer('this is a Buffer test - Hello'))
-//             }
-//          ]
-//  }
+'use strict';
+var _ = require('lodash');
+var Promise = require('promise');
+var dotenv = require('dotenv').config();
+
+/*
+* Assume this works
+*/
+
+if ( ! process.env.SENDGRID_API_KEY ) {
+  throw new Error(
+      'SendGrid API key not found: SENDGRID_API_KEY should be set.'
+  );
+}else{
+console.log("I reached the SENDGRID ELSE");
 
 
 
+var sendgrid = require('sendgrid')(process.env.SENDGRID_API_KEY);
+
+function EmailService() {
+}
+
+EmailService.prototype.send = function( payload){
+  var email = new sendgrid.Email( payload );
+      return new Promise( function ( resolve, reject ) {
+          sendgrid.send( payload, function ( err, json ) {
+              if ( err ) reject( err );
+              else resolve( json );
+          });
+      });
+}
 
 
-// function send(payload){
-//   // this.preparePayload(payload, this.getSubscribers)
-//   // sendgrid.send(payload);
-//     throw new Error("IMPLEMENTATION NEEDED email-servce.send() ")
-// }
+module.exports = EmailService;
+
+}
+
+
+//////////
+
+
+// module.exports.send = function ( payload ) {
+//     var email = new sendgrid.Email( payload );
+//     return new Promise( function ( resolve, reject ) {
+//         sendgrid.send( payload, function ( err, json ) {
+//             if ( err ) reject( err );
+//             else resolve( json );
+//         });
+//     });
+// };
