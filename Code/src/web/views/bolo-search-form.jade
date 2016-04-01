@@ -17,6 +17,7 @@ block content
 
     form#create-bolo-form(action="/bolo/search" enctype="multipart/form-data" method="post")
         input( type="hidden" name="status" value="New" )
+        +select_options( "agencyName", "Agency", agencies, true, "" )
         +select_options( "category", "Category", categories, true, "" )
         +input_text( "firstName", "First Name", "", false, "" )
         +input_text( "lastName", "Last Name", "", false,  "" )
