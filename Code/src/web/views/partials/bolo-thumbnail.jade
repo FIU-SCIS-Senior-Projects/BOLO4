@@ -9,10 +9,9 @@ div.col-xs-12.col-sm-6.col-md-3
                 input( type="hidden" name="id" value=bolo.id )
                 label.control-label( for=bolo.id )
                 select.form-control(id=bolo.id name="status" onchange="this.form.submit()")
+                    option( value=bolo.status, selected disabled ) #{bolo.status}
                     each val in bolo_status
-                        if bolo.status == val
-                            +option( val,true )
-                        else
+                        if bolo.status !== val && val !== ''
                             +option( val,false )
         div.boloImageContainer
         
