@@ -154,10 +154,8 @@ module.exports.getSortedList = function ( req, res ) {
       'currentUser':req.user
     };
     var type = req.params.id;
-
+    
     userService.getUsers().then( function ( users ) {
-
-        console.log(users);
 
         if(type === "name"){
             users.sort(function(a, b) {
