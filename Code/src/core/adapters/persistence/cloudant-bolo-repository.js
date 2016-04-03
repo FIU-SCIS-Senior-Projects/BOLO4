@@ -89,8 +89,7 @@ function attachmentsFromCloudant(attachments) {
 function attachmentsToCloudant(dto) {
     var readFile = Promise.denodeify(fs.readFile);
 
-    if (!dto) return null;
-    console.log(dto.path);
+    if (!dto) return null;    
     return readFile(dto.path).then(function (buffer) {
         return {
             'name': dto.name,
@@ -154,7 +153,7 @@ CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
             return Promise.all(comp_atts).then(function (comp_attDTOs) {
 
                 Array.prototype.push.apply(comp_attDTOs,attDTOs);
-              
+
                 return db.insertMultipart(newdoc, comp_attDTOs, newdoc._id);
             })
         }
