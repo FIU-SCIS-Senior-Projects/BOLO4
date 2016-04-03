@@ -129,6 +129,25 @@ router.get( '/bolo', function ( req, res, next ) {
 
     boloService.getBolos( limit, skip ).then( function ( results ) {
         data.bolos = results.bolos;
+        var now  = moment().format( config.const.DATE_FORMAT);
+        var then = "";
+        var minutes_in_week = 10080;
+        for(var i in data.bolos){
+            var curr = data.bolos[i];
+            if(curr.data.status === 'New')
+            {
+                then = curr.data.lastUpdatedOn;
+                var ms = moment(now, config.const.DATE_FORMAT).diff(moment(then, config.const.DATE_FORMAT));
+                var d = moment.duration(ms);
+                var minutes = parseInt(d.asMinutes());
+                console.log(minutes);
+                if (minutes > minutes_in_week)
+                {
+                    curr.data.status = 'Ongoing';
+
+                }
+            }
+        }
         data.paging.last = Math.ceil( results.total / limit );
 
         agencyService.getAgencies().then( function ( agencies ) {
@@ -296,7 +315,7 @@ router.get( '/bolo/search', function ( req, res ) {
     var data = {
         'form_errors': req.flash( 'form-errors' )
     };
-    data.agencies = [];
+    data.agencies = ['N/A'];
     agencyService.getAgencies().then( function ( agencies ) {
         for(var i in agencies)
         {
