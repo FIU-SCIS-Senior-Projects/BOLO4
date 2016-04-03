@@ -12,40 +12,41 @@ var AdapterFactory = require( path.join( src, 'core/adapters' ) );
 
 require('dotenv').config({ path: path.resolve( __dirname, '../../.env' ) });
 
-describe( 'cloudant user repository', function () {
-    var userRepository;
-    var user, cache, insertedUserID;
+describe( 'Cloudant User Repository', function () {
+    var userRepository, agencyRepository;
+    var user, agency, cache, insertedUserID;
 
     this.timeout( 5000 );
 
     before( function () {
         userRepository = AdapterFactory.create( 'persistence', 'cloudant-user-repository' );
-
         cache = {};
     });
 
-    after( function () {
-        return Promise.all( Object.keys( cache ).map( userRepository.remove ) );
+    afterEach( function () {
+        return Promise.all(Object.keys( cache ).map( userRepository.remove ));
     });
 
     beforeEach( function () {
-        user = UserFixture.create();
+      user = UserFixture.create();
     });
 
-    it.skip( 'inserts a user', function () {
+    it( 'inserts a user', function () {
         /* act */
         var userPromise = userRepository.insert( user );
 
         /* assert */
-        return userPromise
-            .then( function ( newuser ) {
-                expect( user.diff( newuser ) ).to.be.length( 1 )
-                    .and.to.contain( 'id' );
-                insertedUserID = newuser.data.id;
-            });
+        return userPromise.then( function ( newuser ) {
+            cache[newuser.id] = newuser;
+            expect( newuser ).to.not.equal( user );
+            expect( newuser.diff( user ) ).to.be.length( 1 )
+                .and.to.contain( 'id' );
+        });
+
+
     });
 
-    it.skip( 'gets all users', function () {
+    it( 'gets all users', function () {
         /* arrange */
         var other = UserFixture.create();
         other.data.username = 'otherman';
@@ -53,33 +54,36 @@ describe( 'cloudant user repository', function () {
         var dataFixtures = [ user, other ];
         var setupPromise = Promise.all( dataFixtures.map( function ( aUser ) {
             return userRepository.insert( aUser );
-        }))
-        .then( function ( fixtures ) {
-            fixtures.forEach( function ( fixture ) {
-                cache[fixture.data.id] = fixture;
-            });
-            return fixtures;
-        });
+        }));
 
         /* act */
-        var response = setupPromise.then( function ( ready ) {
+        var userPromise = setupPromise.then( function ( response ) {
+            response.forEach(function(fixture){
+              cache[fixture.data.id] = fixture;
+            });
             return userRepository.getAll();
         });
 
         /* assert */
-        return response.then( function ( list ) {
-            expect( list ).to.have.length.of.at.least( 2 );
+        return userPromise.then( function ( list ) {
+            expect( list ).to.have.length( 2 );
         });
     });
 
-    it.skip( 'gets a single user by id', function () {
+    it( 'gets a single user by id', function () {
+        /* arrange */
+        var setupPromise = userRepository.insert( user );
         /* act */
-        var userPromise = userRepository.getById( insertedUserID );
-
+        var userPromise = setupPromise.then(function(response){
+            cache[response.data.id] = response;
+            return userRepository.getById( response.data.id );
+        });
         /* assert */
         return userPromise
             .then( function ( found ) {
-                expect( found.data.id ).to.equal( insertedUserID );
+              expect(found.data.username).to.equal(user.data.username);
+              expect(found.data.email).to.equal(user.data.email);
+              expect(found.data.agency).to.equal(user.data.agency);
             });
     });
 
@@ -91,29 +95,109 @@ describe( 'cloudant user repository', function () {
      * other systems.
      */
     it( 'queries by username', function () {
+        var setupPromise = userRepository.insert( user );
         /* act */
-        var userPromise = userRepository.getByUsername( user.data.username );
-
+        var userPromise = setupPromise.then(function(response){
+          cache[response.data.id] = response;
+          return userRepository.getByUsername( response.data.username );
+        });
         /* assert */
         return userPromise
             .then( function ( found ) {
-                expect( found.data.username ).to.equal( user.data.username );
-            })
-            .catch( function ( error ) {
-                throw error;
+              expect(found.data.username).to.equal(user.data.username);
+              expect(found.data.email).to.equal(user.data.email);
+              expect(found.data.agency).to.equal(user.data.agency);
             });
     });
 
-    it.skip( 'removes a user', function () {
+    it( 'removes a user', function () {
+        /* arrange */
+        var setupPromise = userRepository.insert( user );
+        var storedUserID;
+
         /* act */
-        var responsePromise = userRepository.remove( insertedUserID );
+        var responsePromise = setupPromise.then(function(response){
+          cache[response.data.id] = response;
+          storedUserID = response.data.id;
+          return userRepository.remove( response.data.id );
+        });
 
         /* assert */
         return responsePromise
             .then( function ( response ) {
                 expect( response.ok ).to.be.true;
-                expect( response.id ).to.be.equal( insertedUserID );
+                expect(response.id ).to.equal(storedUserID);
             });
     });
+
+   it( 'returns a valid user if getByEmail is called with a registered email', function () {
+        /* arrange */
+       var setupPromise = userRepository.insert( user );
+
+       /* act */
+       var userPromise = setupPromise.then(function(response){
+         cache[response.data.id] = response;
+         return userRepository.getByEmail( response.data.email );
+       });
+       /* assert */
+       return userPromise
+           .then( function ( found ) {
+               expect( found.data.username ).to.equal( user.data.username );
+               expect( found.data.email ).to.equal( user.data.email );
+           });
+   });
+
+   it( 'returns a null if getByEmail is called with a unregistered email', function () {
+      /* arrange */
+      var setupPromise = userRepository.insert( user );
+
+       /* act */
+       var userPromise = setupPromise.then(function(response){
+         cache[response.data.id] = response;
+         return userRepository.getByEmail( "nonRegisteredEmail" );
+       });
+
+       /* assert */
+       return userPromise
+           .then( function ( found ) {
+               expect( found ).to.equal( null );
+           });
+   });
+
+   it( 'returns a valid user if getByToken is called with a registered resetPasswordToken', function () {
+        /* arrange */
+       var setupPromise = userRepository.insert( user );
+
+       /* act */
+       var userPromise = setupPromise.then(function(response){
+         cache[response.data.id] = response;
+         return userRepository.getByToken( response.data.resetPasswordToken );
+       });
+       /* assert */
+       return userPromise
+           .then( function ( found ) {
+               expect( found.data.username ).to.equal( user.data.username );
+               expect( found.data.email ).to.equal( user.data.email );
+               expect( found.data.resetPasswordToken ).to.equal( user.data.resetPasswordToken );
+           });
+   });
+
+   it( 'returns a null if getByToken is called with a unregistered resetPasswordToken', function () {
+      /* arrange */
+      var setupPromise = userRepository.insert( user );
+
+       /* act */
+       var userPromise = setupPromise.then(function(response){
+         cache[response.data.id] = response;
+         return userRepository.getByToken( "nonRegisteredToken" );
+       });
+
+       /* assert */
+       return userPromise
+           .then( function ( found ) {
+               expect( found ).to.equal( null );
+           });
+   });
+
 
 });

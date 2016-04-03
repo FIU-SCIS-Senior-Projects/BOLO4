@@ -149,9 +149,9 @@ CloudantUserRepository.prototype.getById = function ( id ) {
  * @param {String} - the username of the user to get
  * @returns {Promise|User} promises a user object for the supplied username
  */
-CloudantUserRepository.prototype.getByUsername = function ( id ) {
+CloudantUserRepository.prototype.getByUsername = function ( username ) {
     return db.view( 'users', 'by_username', {
-        'key': id,
+        'key': username,
         'include_docs': true
     })
     .then( function ( found ) {

@@ -153,7 +153,7 @@ CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
             return Promise.all(comp_atts).then(function (comp_attDTOs) {
 
                 Array.prototype.push.apply(comp_attDTOs,attDTOs);
-              
+
                 return db.insertMultipart(newdoc, comp_attDTOs, newdoc._id);
             })
         }
