@@ -336,7 +336,7 @@ router.post( '/bolo/search', function ( req, res, next ) {
 
         var query_obj = formDTO.fields;
         console.log(query_obj);
-        var query_string = '';
+        var query_string = '( ';
         var key = '';
         var value = '';
         var MATCH_EXPR = ' OR ';
@@ -351,6 +351,7 @@ router.post( '/bolo/search', function ( req, res, next ) {
             key = Object.keys(query_obj)[i];
             value = query_obj[Object.keys(query_obj)[i]];
         console.log(key+':'+value);
+
             if (key !== "status" && key !== 'matchFields' && value !== "" && value != 'N/A' ) {
                 if(expression === true) {
                     query_string += MATCH_EXPR;
@@ -361,12 +362,12 @@ router.post( '/bolo/search', function ( req, res, next ) {
             }
 
         }
-
+        if(query_string !== '( ')
+        query_string += ') AND Type:bolo';
         //form was empty, return empty object
-        if(query_string === '')
-        {
+        else
             query_string = {};
-        }
+
         return query_string;
 
     }).then( function ( query_string) {

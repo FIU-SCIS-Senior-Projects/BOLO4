@@ -53,7 +53,12 @@ var bolo_indexer = function (doc) {
     if (typeof(doc.hairColor) !== 'undefined') {
         index("hairColor", doc.hairColor);
     }
-
+    if (typeof(doc.hairColor) !== 'undefined') {
+        index("hairColor", doc.hairColor);
+    }
+    if (typeof(doc.Type) !== 'undefined') {
+        index("Type", doc.Type);
+    }
 };
 
 
@@ -81,7 +86,9 @@ var agency_indexer = function (doc) {
     if (typeof(doc.isActive) !== 'undefined') {
         index("isActive", doc.isActive );
     }
-
+    if (typeof(doc.Type) !== 'undefined') {
+        index("Type", doc.Type);
+    }
 };
 
 var user_indexer = function (doc) {
@@ -105,7 +112,9 @@ var user_indexer = function (doc) {
     if (typeof(doc.agency) !== 'undefined') {
         index("agency", doc.agency);
     }
-
+    if (typeof(doc.agencyName) !== 'undefined') {
+        index("agencyName", doc.agencyName);
+    }
     if (typeof(doc.badge) !== 'undefined') {
         index("badge", doc.badge );
     }
@@ -115,7 +124,9 @@ var user_indexer = function (doc) {
     if (typeof(doc.ranktitle) !== 'undefined') {
         index("ranktitle", doc.ranktitle );
     }
-
+    if (typeof(doc.Type) !== 'undefined') {
+        index("Type", doc.Type);
+    }
 };
 
 var BOLO_DB = 'bolo';
