@@ -151,6 +151,7 @@ describe( 'agency service module', function () {
                 });
         });
       });
+
       it( 'promises an agency will not be updated if agency does not exist', function () {
           /* arrange */
           agencies.push(agency);
@@ -177,4 +178,5 @@ describe( 'agency service module', function () {
               .and.to.match( /does not exist/ );
           });
       });
+
 });

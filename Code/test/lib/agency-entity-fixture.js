@@ -19,6 +19,8 @@ module.exports.create = function ( opts ) {
     return new Agency( _.extend( defaults, opts ) );
 };
 
+
+
 module.exports.collection = function ( qty ) {
     var collection = [];
     for ( var i = 0; i < qty; i++ ) {

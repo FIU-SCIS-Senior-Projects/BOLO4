@@ -7,7 +7,7 @@
 
     "pretest": "jshint ./test/** ./src/**",
     "test": "istanbul cover _mocha --check-leaks -- ./test/unit/** ./test/integration/**",
-    "unit-test": "mocha --check-leaks ./test/unit/**",
+    "unit-test": "mocha --check-leaks ./test/unit/*.js",
     "cover": "istanbul cover _mocha -- ./test/unit/** ./test/integration/**",
     "docs": "jsdoc -r -R README.md -d ./jsdoc ./src"
   },

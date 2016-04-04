@@ -153,12 +153,9 @@ module.exports.getSortedList = function ( req, res ) {
       'currentAgency': req.user.agency,
       'currentUser':req.user
     };
-
     var type = req.params.id;
-    console.log(type);
+    
     userService.getUsers().then( function ( users ) {
-
-        console.log(users);
 
         if(type === "name"){
             users.sort(function(a, b) {
@@ -180,8 +177,6 @@ module.exports.getSortedList = function ( req, res ) {
                  return a.data.tier < b.data.tier;
             });
         }
-
-
 
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;
