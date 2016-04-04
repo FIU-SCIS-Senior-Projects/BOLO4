@@ -137,9 +137,21 @@ router.post( '/forgotPassword',
             userService.updateUser(user.id, user);
 
             console.log(token);
-            userService.sendEmail(email); //stub
-            req.flash( 'messages', 'Reset information successfully sent to %s.', email );
-            res.redirect( 'login' );
+            //TODO: Uncomment when Sendgrid branch is merged
+            // emailService.send({
+            //     'to': email,
+            //     'from': config.email.from,
+            //     'fromName': config.email.fromName,
+            //     'subject' : 'BOLO Alert: Reset password requested',
+            //     'text': "A password reset has been requested for the account registered to this email.\n"+
+            //       "To change your password, follow this link: " +
+            //       config.appURL + "/changepassword/" + token + "\n\n" +
+            //       "If you did not request to change your password, please contact a system administrator and immediately change your password."
+            // }).then(function(json){
+              req.flash( 'messages', 'Reset information successfully sent to %s.', email );
+              res.redirect( 'login' );
+            // });
+
           });
 
         });

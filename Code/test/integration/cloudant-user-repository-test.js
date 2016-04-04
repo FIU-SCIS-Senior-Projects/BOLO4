@@ -31,6 +31,7 @@ describe( 'Cloudant User Repository', function () {
       user = UserFixture.create();
     });
 
+  describe( '#insert repository method', function () {
     it( 'inserts a user', function () {
         /* act */
         var userPromise = userRepository.insert( user );
@@ -45,7 +46,8 @@ describe( 'Cloudant User Repository', function () {
 
 
     });
-
+  });
+  describe( '#getAll repository method', function () {
     it( 'gets all users', function () {
         /* arrange */
         var other = UserFixture.create();
@@ -66,10 +68,11 @@ describe( 'Cloudant User Repository', function () {
 
         /* assert */
         return userPromise.then( function ( list ) {
-            expect( list ).to.have.length( 2 );
+            expect( list ).to.have.length.of.at.least( 2 );
         });
     });
-
+  });
+  describe( '#getById repository method', function () {
     it( 'gets a single user by id', function () {
         /* arrange */
         var setupPromise = userRepository.insert( user );
@@ -86,7 +89,9 @@ describe( 'Cloudant User Repository', function () {
               expect(found.data.agency).to.equal(user.data.agency);
             });
     });
+  });
 
+  describe( '#getByUsername repository method', function () {
     /*
      * Assumption: usernames are unique.
      *
@@ -109,7 +114,8 @@ describe( 'Cloudant User Repository', function () {
               expect(found.data.agency).to.equal(user.data.agency);
             });
     });
-
+  });
+  describe( '#remove repository method', function () {
     it( 'removes a user', function () {
         /* arrange */
         var setupPromise = userRepository.insert( user );
@@ -129,8 +135,9 @@ describe( 'Cloudant User Repository', function () {
                 expect(response.id ).to.equal(storedUserID);
             });
     });
-
-   it( 'returns a valid user if getByEmail is called with a registered email', function () {
+  });
+  describe( '#getByEmail repository method', function () {
+   it( 'returns a valid user called with a registered email', function () {
         /* arrange */
        var setupPromise = userRepository.insert( user );
 
@@ -163,7 +170,8 @@ describe( 'Cloudant User Repository', function () {
                expect( found ).to.equal( null );
            });
    });
-
+ });
+ describe( '#getByToken repository method', function () {
    it( 'returns a valid user if getByToken is called with a registered resetPasswordToken', function () {
         /* arrange */
        var setupPromise = userRepository.insert( user );
@@ -198,6 +206,6 @@ describe( 'Cloudant User Repository', function () {
                expect( found ).to.equal( null );
            });
    });
-
+ });
 
 });

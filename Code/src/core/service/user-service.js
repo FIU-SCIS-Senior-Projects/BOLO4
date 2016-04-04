@@ -271,10 +271,6 @@ UserService.prototype.formatDTO = function ( dto ) {
     return UserService.formatDTO( dto );
 };
 
-UserService.prototype.sendEmail = function ( email ) {
-    return this.userRepository.sendEmail( email );
-};
-
 UserService.prototype.getByEmail = function ( email ) {
     return this.userRepository.getByEmail( email );
 };
