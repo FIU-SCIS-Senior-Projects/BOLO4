@@ -12,6 +12,7 @@ var src = path.resolve( __dirname, '../../src' );
 var Agency = require( path.join( src, 'core/domain/agency' ) );
 var AgencyService = require( path.join( src, 'core/service/agency-service' ) );
 var AgencyFixture = require( '../lib/agency-entity-fixture' );
+var AgencyFixture2 = require( '../lib/agency-entity-fixture2' );
 
 
 describe( 'agency service module', function () {
@@ -19,6 +20,7 @@ describe( 'agency service module', function () {
     var agencyService;
     var mockAgencyRepo;
     var agency;
+    var agency2;
     var attachments;
     var agencies;
 
@@ -39,6 +41,7 @@ describe( 'agency service module', function () {
         };
         agencyService = new AgencyService( mockAgencyRepo );
         agency = AgencyFixture.create();
+        agency2 = AgencyFixture2.create();
         attachments = [];
         agencies = [];
     });
@@ -151,6 +154,7 @@ describe( 'agency service module', function () {
                 });
         });
       });
+
       it( 'promises an agency will not be updated if agency does not exist', function () {
           /* arrange */
           agencies.push(agency);
@@ -177,4 +181,33 @@ describe( 'agency service module', function () {
               .and.to.match( /does not exist/ );
           });
       });
+
+      it( 'promises an agency will not be updated if agency with the same name exists', function () {
+          /* arrange */
+          agencies.push(agency2);
+          mockAgencyRepo.update = sinon.stub()
+            .withArgs(agency2, attachments)
+            .returns(Promise.resolve(agency2));
+
+          mockAgencyRepo.getAgencies = sinon.stub()
+            .returns(Promise.resolve(agencies));
+
+          mockAgencyRepo.getAgency = sinon.stub()
+            .withArgs(agency2.id, agency2.name)
+            .returns(Promise.reject(agency2));
+
+          /* act */
+          var response = agencyService.updateAgency( agency, attachments );
+
+          /* assert */
+          return response
+          .then(function ( agencyResp ) {
+              expect( agencyResp ).to.be.undefined;
+          }, function ( agencyResp ) {
+              expect( agencyResp ).to.be.instanceOf( Error )
+              .and.to.match( /Name exists/ );
+          });
+      });
+
+
 });

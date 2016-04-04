@@ -176,7 +176,7 @@ router.get( '/bolo/agency/:id', function ( req, res, next ) {
 
         agencyService.getAgencies().then( function ( agencies ) {
             data.agencies = agencies;
-            res.render('bolo-list-by-agency', data );
+            res.render('bolo-list', data );
         });
     }).catch( function ( error ) {
         next( error );
@@ -430,6 +430,12 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             var bolo = boloService.previewBolo(boloDTO);
             preview.bolo = bolo;
             preview.agency = bolo.agency;
+            preview.image = "none";
+            preview.ranktitle = req.user.ranktitle;
+            preview.sectunit = req.user.sectunit;
+            if(formDTO.fields.featured_image){
+                preview.image = fi.path;
+            }
             return Promise.all([preview, formDTO]);
 
         }
@@ -455,13 +461,25 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
                 pData[0].agency_phone = response.data.phone;
-                res.render( 'bolo-preview-details', pData[0] );
+
+                var readFile = Promise.denodeify(fs.readFile);
+
+                if(pData[0].image === "none"){
+                    pData[0].buffer;
+                    res.render('bolo-preview-details', pData[0]);
+                }
+                else{
+                    readFile(pData[0].image).then( function(buffer){
+                        pData[0].buffer = buffer.toString('base64');
+                        res.render( 'bolo-preview-details', pData[0] );
+                    });
+                }
             });
         }
 
     }).catch( function ( error ) {
          next( error );
-       });
+    });
 
 });
 

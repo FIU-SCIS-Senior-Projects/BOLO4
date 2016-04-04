@@ -90,7 +90,6 @@ function attachmentsToCloudant(dto) {
     var readFile = Promise.denodeify(fs.readFile);
 
     if (!dto) return null;
-    console.log(dto.path);
     return readFile(dto.path).then(function (buffer) {
         return {
             'name': dto.name,
@@ -313,6 +312,14 @@ CloudantBoloRepository.prototype.getBolosByAgency = function (id, limit, skip) {
     return db.view('bolo', 'all_active', opts).then(function (result) {
         var bolos = _.map(result.rows, function (row) {
             return boloFromCloudant(row.doc);
+        });
+        var index = 0;
+
+        bolos.forEach(function(bolo){
+            if(bolo.data.agency !== id){
+                delete bolos[index];
+            }
+            index++;
         });
 
         bolos.agency = id ;
