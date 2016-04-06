@@ -248,13 +248,9 @@ CloudantAgencyRepository.prototype.searchAgencies = function (query_string) {
 };
 
 
-CloudantAgencyRepository.prototype.findAgencyById = function (id, name) {
-
-    //TODO: implement to index for both name and id
-    //var selector = {selector:{"$or":[{agency_id:id},{name:name}]}};
+CloudantAgencyRepository.prototype.findAgencyById = function (id) {
 
    var selector = {selector:{agency_id:id}};
-   var selector1 = {selector:{name:name}};
    var result = 0;
 
    return db.find(selector).then( function (id_result ) {
