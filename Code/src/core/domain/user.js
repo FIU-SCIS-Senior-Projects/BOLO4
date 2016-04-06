@@ -71,19 +71,21 @@ module.exports = User;
  */
 function User ( data ) {
     var defaults = {
-        'id'            : null,
-        'username'      : null,
-        'email'         : null,
-        'fname'         : '',
-        'lname'         : '',
-        'password'      : null,
-        'tier'          : 1,
-        'agency'        : null,
-        'agencyName'    : '',
-        'badge'         : '',
-        'sectunit'      : '',
-        'ranktitle'     : '',
-        'notifications' : []
+        'id'                    : null,
+        'username'              : null,
+        'email'                 : null,
+        'fname'                 : '',
+        'lname'                 : '',
+        'password'              : null,
+        'tier'                  : 1,
+        'agency'                : null,
+        'agencyName'             : '',
+        'badge'                 : '',
+        'sectunit'              : '',
+        'ranktitle'             : '',
+        'notifications'         : [],
+        'resetPasswordToken'    : '',
+        'resetPasswordExpires'  : null
     };
 
     this.data = _.extend( {}, defaults, data );
