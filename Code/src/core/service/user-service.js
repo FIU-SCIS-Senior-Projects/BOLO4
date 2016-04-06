@@ -85,6 +85,7 @@ UserService.prototype.registerUser = function ( userDTO ) {
 
       return context.agencyService.getAgency(userDTO.agency).then(function(response){
         userDTO.agencyName = response.name;
+        userDTO.notifications = [response.name];
 
         var newuser = new User( userDTO );
         if ( userDTO.tier && typeof userDTO.tier === 'string' ) {

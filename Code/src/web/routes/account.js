@@ -142,6 +142,7 @@ function getAvailableAgencyNotifications ( req, res ) {
     var data = { 'account_nav': 'account-notification' };
 
     agencyService.getAgencies().then( function ( agencies ) {
+      console.log(agencies);
         data.agencies = agencies;
         res.render( 'account-notifications-add', data );
     })

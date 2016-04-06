@@ -38,40 +38,40 @@ var cleanTemporaryFiles = formUtil.cleanTempFiles;
 function sendBoloNotificationEmail ( bolo, template ) {
     return userService.getUsers()
     .then( function ( users ) {
-      console.log("HERE IS TEST FOR USERS:");
-      console.log(users);
-
+        // filters out users and pushes their emails into array
         var subscribers = users.filter( function( user ) {
-          // iterate throuh array
+          var flag = false;
           if(user.notifications){
-            var notificationLength = user.notifications.length
+            var notificationLength = user.notifications.length;
             for(var i = 0; i < notificationLength; i++){
-              console.log(user.notifications[i]);
-              return bolo.agencyName === user.notifications[i];
+              if(bolo.agencyName === user.notifications[i]) {
+                flag = true;
+              }
             }
           }
+          return flag;
         }).map(function(user){
             return user.email;
         });
-
-        console.log("HERE IS TEST FOR SUBSCRIBERS:");
-        console.log(subscribers);
 
         var tmp = config.email.template_path + '/' + template + '.jade';
         var tdata = {
             'bolo': bolo,
             'app_url': config.appURL
         };
+
         /** @todo check if this is async **/
         var html = jade.renderFile( tmp, tdata );
 
-        return emailService.send({
-            'to': subscribers,
-            'from': config.email.from,
-            'fromName': config.email.fromName,
-            'subject' : 'BOLO Alert: ' + bolo.category,
-            'html': html
-        });
+        return emailService.send(
+          {
+              'to': subscribers,
+              'from': config.email.from,
+              'fromName': config.email.fromName,
+              'subject' : 'BOLO Alert: ' + bolo.category,
+              'html': html
+          }
+        );
     })
     .catch( function ( error ) {
         console.error(
@@ -137,7 +137,7 @@ router.get( '/bolo', function ( req, res, next ) {
     var page = parseInt( req.query.page ) || 1;
     var limit = config.const.BOLOS_PER_PAGE;
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
-
+    console.log(req.user);
     var data = {
         'paging': { 'first': 1, 'current': page },
         'agencies': []
@@ -857,7 +857,6 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
             doc.end();
         })
     }
-
 
 // handle requests for bolo attachments
 function getAttachment ( req, res ) {
