@@ -149,9 +149,9 @@ CloudantUserRepository.prototype.getById = function ( id ) {
  * @param {String} - the username of the user to get
  * @returns {Promise|User} promises a user object for the supplied username
  */
-CloudantUserRepository.prototype.getByUsername = function ( id ) {
+CloudantUserRepository.prototype.getByUsername = function ( username ) {
     return db.view( 'users', 'by_username', {
-        'key': id,
+        'key': username,
         'include_docs': true
     })
     .then( function ( found ) {
@@ -207,3 +207,32 @@ CloudantUserRepository.prototype.remove = function ( id ) {
         });
 };
 
+CloudantUserRepository.prototype.getByEmail = function ( email ) {
+    return db.view( 'users', 'by_email', {
+        'key': email,
+        'include_docs': true
+    })
+    .then( function ( found ) {
+        if ( !found.rows.length ) { return null; }
+        return fromCloudant( found.rows[0].doc );
+    })
+    .catch( function ( error ) {
+        var msg = error.reason || error.mesage || error;
+        throw new Error( "Unable to retrive user data: " + msg );
+    });
+};
+
+CloudantUserRepository.prototype.getByToken = function ( token ) {
+    return db.view( 'users', 'by_token', {
+        'key': token,
+        'include_docs': true
+    })
+    .then( function ( found ) {
+        if ( !found.rows.length ) { return null; }
+        return fromCloudant( found.rows[0].doc );
+    })
+    .catch( function ( error ) {
+        var msg = error.reason || error.mesage || error;
+        throw new Error( "Unable to retrive user data: " + msg );
+    });
+};

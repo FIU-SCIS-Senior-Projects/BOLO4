@@ -8,16 +8,18 @@ var User = require( path.resolve( __dirname, '../../src/core/domain/user' ) );
 
 var defaults = {
     'username'      : 'superuser',
-    'password'      : 'superuser1',
+    'password'      : 'Password1@',
     'fname'         : 'Kevin',
     'lname'         : 'Flynn',
     'email'         : 'kflynn@en.com',
-    'agency'        : '123456',
-    'agencyName'    : 'Pinecrest',
+    'agency'        : 'abc123',
+    'agencyName'    : 'Test Agency',
     'tier'          : 1,
     'badge'         : '',
     'sectunit'      : '',
-    'ranktitle'     : ''
+    'ranktitle'     : '',
+    'resetPasswordToken' : 'testToken123',
+    'resetPasswordExpires' : null,
 };
 
 module.exports.create = function ( opts ) {

@@ -40,7 +40,7 @@ block content
                 p.text-center.text-danger.strong #{bolo.data.status}
                 if Object.keys( bolo.attachments ).length
                   - var keys = Object.keys( bolo.data.attachments )
-                  img#featured.img-fluid(src="/bolo/asset/" + bolo.data.id + "/" + keys[0] alt="", width=400)
+                  img#featured.img-fluid(src="/bolo/asset/" + bolo.data.id + "/featured" alt="", width=400)
                 else
                   img#featured.img-fluid( src="/img/nopic.png" alt="", width=400 )
                 p.strong Created: #{bolo.data.createdOn}
@@ -92,22 +92,26 @@ block content
             div.col-xs-8
         div.row
             div.col-xs-4
+              if Object.keys( bolo.attachments ).length
                 a(href='/bolo/details/pics/' + bolo.data.id) Additional images
         form.form-horizontal
         | &nbsp;
-        p Additional Info:
+        p.strong Additional Info:
         if bolo.data.additional.length
           p #{bolo.data.additional}
         else
           | &nbsp;
         | &nbsp;
         if bolo.data.video_url.length
-          p.strong Video Link:
-          p #{bolo.data.video_url}
+          p.strong Video Link: 
+          a(href=bolo.data.video_url) #{bolo.data.video_url}
+          p
+          | &nbsp;
         | &nbsp;
-        p Summary:
-        if bolo.data.additional.length
+        p.strong Summary:
+        if bolo.data.summary.length
           p #{bolo.data.summary}
+          p - - -
         else
           | &nbsp;
         if bolo.data.authorFName != null || bolo.data.authorLName != null

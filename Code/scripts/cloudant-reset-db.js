@@ -18,7 +18,7 @@ var bolo_indexer = function (doc) {
         index("agency", doc.agency);
     }
     if (typeof(doc.agencyName) !== 'undefined') {
-        index("agencyName", doc.agency);
+        index("agencyName", doc.agencyName);
     }
     if (typeof(doc.author) !== 'undefined') {
         index("author", doc.author);
@@ -53,7 +53,12 @@ var bolo_indexer = function (doc) {
     if (typeof(doc.hairColor) !== 'undefined') {
         index("hairColor", doc.hairColor);
     }
-
+    if (typeof(doc.hairColor) !== 'undefined') {
+        index("hairColor", doc.hairColor);
+    }
+    if (typeof(doc.Type) !== 'undefined') {
+        index("Type", doc.Type);
+    }
 };
 
 
@@ -81,7 +86,9 @@ var agency_indexer = function (doc) {
     if (typeof(doc.isActive) !== 'undefined') {
         index("isActive", doc.isActive );
     }
-
+    if (typeof(doc.Type) !== 'undefined') {
+        index("Type", doc.Type);
+    }
 };
 
 var user_indexer = function (doc) {
@@ -105,7 +112,9 @@ var user_indexer = function (doc) {
     if (typeof(doc.agency) !== 'undefined') {
         index("agency", doc.agency);
     }
-
+    if (typeof(doc.agencyName) !== 'undefined') {
+        index("agencyName", doc.agencyName);
+    }
     if (typeof(doc.badge) !== 'undefined') {
         index("badge", doc.badge );
     }
@@ -115,7 +124,9 @@ var user_indexer = function (doc) {
     if (typeof(doc.ranktitle) !== 'undefined') {
         index("ranktitle", doc.ranktitle );
     }
-
+    if (typeof(doc.Type) !== 'undefined') {
+        index("Type", doc.Type);
+    }
 };
 
 var BOLO_DB = 'bolo';
@@ -156,6 +167,12 @@ var USERS_DESIGN_DOC = {
         },
         "notifications": {
             "map": "function (doc) { if ( 'user' === doc.Type ) { for ( var i = 0; i < doc.notifications.length; i++ ) { emit( doc.notifications[i], doc.email ); } } }"
+        },
+        "by_email": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.email, null ); }"
+        },
+        "by_token": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.resetPasswordToken, null ); }"
         }
     },
 
@@ -232,10 +249,10 @@ function createIndex(dbname){
 
         var db = cloudant.db.use(dbname);
 
-    db.index(agency_id, function (err, body) {
-        if (err) reject(err);
-        resolve(body);
-    });
+        db.index(agency_id, function (err, body) {
+            if (err) reject(err);
+            resolve(body);
+        });
     });
 }
 

@@ -129,6 +129,25 @@ router.get( '/bolo', function ( req, res, next ) {
 
     boloService.getBolos( limit, skip ).then( function ( results ) {
         data.bolos = results.bolos;
+        var now  = moment().format( config.const.DATE_FORMAT);
+        var then = "";
+        var minutes_in_week = 10080;
+        for(var i in data.bolos){
+            var curr = data.bolos[i];
+            if(curr.data.status === 'New')
+            {
+                then = curr.data.lastUpdatedOn;
+                var ms = moment(now, config.const.DATE_FORMAT).diff(moment(then, config.const.DATE_FORMAT));
+                var d = moment.duration(ms);
+                var minutes = parseInt(d.asMinutes());
+                console.log(minutes);
+                if (minutes > minutes_in_week)
+                {
+                    curr.data.status = 'Ongoing';
+
+                }
+            }
+        }
         data.paging.last = Math.ceil( results.total / limit );
 
         agencyService.getAgencies().then( function ( agencies ) {
@@ -157,7 +176,7 @@ router.get( '/bolo/agency/:id', function ( req, res, next ) {
 
         agencyService.getAgencies().then( function ( agencies ) {
             data.agencies = agencies;
-            res.render('bolo-list-by-agency', data );
+            res.render('bolo-list', data );
         });
     }).catch( function ( error ) {
         next( error );
@@ -296,8 +315,17 @@ router.get( '/bolo/search', function ( req, res ) {
     var data = {
         'form_errors': req.flash( 'form-errors' )
     };
+    data.agencies = ['N/A'];
+    agencyService.getAgencies().then( function ( agencies ) {
+        for(var i in agencies)
+        {
+            var agency = agencies[i];
+            data.agencies.push(agency.data.name);
+        }
 
-    res.render( 'bolo-search-form', data );
+        res.render( 'bolo-search-form', data );
+    });
+
 });
 
 // process bolo search user form input
@@ -307,7 +335,8 @@ router.post( '/bolo/search', function ( req, res, next ) {
     {
 
         var query_obj = formDTO.fields;
-        var query_string = '';
+        console.log(query_obj);
+        var query_string = '( ';
         var key = '';
         var value = '';
         var MATCH_EXPR = ' OR ';
@@ -322,7 +351,8 @@ router.post( '/bolo/search', function ( req, res, next ) {
             key = Object.keys(query_obj)[i];
             value = query_obj[Object.keys(query_obj)[i]];
         console.log(key+':'+value);
-            if (key !== "status" && key !== 'matchFields' && value !== "" ) {
+
+            if (key !== "status" && key !== 'matchFields' && value !== "" && value != 'N/A' ) {
                 if(expression === true) {
                     query_string += MATCH_EXPR;
                     expression = false;
@@ -332,12 +362,12 @@ router.post( '/bolo/search', function ( req, res, next ) {
             }
 
         }
-
+        if(query_string !== '( ')
+        query_string += ') AND Type:bolo';
         //form was empty, return empty object
-        if(query_string === '')
-        {
+        else
             query_string = {};
-        }
+
         return query_string;
 
     }).then( function ( query_string) {
@@ -380,7 +410,7 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
         boloDTO.lastUpdatedBy.firstName = req.user.fname;
         boloDTO.lastUpdatedBy.lastName = req.user.lname;
         boloDTO.agencyName = req.user.agencyName;
-
+        boloDTO.status = 'New';
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
@@ -400,6 +430,12 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
             var bolo = boloService.previewBolo(boloDTO);
             preview.bolo = bolo;
             preview.agency = bolo.agency;
+            preview.image = "none";
+            preview.ranktitle = req.user.ranktitle;
+            preview.sectunit = req.user.sectunit;
+            if(formDTO.fields.featured_image){
+                preview.image = fi.path;
+            }
             return Promise.all([preview, formDTO]);
 
         }
@@ -425,16 +461,29 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
                 pData[0].agency_zip = response.data.zip;
                 pData[0].agency_state = response.data.state;
                 pData[0].agency_phone = response.data.phone;
-                res.render( 'bolo-preview-details', pData[0] );
+
+                var readFile = Promise.denodeify(fs.readFile);
+
+                if(pData[0].image === "none"){
+                    pData[0].buffer;
+                    res.render('bolo-preview-details', pData[0]);
+                }
+                else{
+                    readFile(pData[0].image).then( function(buffer){
+                        pData[0].buffer = buffer.toString('base64');
+                        res.render( 'bolo-preview-details', pData[0] );
+                    });
+                }
             });
         }
 
     }).catch( function ( error ) {
          next( error );
-       });
+    });
 
 });
 
+//update bolo status through thumbnail select menu
 router.post( '/bolo/update/:id', function ( req, res, next ) {
     console.log("posted to bolo/update/:id");
     var bolo_id = req.params.id;
@@ -478,6 +527,7 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
         next( error );
     });
 });
+
 // render the bolo edit form
 router.get( '/bolo/edit/:id', function ( req, res, next ) {
     var data = {
@@ -518,10 +568,13 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
+        if(formDTO.fields.status === ''){
+            boloDTO.status = 'Updated';
+
+        }
         boloDTO.lastUpdatedOn = moment().format( config.const.DATE_FORMAT );
         boloDTO.lastUpdatedBy.firstName = req.user.fname;
         boloDTO.lastUpdatedBy.lastName = req.user.lname;
-
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;

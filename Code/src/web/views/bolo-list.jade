@@ -5,7 +5,7 @@ block jumbo
     .jumbotron
         .container
             div#wrapper.row
-                div.col-xs-2.col-md-10
+                div.col-xs-2.col-md-8
                     p Active BOLOs
                 div.col-xs-2
                     .dropdown
@@ -15,6 +15,8 @@ block jumbo
                             a.btn.btn-default(href = "/bolo/", type="button") View all
                             for agency in agencies
                                 a.btn.btn-default(href="/bolo/agency/" + agency.id, name = "agencyID", value = agency.id, type="button") #{agency.name}
+                div.col-xs-2
+                    a.dropbtn.pull-right(href="/bolo/create") Post BOLO
 
             script.
                 function myFunction() {
@@ -44,6 +46,7 @@ block content
 
     .row
         for bolo in bolos
+            if bolo
                 include ./partials/bolo-thumbnail.jade
                     .actions
                         a.btn.btn-default( href="/bolo/edit/" + bolo.id, role="button" ) Edit

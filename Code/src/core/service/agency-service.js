@@ -145,9 +145,9 @@ AgencyService.prototype.searchAgencies = function(query_string){
 
 };
 
-AgencyService.prototype.findAgencyById = function(id, name){
+AgencyService.prototype.findAgencyById = function(id){
 
-    var result = this.AgencyRepository.findAgencyById(id, name);
+    var result = this.AgencyRepository.findAgencyById(id);
     return result;
 
 };
