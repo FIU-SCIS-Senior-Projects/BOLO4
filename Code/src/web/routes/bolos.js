@@ -137,7 +137,6 @@ router.get( '/bolo', function ( req, res, next ) {
     var page = parseInt( req.query.page ) || 1;
     var limit = config.const.BOLOS_PER_PAGE;
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
-    console.log(req.user);
     var data = {
         'paging': { 'first': 1, 'current': page },
         'agencies': []
