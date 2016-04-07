@@ -59,6 +59,9 @@ var bolo_indexer = function (doc) {
     if (typeof(doc.Type) !== 'undefined') {
         index("Type", doc.Type);
     }
+    if (typeof(doc.record) !== 'undefined') {
+        index("record", doc.record);
+    }
 };
 
 
