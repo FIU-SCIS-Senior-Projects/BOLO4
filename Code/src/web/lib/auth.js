@@ -18,6 +18,8 @@ var users           = require('../routes/admin/users');
 var userRepository  = new config.UserRepository();
 var agencyService  = new config.AgencyService( new config.AgencyRepository() );
 var userService = new config.UserService( userRepository , agencyService);
+var emailService = new config.EmailService();
+
 var parseFormData = formUtil.parseFormData;
 var FormError = formUtil.FormError;
 var FERR = config.const.GFERR;
@@ -116,6 +118,7 @@ router.get( '/forgotPassword',
 
 router.post( '/forgotPassword',
     function ( req, res ) {
+
       var email = req.body.email;
         crypto.randomBytes(20, function(err, buf) {
 
@@ -135,22 +138,19 @@ router.post( '/forgotPassword',
             user.resetPasswordToken = token;
             user.resetPasswordExpires = Date.now() + 3600000;
             userService.updateUser(user.id, user);
-
-            console.log(token);
-            //TODO: Uncomment when Sendgrid branch is merged
-            // emailService.send({
-            //     'to': email,
-            //     'from': config.email.from,
-            //     'fromName': config.email.fromName,
-            //     'subject' : 'BOLO Alert: Reset password requested',
-            //     'text': "A password reset has been requested for the account registered to this email.\n"+
-            //       "To change your password, follow this link: " +
-            //       config.appURL + "/changepassword/" + token + "\n\n" +
-            //       "If you did not request to change your password, please contact a system administrator and immediately change your password."
-            // }).then(function(json){
+            emailService.send({
+                'to': email,
+                'from': config.email.from,
+                'fromName': config.email.fromName,
+                'subject' : 'BOLO Alert: Reset password requested',
+                'text': 'A password reset has been requested for the account registered to this email.\n'+
+                  'To change your password, follow this link: \n\n' +
+                  config.appURL + '/changepassword/' + token + '\n\n' +
+                  'If you did not request to change your password, please contact a system administrator and immediately change your password.'
+            }).then(function(json){
               req.flash( 'messages', 'Reset information successfully sent to %s.', email );
               res.redirect( 'login' );
-            // });
+             });
 
           });
 
