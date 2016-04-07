@@ -159,6 +159,15 @@ var USERS_DESIGN_DOC = {
         "by_username": {
             "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.username, null ); }"
         },
+        "by_lname": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.lname, null ); }"
+        },
+        "by_agency": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.agency, null ); }"
+        },
+        "by_tier": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.tier, null ); }"
+        },
         "all": {
             "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc._id, 1 ); }"
         },

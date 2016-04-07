@@ -115,8 +115,8 @@ UserService.prototype.registerUser = function ( userDTO ) {
  *
  * @returns {Promise|User|Array} Promises an Array of User objects.
  */
-UserService.prototype.getUsers = function () {
-    return this.userRepository.getAll();
+UserService.prototype.getUsers = function (sortBy) {
+    return this.userRepository.getAll(sortBy);
 };
 
 // connection between this and payload function
