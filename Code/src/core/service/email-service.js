@@ -11,7 +11,7 @@ if ( ! process.env.SENDGRID_API_KEY ) {
   throw new Error(
       'SendGrid API key not found: SENDGRID_API_KEY should be set.'
   );
-}else{
+}
 // reaches here if API Key is found
 var sendgrid = require('sendgrid')(process.env.SENDGRID_API_KEY);
 
@@ -26,8 +26,8 @@ EmailService.prototype.send = function( payload){
               else resolve( json );
           });
       });
-}
+};
 
 module.exports = EmailService;
 
-}
+
