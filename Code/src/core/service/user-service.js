@@ -85,6 +85,7 @@ UserService.prototype.registerUser = function ( userDTO ) {
 
       return context.agencyService.getAgency(userDTO.agency).then(function(response){
         userDTO.agencyName = response.name;
+        userDTO.notifications = [response.name];
 
         var newuser = new User( userDTO );
         if ( userDTO.tier && typeof userDTO.tier === 'string' ) {
@@ -118,6 +119,7 @@ UserService.prototype.getUsers = function () {
     return this.userRepository.getAll();
 };
 
+// connection between this and payload function
 UserService.prototype.getAgencySubscribers = function ( agencyID ) {
     return this.userRepository.getByAgencySubscription( agencyID );
 };

@@ -199,7 +199,6 @@ CloudantAgencyRepository.prototype.getAgencies = function ( ids ) {
         view = 'all_active';
         opts.keys = ids;
     }
-
     return db.view( 'agency', view, opts ).then( function ( result ) {
         var agencies = result.rows.map( function ( row ) {
             return agencyFromCloudant( row.doc );

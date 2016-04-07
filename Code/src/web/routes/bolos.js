@@ -19,7 +19,7 @@ var config          = require('../config');
 var agencyService   = new config.AgencyService( new config.AgencyRepository() );
 var userService     = new config.UserService( new config.UserRepository(), agencyService);
 var boloService     = new config.BoloService( new config.BoloRepository() );
-var emailService    = config.EmailService;
+var emailService    = new config.EmailService();
 
 var BoloAuthorize   = require('../lib/authorization.js').BoloAuthorize;
 
@@ -34,10 +34,23 @@ var cleanTemporaryFiles = formUtil.cleanTempFiles;
 /**
  * Send email notification of a new bolo.
  */
+
 function sendBoloNotificationEmail ( bolo, template ) {
-    return userService.getAgencySubscribers( bolo.agency )
+    return userService.getUsers()
     .then( function ( users ) {
-        var subscribers = users.map( function( user ) {
+        // filters out users and pushes their emails into array
+        var subscribers = users.filter( function( user ) {
+          var flag = false;
+          if(user.notifications){
+            var notificationLength = user.notifications.length;
+            for(var i = 0; i < notificationLength; i++){
+              if(bolo.agencyName === user.notifications[i]) {
+                flag = true;
+              }
+            }
+          }
+          return flag;
+        }).map(function(user){
             return user.email;
         });
 
@@ -46,16 +59,19 @@ function sendBoloNotificationEmail ( bolo, template ) {
             'bolo': bolo,
             'app_url': config.appURL
         };
+
         /** @todo check if this is async **/
         var html = jade.renderFile( tmp, tdata );
 
-        return emailService.send({
-            'to': subscribers,
-            'from': config.email.from,
-            'fromName': config.email.fromName,
-            'subject' : 'BOLO Alert: ' + bolo.category,
-            'html': html
-        });
+        return emailService.send(
+          {
+              'to': subscribers,
+              'from': config.email.from,
+              'fromName': config.email.fromName,
+              'subject' : 'BOLO Alert: ' + bolo.category,
+              'html': html
+          }
+        );
     })
     .catch( function ( error ) {
         console.error(
@@ -121,7 +137,6 @@ router.get( '/bolo', function ( req, res, next ) {
     var page = parseInt( req.query.page ) || 1;
     var limit = config.const.BOLOS_PER_PAGE;
     var skip = ( 1 <= page ) ? ( page - 1 ) * limit : 0;
-
     var data = {
         'paging': { 'first': 1, 'current': page },
         'agencies': []
@@ -750,6 +765,7 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
         next( error );
     });
 });
+
     /**
      * Generates PDF from bolo / agency information
      */
@@ -825,6 +841,7 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
                 + data.bolo.authorFName
                 + " "
                 + data.bolo.authorLName, 15);
+
         boloService.getAttachment(data.bolo.id, 'featured').then(function (attDTO) {
             someData.featured = attDTO.data;
             doc.image(someData.featured, 15, 150, {width: 300, height: 300});

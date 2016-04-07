@@ -94,7 +94,8 @@ module.exports.postCreateForm = function ( req, res ) {
 
         formDTO.fields.tier = formDTO.fields.role;
         formDTO.fields.agency = formDTO.fields.agency || req.user.agency;
-        formDTO.fields.notifications = [ formDTO.fields.agency ];
+        formDTO.fields.notifications = [ null ];
+
 
         var userDTO = userService.formatDTO( formDTO.fields );
 
@@ -209,7 +210,7 @@ module.exports.getDetails = function ( req, res, next ) {
         });
     })
     .catch( function ( error ) {
-        req.flash( FERR, 'Unable to get user information, please try again.' );        
+        req.flash( FERR, 'Unable to get user information, please try again.' );
         next( error );
     });
 };
