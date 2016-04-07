@@ -519,6 +519,12 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
             data.bolo.lastUpdatedOn = temp.toString();
             console.log(data.bolo.lastUpdatedOn);
             var att = [];
+            /*************************************************/
+
+
+            /*************************************************/
+
+
             boloService.updateBolo(data.bolo, att).then(function(bolo){
 
                 res.redirect('/bolo');
@@ -591,7 +597,7 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         boloDTO.lastUpdatedBy.firstName = req.user.fname;
         boloDTO.lastUpdatedBy.lastName = req.user.lname;
 
-        boloDTO.record = boloDTO.record + 'Updated on ' + boloDTO.lastUpdatedOn + '\nBy ' + req.user.fname + ' ' + req.user.lname + '\nFrom ' + req.user.agencyName + '\n\n';
+        boloDTO.record = boloDTO.record + 'Edited on ' + boloDTO.lastUpdatedOn + '\nBy ' + req.user.fname + ' ' + req.user.lname + '\nFrom ' + req.user.agencyName + '\n\n';
 
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
