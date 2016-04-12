@@ -4,7 +4,11 @@ extends layout
 block jumbo
 	.jumbotron
 		.container
-			p Record Tracking
+			div#wrapper.row
+				div.col-xs-2.col-md-8
+					p Record Tracking
+				div
+					a.btn.btn-default( type = "button" value = "back" onClick="history.go(-1);return true;") Back to BOLO
 
 
 block content

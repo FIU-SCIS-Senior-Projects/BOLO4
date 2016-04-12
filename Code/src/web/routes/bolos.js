@@ -523,7 +523,7 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
             data.bolo.lastUpdatedOn = temp.toString();
             console.log(data.bolo.lastUpdatedOn);
             var att = [];
-            data.bolo.record = data.bolo.record+'Updated to '+bolo_status+' on '+temp+'\nBy '+fname+' '+ lname +'\n'+'From '+agency+'\n\n';
+            data.bolo.record = data.bolo.record+'Updated to "'+bolo_status+'" on '+temp+'\nBy '+fname+' '+ lname +'\n'+'From '+agency+'\n\n';
 
             boloService.updateBolo(data.bolo, att).then(function(bolo){
 
