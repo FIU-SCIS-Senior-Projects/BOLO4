@@ -503,6 +503,10 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
     console.log("posted to bolo/update/:id");
     var bolo_id = req.params.id;
     var bolo_status = req.body.status;
+    var fname = req.user.fname;
+    var lname = req.user.lname;
+    var agency = req.user.agencyName;
+
     var data = {
         'form_errors': req.flash( 'form-errors' )
     };
@@ -519,11 +523,7 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
             data.bolo.lastUpdatedOn = temp.toString();
             console.log(data.bolo.lastUpdatedOn);
             var att = [];
-            /*************************************************/
-
-
-            /*************************************************/
-
+            data.bolo.record = data.bolo.record+'Updated to '+bolo_status+' on '+temp+'\nBy '+fname+' '+ lname +'\n'+'From '+agency+'\n\n';
 
             boloService.updateBolo(data.bolo, att).then(function(bolo){
 
@@ -597,7 +597,7 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         boloDTO.lastUpdatedBy.firstName = req.user.fname;
         boloDTO.lastUpdatedBy.lastName = req.user.lname;
 
-        boloDTO.record = boloDTO.record + 'Edited on ' + boloDTO.lastUpdatedOn + '\nBy ' + req.user.fname + ' ' + req.user.lname + '\nFrom ' + req.user.agencyName + '\n\n';
+        boloDTO.record = boloDTO.record+'Edited on '+boloDTO.lastUpdatedOn+'\nBy '+req.user.fname+' '+req.user.lname+'\nFrom '+req.user.agencyName+'\n\n';
 
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
@@ -724,7 +724,6 @@ router.get( '/bolo/details/:id', function ( req, res, next ) {
 
     boloService.getBolo( req.params.id ).then( function ( bolo ) {
         data.bolo = bolo;
-        console.log(bolo);
     return agencyService.getAgency( bolo.agency );
 
     }).then( function ( agency ) {
@@ -782,7 +781,6 @@ router.get('/bolo/details/record/:id', function (req, res, next){
     };
     boloService.getBolo(req.params.id).then( function (bolo){
         data.record = bolo.record;
-        console.log(data.record);
         res.render('bolo-record-tracking', data);
 
     }).catch( function ( error ) {
