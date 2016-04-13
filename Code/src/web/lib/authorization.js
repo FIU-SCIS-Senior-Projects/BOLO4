@@ -18,7 +18,7 @@ function BoloAuthorize ( bolo, author, user ) {
 }
 
 BoloAuthorize.prototype.isAdmin = function () {
-    return 4 === this.user.tier || 3 === this.user.tier;
+    return 4 === this.user.tier;
 };
 
 BoloAuthorize.prototype.sameUser = function () {

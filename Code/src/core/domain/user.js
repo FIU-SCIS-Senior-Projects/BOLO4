@@ -144,7 +144,7 @@ User.prototype.isValid = function () {
  * @param {String} - the password to validate
  * @returns {boolean} true if valid, false otherwise
  */
-User.prototype.isValidPassword = function ( password ) {
+User.prototype.matchesCurrentPassword = function ( password ) {
     return this.password === hash( password );
 };
 
