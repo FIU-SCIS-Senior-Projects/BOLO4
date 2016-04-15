@@ -59,6 +59,9 @@ var bolo_indexer = function (doc) {
     if (typeof(doc.Type) !== 'undefined') {
         index("Type", doc.Type);
     }
+    if (typeof(doc.record) !== 'undefined') {
+        index("record", doc.record);
+    }
 };
 
 
@@ -158,6 +161,15 @@ var USERS_DESIGN_DOC = {
     "views": {
         "by_username": {
             "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.username, null ); }"
+        },
+        "by_lname": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.lname, null ); }"
+        },
+        "by_agency": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.agency, null ); }"
+        },
+        "by_tier": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.tier, null ); }"
         },
         "all": {
             "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc._id, 1 ); }"

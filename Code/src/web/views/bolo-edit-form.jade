@@ -26,6 +26,8 @@ block content
 
     form( action="/bolo/edit/" + bolo.id enctype="multipart/form-data" method="post" )
         input( type="hidden" name="id" value=bolo.id )
+        input( type="hidden" name="record" value=bolo.record)
+        input( type="hidden" name="agencyName" value=bolo.agencyName)
 
         +select_options( "status", "Status", bolo_status, false, bolo.status )
         +select_options( "category", "Category", categories, true, bolo.category )

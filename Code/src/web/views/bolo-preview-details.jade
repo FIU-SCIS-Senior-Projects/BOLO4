@@ -15,8 +15,8 @@ block content
     div.container-fluid#boloPage
         div.row
             - var att_route = '/agency/' + bolo.data.agency + '/img';
-            div.col-xs-2.col-md-2#logo
-              img( src=att_route + '/logo' alt="", width=150, height=175 )
+            div.col-xs-2.col-md-2
+              img#logo.img-fluid( src=att_route + '/logo' alt="", width=150, height=175 )
             div.col-xs-8
               p.text-danger.strong #{"UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE"}
               p.strong #{agency_name} Police Department
@@ -27,7 +27,7 @@ block content
               p
                 em #{agency_phone}
             div.col-xs-2#badge
-              img( src=att_route + '/shield' alt="", width=150, height=180)
+              img#badge.img-fluid( src=att_route + '/shield' alt="", width=150, height=180)
         div.text-center
           h1.text-danger.strong #{bolo.data.category}
         | &nbsp;
@@ -89,6 +89,10 @@ block content
                   +form_labels_row("Tattoos/Scars", bolo.data.tattoos,bolo.data.tattoos?"":"hidden")
                 else
                   +form_labels_row("Tattoos/Scars", "N/A" )
+            div.row
+              div.col-xs-8
+            div.row
+              div.col-xs-4
             form.form-horizontal
             | &nbsp;
             p.strong Additional Info:

@@ -111,8 +111,10 @@ CloudantUserRepository.prototype.update = function ( user ) {
  *
  * @returns {Promise|User|Array} an array of all user's in the repository.
  */
-CloudantUserRepository.prototype.getAll = function () {
-    return db.view( 'users', 'by_username', { 'include_docs': true } )
+CloudantUserRepository.prototype.getAll = function (sortBy) {
+    var sort = 'by_' + sortBy;
+
+    return db.view( 'users', sort, { 'include_docs': true } )
         .then( function ( docs ) {
             if ( ! docs.rows.length ) return Promise.resolve( null );
 

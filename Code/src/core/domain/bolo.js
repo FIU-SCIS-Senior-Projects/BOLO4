@@ -67,6 +67,7 @@ function Bolo( data ) {
         video_url       : '',
         isActive        : true,
         status          : '',
+        record          : '',
         images          : {}
     };
 
