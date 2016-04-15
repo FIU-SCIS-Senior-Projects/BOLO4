@@ -24,6 +24,7 @@ var agencyService = new config.AgencyService(new config.AgencyRepository());
 var userService = new config.UserService(new config.UserRepository(), agencyService);
 var boloService = new config.BoloService(new config.BoloRepository());
 var emailService = new config.EmailService();
+var pdfService = new config.PDFService();
 
 var BoloAuthorize = require('../lib/authorization.js').BoloAuthorize;
 
@@ -530,78 +531,7 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
                 pData[0].agency_state = response.data.state;
                 pData[0].agency_phone = response.data.phone;
 
-                var doc = new PDFDocument();
-                var someData = {};
 
-                doc.fontSize(8);
-                doc.fillColor('red');
-                doc.text("UNCLASSIFIED// FOR OFFICIAL USE ONLY// LAW ENFORCEMENT SENSITIVE", 120, 15)
-                    .moveDown(0.25);
-                doc.fillColor('black');
-                doc.text(pData[0].agency_name + "Police Department")
-                    .moveDown(0.25);
-                doc.text(pData[0].agency_address)
-                    .moveDown(0.25);
-                doc.text(pData[0].agency_city + ", " + pData[0].agency_state + ", " + pData[0].agency_zip)
-                    .moveDown(0.25);
-                doc.text(pData[0].agency_phone)
-                    .moveDown(0.25);
-                doc.fontSize(20);
-                doc.fillColor('red');
-                doc.text(pData[0].bolo.category, 120, 115, {
-                        align: 'center'
-                  })
-                  .moveDown();
-                console.log("CHECK 2");
-                doc.fillColor('black');
-                doc.fontSize(11);
-                doc.font('Times-Roman')
-                    .text("Name: " + pData[0].bolo.firstName + " " + pData[0].bolo.lastName, 350)
-                    .moveDown();
-                doc.font('Times-Roman')
-                    .text("Race: " + pData[0].bolo.race, 350)
-                    .moveDown();
-                doc.font('Times-Roman')
-                    .text("DOB: " + pData[0].bolo.dob, 350)
-                    .moveDown();
-
-                doc.font('Times-Roman')
-                    .text("License#: " + pData[0].bolo.dlNumber, 350)
-                    .moveDown();
-                doc.font('Times-Roman')
-                    .text("Height: " + pData[0].bolo.height, 350)
-                    .moveDown();
-                doc.font('Times-Roman')
-                    .text("Weight: " + pData[0].bolo.weight + "lbs", 350)
-                    .moveDown();
-                doc.font('Times-Roman')
-                    .text("Sex: " + pData[0].bolo.sex, 350)
-                    .moveDown();
-                console.log("CHECK 3");
-                doc.font('Times-Roman')
-                    .text("Hair Color: " + pData[0].bolo.hairColor, 350)
-                    .moveDown();
-                doc.font('Times-Roman')
-                    .text("Tattoos/Scars: " + pData[0].bolo.tattoos, 350)
-                    .moveDown();
-                doc.font('Times-Roman')
-                    .text("Additional: ", 15, 465)
-                    .moveDown(0.25);
-                doc.font('Times-Roman')
-                    .text(pData[0].bolo.additional, {
-                        width: 200
-                    })
-                    .moveDown();
-                doc.font('Times-Roman')
-                    .text("Summary: ", 15)
-                    .moveDown(0.25);
-                doc.font('Times-Roman')
-                    .text(pData[0].bolo.summary, {
-                        width: 200
-                    })
-                    .moveDown(5);
-                doc.font('Times-Roman')
-                    .text("Any Agency having questions regarding this document may contact: " + pData[0].bolo.authorFName + " " + pData[0].bolo.authorLName, 15);
                 /** @todo must handle when featured image is empty **/
                 if (pData[0].image === "none") {
                     //pData[0].buffer;
@@ -998,6 +928,7 @@ router.get('/bolo/details/pics/:id', function(req, res, next) {
         next(error);
     });
 });
+
 
 router.get('/bolo/details/record/:id', function (req, res, next){
     var data = {
