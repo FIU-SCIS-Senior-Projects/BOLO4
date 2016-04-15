@@ -32,11 +32,11 @@ var userService = new UserService( new UserRepository(), agencyService );
 agencyService.searchAgencies("name:Pinecrest").then( function ( response ) {
         var agencies = response.agencies;
         var rootDTO = userService.formatDTO({
-            "username": "root",
-            "password": "Password1!",
-            "fname" : "Root",
-            "lname" : "User",
-            "email": "root@example.com",
+            "username": "jason4",
+            "password": "Jasoncohen4",
+            "fname" : "Jason",
+            "lname" : "Cohen",
+            "email": "jasoncohen4@example.com",
             "tier": 4,
             "agency": agencies[0].id,
             "agencyName" : agencies[0].name,
@@ -46,45 +46,45 @@ agencyService.searchAgencies("name:Pinecrest").then( function ( response ) {
         });
 
         var adminDTO = userService.formatDTO({
-            "username": "admin",
-            "password": "Password1!",
-            "fname" : "Admin",
-            "lname" : "User",
-            "email": "admin@example.com",
-            "tier": 3,
-            "agency": agencies[0].id,
-            "agencyName" : agencies[0].name,
-            "badge"     : "officerBadge",
-            "sectunit"  : "officerUnit",
-            "ranktitle" : "officerRank"
+          "username": "jason3",
+          "password": "Jasoncohen3",
+          "fname" : "Jason",
+          "lname" : "Cohen",
+          "email": "jasoncohen3@example.com",
+          "tier": 3,
+          "agency": agencies[0].id,
+          "agencyName" : agencies[0].name,
+          "badge"     : "officerBadge",
+          "sectunit"  : "officerUnit",
+          "ranktitle" : "officerRank"
         });
 
         var superDTO = userService.formatDTO({
-            "username": "super",
-            "password": "Password1!",
-            "fname" : "Supervisor",
-            "lname" : "User",
-            "email": "super@example.com",
-            "tier": 2,
-            "agency": agencies[0].id,
-            "agencyName" : agencies[0].name,
-            "badge"     : "superBadge",
-            "sectunit"  : "superSect",
-            "ranktitle" : "superRank"
+          "username": "jason2",
+          "password": "Jasoncohen2",
+          "fname" : "Jason",
+          "lname" : "Cohen",
+          "email": "jasoncohen2@example.com",
+          "tier": 2,
+          "agency": agencies[0].id,
+          "agencyName" : agencies[0].name,
+          "badge"     : "officerBadge",
+          "sectunit"  : "officerUnit",
+          "ranktitle" : "officerRank"
         });
 
         var officerDTO = userService.formatDTO({
-            "username": "officer",
-            "password": "Password1!",
-            "fname" : "Officer",
-            "lname" : "User",
-            "email": "officer@example.com",
-            "tier": 1,
-            "agency": agencies[0].id,
-            "agencyName" : agencies[0].name,
-            "badge"     : "officerBadge",
-            "sectunit"  : "officerUnit",
-            "ranktitle" : "officerRank"
+          "username": "jason1",
+          "password": "Jasoncohen1",
+          "fname" : "Jason",
+          "lname" : "Cohen",
+          "email": "jasoncohen1@example.com",
+          "tier": 1,
+          "agency": agencies[0].id,
+          "agencyName" : agencies[0].name,
+          "badge"     : "officerBadge",
+          "sectunit"  : "officerUnit",
+          "ranktitle" : "officerRank"
         });
         console.log(
             "Attempting to create users..."
