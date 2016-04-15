@@ -290,7 +290,7 @@ UserService.prototype.formatDTO = function ( dto ) {
 };
 
 UserService.prototype.getByEmail = function ( email ) {
-    return this.userRepository.getByEmail( email );
+    return this.userRepository.getByEmail( email.toLowerCase() );
 };
 
 UserService.prototype.getByToken = function ( email ) {
