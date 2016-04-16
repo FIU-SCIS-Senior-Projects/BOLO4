@@ -115,7 +115,7 @@ module.exports.postCreateForm = function ( req, res ) {
     })
     .catch( function ( error ) {
         if ( ! /already registered/i.test( error.message ) ) throw error;
-            req.flash( FERR, 'User already registered.' );
+            req.flash( FERR, error.message );
             res.redirect( 'back' );
     })
     .catch( function ( error ) {
@@ -135,7 +135,8 @@ module.exports.getList = function ( req, res ) {
       'currentAgency': req.user.agency,
       'currentUser':req.user
     };
-    userService.getUsers().then( function ( users ) {
+    var sort = 'username';
+    userService.getUsers(sort).then( function ( users ) {
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;
         });
@@ -154,31 +155,9 @@ module.exports.getSortedList = function ( req, res ) {
       'currentAgency': req.user.agency,
       'currentUser':req.user
     };
-    var type = req.params.id;
-    
-    userService.getUsers().then( function ( users ) {
+    var sort = req.params.id;
 
-        if(type === "name"){
-            users.sort(function(a, b) {
-                 return a.data.lname > b.data.lname;
-            });
-        }
-        if(type === "agency"){
-            users.sort(function(a, b) {
-                 return a.data.agencyName > b.data.agencyName;
-            });
-        }
-        if(type === "username"){
-            users.sort(function(a, b) {
-                 return a.data.username > b.data.username;
-            });
-        }
-        if(type === "role"){
-            users.sort(function(a, b) {
-                 return a.data.tier < b.data.tier;
-            });
-        }
-
+    userService.getUsers(sort).then( function ( users ) {
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;
         });

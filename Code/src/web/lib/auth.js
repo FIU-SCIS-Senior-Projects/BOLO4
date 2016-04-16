@@ -149,9 +149,11 @@ router.post( '/forgotPassword',
             }
 
             var token = buf.toString('hex');
+            console.log(token);
             user.resetPasswordToken = token;
             user.resetPasswordExpires = Date.now() + 3600000;
             userService.updateUser(user.id, user);
+
             emailService.send({
                 'to': email,
                 'from': config.email.from,
@@ -208,12 +210,21 @@ router.post( '/forgotPassword',
             res.redirect( '/login' );
         })
         .catch( function ( error ) {
-            if ( 'FormError' !== error.name ) throw error;
+          var patt = new RegExp("matches previous");
+          var res = patt.test(error.message);
+
+          if ( res ) {
+            req.flash( FERR, 'New password must not match previous.' );
             res.redirect( 'back' );
+          }
+
+          if ( 'FormError' !== error.name ) throw error;
+
+          console.error( 'Error at /users/:id/reset-password >>> ', error.message );
+          req.flash( FERR, 'Error occurred, please try again.' );
+          res.redirect( 'back' );
         })
         .catch( function ( error ) {
-            console.error( 'Error at /users/:id/reset-password >>> ', error.message );
-            req.flash( FERR, 'Unknown error occurred, please try again.' );
             res.redirect( 'back' );
         });
       });

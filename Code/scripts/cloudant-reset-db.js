@@ -59,6 +59,9 @@ var bolo_indexer = function (doc) {
     if (typeof(doc.Type) !== 'undefined') {
         index("Type", doc.Type);
     }
+    if (typeof(doc.record) !== 'undefined') {
+        index("record", doc.record);
+    }
 };
 
 
@@ -159,6 +162,15 @@ var USERS_DESIGN_DOC = {
         "by_username": {
             "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.username, null ); }"
         },
+        "by_lname": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.lname, null ); }"
+        },
+        "by_agency": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.agency, null ); }"
+        },
+        "by_tier": {
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.tier, null ); }"
+        },
         "all": {
             "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc._id, 1 ); }"
         },
@@ -169,7 +181,7 @@ var USERS_DESIGN_DOC = {
             "map": "function (doc) { if ( 'user' === doc.Type ) { for ( var i = 0; i < doc.notifications.length; i++ ) { emit( doc.notifications[i], doc.email ); } } }"
         },
         "by_email": {
-            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.email, null ); }"
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.email.toLowerCase(), null ); }"
         },
         "by_token": {
             "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.resetPasswordToken, null ); }"

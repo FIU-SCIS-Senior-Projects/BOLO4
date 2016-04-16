@@ -14,21 +14,29 @@ var AgencyRepository  = require( path.join( core, 'adapters/persistence/cloudant
 
 /** This is the main module we will be using **/
 var agencyService = new AgencyService( new AgencyRepository() );
-console.log(process.argv.length);
+// console.log(process.argv.length);
 
-/** Light sanity check **/
-if ( process.argv.length != 3 ) {
-    console.error(
-        "Invalid number of arguments:\nUsage: node",
-        path.basename( process.argv[1] ), "<agency_id>"
-    );
-    return;
-}
+// /** Light sanity check **/
+// if ( process.argv.length != 3 ) {
+//     console.error(
+//         "Invalid number of arguments:\nUsage: node",
+//         path.basename( process.argv[1] ), "<agency_id>"
+//     );
+//     return;
+// }
 
 /** These are the required fields per core/domain/user.js **/
 var agencyDTO = agencyService.formatDTO({
     "name": "Pinecrest",
-    "agency_id": process.argv[2],
+    "agency_id": 123,
+    "city": "Miami",
+    "state": "Florida",
+    "isActive": true
+});
+
+var agencyDTO2 = agencyService.formatDTO({
+    "name": "FIU",
+    "agency_id": 456,
     "city": "Miami",
     "state": "Florida",
     "isActive": true
@@ -41,6 +49,20 @@ console.log(
 
 /** Try to register the user **/
 agencyService.createAgency( agencyDTO,[] ).then( function (response,error ) {
+    if(response)
+    {
+        console.log("Created Agency -- Cloudant Response is: \n", response);
+    }
+
+    else
+       throw error;
+
+
+}).catch( function ( error ) {
+    console.error( "An error occurred -- Cloudant Response Error: \n", error );
+});
+
+agencyService.createAgency( agencyDTO2,[] ).then( function (response,error ) {
     if(response)
     {
         console.log("Created Agency -- Cloudant Response is: \n", response);

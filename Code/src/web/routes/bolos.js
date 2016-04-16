@@ -96,6 +96,8 @@ console.log("called get all bolo data");
             agencyService.getAgency( bolo.agency ),
             userService.getUser( bolo.author )
         ]);
+    }, function(reason){
+      throw new Error('Error retrieving all BOLO info.');
     }).then( function ( responses ) {
         console.log(responses);
         data.agency = responses[0];
@@ -272,7 +274,7 @@ router.post('/bolo/archive/purge',function(req,res) {
                             }
                              res.send({redirect: '/bolo/archive'});
 
-                         })
+                         });
                     });
 
                 }
@@ -289,7 +291,7 @@ router.post('/bolo/archive/purge',function(req,res) {
         }).catch(function(){
         req.flash(GFERR,"error in purge process, please try again");
         res.send({redirect: '/bolo/archive'});
-    })
+    });
 
 });
 
@@ -319,8 +321,7 @@ router.get( '/bolo/search/results', function ( req, res ) {
             console.log("previous: " + data.previous_bookmark);
         data.bolos = results.bolos;
         res.render( 'bolo-search-results', data );
-    })
-        .catch( function ( error ) {
+    }).catch( function ( error ) {
         next( error );
     });
 
@@ -502,6 +503,10 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
 router.post( '/bolo/update/:id', function ( req, res, next ) {
     var bolo_id = req.params.id;
     var bolo_status = req.body.status;
+    var fname = req.user.fname;
+    var lname = req.user.lname;
+    var agency = req.user.agencyName;
+
     var data = {
         'form_errors': req.flash( 'form-errors' )
     };
@@ -518,6 +523,8 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
             data.bolo.lastUpdatedOn = temp.toString();
             data.bolo.agencyName = req.user.agencyName;
             var att = [];
+            data.bolo.record = data.bolo.record+'Updated to "'+bolo_status+'" on '+temp+'\nBy '+fname+' '+ lname +'\n'+'From '+agency+'\n\n';
+
             boloService.updateBolo(data.bolo, att).then(function(bolo){
 
                 res.redirect('/bolo');
@@ -528,9 +535,12 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
                 });
 
         }
+    }, function(reason){
+      req.flash( GFERR,
+          'The BOLO you were trying to edit does not exist.'
+      );
+      res.redirect( '/bolo' );
     }).catch( function ( error ) {
-        if ( ! /unauthorized/i.test( error.message ) ) throw error;
-
         req.flash( GFERR,
             'You do not have permissions to edit this BOLO. Please ' +
             'contact your agency\'s supervisor or administrator ' +
@@ -545,29 +555,30 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
 // render the bolo edit form
 router.get( '/bolo/edit/:id', function ( req, res, next ) {
     var data = {
-        'form_errors': req.flash( 'form-errors' )
+        'form_errors': req.flash( 'form-errors' ),
     };
 
-    /** @todo car we trust that this is really an id? **/
-
     getAllBoloData( req.params.id ).then( function(boloData)   {
-
         _.extend(data, boloData);
-
         var auth = new BoloAuthorize( data.bolo, data.author, req.user );
 
         if ( auth.authorizedToEdit() ) {
             res.render( 'bolo-edit-form', data );
         }
-    }).catch( function ( error ) {
-        if ( ! /unauthorized/i.test( error.message ) ) throw error;
-
+      },
+      function(reason){
+        req.flash( GFERR,
+            'The BOLO you were trying to edit does not exist.'
+        );
+        res.redirect( '/bolo' );
+      }
+    ).catch( function ( error ) {
         req.flash( GFERR,
             'You do not have permissions to edit this BOLO. Please ' +
             'contact your agency\'s supervisor or administrator ' +
             'for access.'
         );
-        res.redirect( 'back' );
+        res.redirect( '/bolo' );
     }).catch( function ( error ) {
         next( error );
     });
@@ -576,20 +587,20 @@ router.get( '/bolo/edit/:id', function ( req, res, next ) {
 
 // handle requests to process edits on a specific bolo
 router.post( '/bolo/edit/:id', function ( req, res, next ) {
-    /** @todo confirm that the request id and field id match **/
-
     parseFormData( req, attachmentFilter ).then( function ( formDTO ) {
         var boloDTO = boloService.formatDTO( formDTO.fields );
         var attDTOs = [];
 
         if(formDTO.fields.status === ''){
             boloDTO.status = 'Updated';
-
         }
         boloDTO.lastUpdatedOn = moment().format( config.const.DATE_FORMAT );
         boloDTO.lastUpdatedBy.firstName = req.user.fname;
         boloDTO.lastUpdatedBy.lastName = req.user.lname;
         boloDTO.agencyName = req.user.agencyName;
+
+        boloDTO.record = boloDTO.record+'Edited on '+boloDTO.lastUpdatedOn+'\nBy '+req.user.fname+' '+req.user.lname+'\nFrom '+req.user.agencyName+'\n\n';
+
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
@@ -607,7 +618,7 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         if ( formDTO.fields['image_remove[]'] ) {
             boloDTO.images_deleted = formDTO.fields['image_remove[]'];
         }
-
+        console.log("asda",boloDTO);
         var result = boloService.updateBolo( boloDTO, attDTOs );
         return Promise.all( [ result, formDTO ] );
     }).then( function ( pData ) {
@@ -765,6 +776,21 @@ router.get('/bolo/details/pics/:id', function (req, res, next){
         next( error );
     });
 });
+
+router.get('/bolo/details/record/:id', function (req, res, next){
+    var data = {
+        'form_errors': req.flash( 'form-errors' )
+    };
+    boloService.getBolo(req.params.id).then( function (bolo){
+        data.record = bolo.record;
+        res.render('bolo-record-tracking', data);
+
+    }).catch( function ( error ) {
+        next( error );
+    });
+});
+
+
 
     /**
      * Generates PDF from bolo / agency information

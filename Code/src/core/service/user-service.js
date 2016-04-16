@@ -36,7 +36,7 @@ function UserService ( userRepository , agencyService) {
 UserService.prototype.authenticate = function ( username, password ) {
     return this.userRepository.getByUsername( username )
     .then( function ( user ) {
-        if ( user && user.isValidPassword( password ) ) {
+        if ( user && user.matchesCurrentPassword( password ) ) {
             return user;
         }
 
@@ -96,16 +96,21 @@ UserService.prototype.registerUser = function ( userDTO ) {
             throw new Error( 'User registration invalid' );
         }
 
-        return context.userRepository.getByUsername( newuser.username )
-        .then( function ( existingUser ) {
-            if ( existingUser ) {
-                throw new Error(
-                    'User already registered: ' + existingUser.username
-                );
-            }
-
-            newuser.hashPassword();
-            return context.userRepository.insert( newuser );
+        var usernameCheck = context.userRepository.getByUsername( newuser.username );
+        var emailCheck = context.userRepository.getByEmail( newuser.email );
+        return Promise.all([usernameCheck, emailCheck]).then(function(users){
+          if ( users[0] ) {
+            throw new Error(
+                'Username is already registered: \'' + users[0].username + '\''
+            );
+          }
+          else if (users[1]){
+            throw new Error(
+                'Email is already registered: ' + users[1].email + '\''
+            );
+          }
+          newuser.hashPassword();
+          return context.userRepository.insert( newuser );
         });
     });
 };
@@ -115,8 +120,8 @@ UserService.prototype.registerUser = function ( userDTO ) {
  *
  * @returns {Promise|User|Array} Promises an Array of User objects.
  */
-UserService.prototype.getUsers = function () {
-    return this.userRepository.getAll();
+UserService.prototype.getUsers = function (sortBy) {
+    return this.userRepository.getAll(sortBy);
 };
 
 // connection between this and payload function
@@ -134,16 +139,23 @@ UserService.prototype.getAgencySubscribers = function ( agencyID ) {
 UserService.prototype.resetPassword = function ( id, password ) {
     var context = this;
     return context.userRepository.getById( id ).then( function ( user ) {
-        user.resetPasswordToken = '';
-        user.resetPasswordExpires = null;
-        user.password = password;
-        user.hashPassword();
-        return context.userRepository.update( user );
+
+      if(user.matchesCurrentPassword(password)){
+        throw new Error("Password matches previous password.");
+      }
+
+      user.resetPasswordToken = '';
+      user.resetPasswordExpires = null;
+      user.password = password;
+      user.hashPassword();
+      return context.userRepository.update( user );
     }, function ( error ) {
-        throw new Error( 'Unable to get current user data: ', error.message );
+      var message = 'Unable to get current user data: ' + error.message;
+        throw new Error( message );
     })
     .catch( function ( error ) {
-        throw new Error( 'Error saving password to repository: ', error.message );
+      var message = 'Error saving password to repository: ' + error.message;
+        throw new Error( message );
     });
 };
 
@@ -158,36 +170,40 @@ UserService.prototype.resetPassword = function ( id, password ) {
 UserService.prototype.updateUser = function ( id, userDTO ) {
     var context = this;
 
-    return context.userRepository.getById( id ).then( function ( user ) {
-        function blacklisted ( key ) {
-            var list = [ 'password', 'tier', 'notifications' ];
-            return ( -1 !== list.indexOf( key ) );
-        }
+    return context.agencyService.getAgency(userDTO.agency).then(function(response){
 
-        if ( typeof userDTO.tier === 'string' && undefined !== User[userDTO.tier] ) {
-            user.tier = User[userDTO.tier];
-        }
+      return context.userRepository.getById( id ).then( function ( user ) {
+          function blacklisted ( key ) {
+              var list = [ 'password', 'tier', 'notifications' ];
+              return ( -1 !== list.indexOf( key ) );
+          }
 
-        if ( userDTO.agency && userDTO.agency !== user.agency ) {
-            user.notifications.push( userDTO.agency );
-        }
+          if ( typeof userDTO.tier === 'string' && undefined !== User[userDTO.tier] ) {
+              user.tier = User[userDTO.tier];
+          }
 
-        Object.keys( user.data ).forEach( function ( key ) {
-            if ( userDTO[key] && ! blacklisted( key ) ) {
-                user[key] = userDTO[key];
-            }
-        });
+          if ( userDTO.agency && userDTO.agency !== user.agency ) {
+              user.notifications.push( userDTO.agency );
+              user.agencyName = response.name;
+          }
 
-        return context.userRepository.update( user );
-    }, function ( error ) {
-        throw new Error(
-            'Unable to get user id ' + id + ': ' + error.message
-        );
-    })
-    .catch( function ( error ) {
-        throw new Error(
-            'Error saving user data changes to repository: ' + error.message
-        );
+          Object.keys( user.data ).forEach( function ( key ) {
+              if ( userDTO[key] && ! blacklisted( key ) ) {
+                  user[key] = userDTO[key];
+              }
+          });
+
+          return context.userRepository.update( user );
+      }, function ( error ) {
+          throw new Error(
+              'Unable to get user id ' + id + ': ' + error.message
+          );
+      })
+      .catch( function ( error ) {
+          throw new Error(
+              'Error saving user data changes to repository: ' + error.message
+          );
+      });
     });
 };
 
@@ -274,7 +290,7 @@ UserService.prototype.formatDTO = function ( dto ) {
 };
 
 UserService.prototype.getByEmail = function ( email ) {
-    return this.userRepository.getByEmail( email );
+    return this.userRepository.getByEmail( email.toLowerCase() );
 };
 
 UserService.prototype.getByToken = function ( email ) {

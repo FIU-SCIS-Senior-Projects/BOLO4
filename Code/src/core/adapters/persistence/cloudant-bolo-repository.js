@@ -155,7 +155,7 @@ CloudantBoloRepository.prototype.insert = function (bolo, attachments) {
                 Array.prototype.push.apply(comp_attDTOs,attDTOs);
 
                 return db.insertMultipart(newdoc, comp_attDTOs, newdoc._id);
-            })
+            });
         }
             else  return db.insertMultipart(newdoc, attDTOs, newdoc._id);
         }
@@ -192,7 +192,7 @@ CloudantBoloRepository.prototype.update = function (bolo, attachments) {
 
         var blacklist = [
             'isActive', 'Type', '_id', '_attachments', 'createdOn', 'agency',
-            'author', 'authorFname', 'authorLName', 'authorUName', 'images'
+            'author', 'authorFname', 'authorLName', 'authorUName', 'images', 'agencyName'
         ];
 
         _(newdoc).omit(blacklist).each(function (val, key) {
@@ -226,7 +226,7 @@ CloudantBoloRepository.prototype.update = function (bolo, attachments) {
                     Array.prototype.push.apply(comp_attDTOs,attDTOs);
 
                     return db.insertMultipart(doc, comp_attDTOs, newdoc._id);
-                })
+                });
             }
             else  return db.insertMultipart(doc, attDTOs, newdoc._id);
         }
