@@ -115,7 +115,7 @@ module.exports.postCreateForm = function ( req, res ) {
     })
     .catch( function ( error ) {
         if ( ! /already registered/i.test( error.message ) ) throw error;
-            req.flash( FERR, 'User already registered.' );
+            req.flash( FERR, error.message );
             res.redirect( 'back' );
     })
     .catch( function ( error ) {
@@ -156,7 +156,7 @@ module.exports.getSortedList = function ( req, res ) {
       'currentUser':req.user
     };
     var sort = req.params.id;
-    
+
     userService.getUsers(sort).then( function ( users ) {
         data.users = users.filter( function ( oneUser ) {
             return oneUser.id !== req.user.id;

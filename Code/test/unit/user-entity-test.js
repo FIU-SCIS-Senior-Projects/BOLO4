@@ -53,7 +53,7 @@ describe( 'user domain entity', function () {
         user.password = 'abracadabra';
 
         /* assert */
-        expect( user.isValidPassword( 'abracadabra' ) ).to.be.false;
+        expect( user.matchesCurrentPassword( 'abracadabra' ) ).to.be.false;
     });
 
     it( 'validates hashed passwords', function () {
@@ -62,8 +62,8 @@ describe( 'user domain entity', function () {
         user.hashPassword();
 
         /* assert */
-        expect( user.isValidPassword( 'some-password' ) ).to.be.false;
-        expect( user.isValidPassword( 'abracadabra' ) ).to.be.true;
+        expect( user.matchesCurrentPassword( 'some-password' ) ).to.be.false;
+        expect( user.matchesCurrentPassword( 'abracadabra' ) ).to.be.true;
     });
 
     describe( 'roles', function () {

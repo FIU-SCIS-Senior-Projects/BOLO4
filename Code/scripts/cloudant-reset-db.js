@@ -181,7 +181,7 @@ var USERS_DESIGN_DOC = {
             "map": "function (doc) { if ( 'user' === doc.Type ) { for ( var i = 0; i < doc.notifications.length; i++ ) { emit( doc.notifications[i], doc.email ); } } }"
         },
         "by_email": {
-            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.email, null ); }"
+            "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.email.toLowerCase(), null ); }"
         },
         "by_token": {
             "map": "function ( doc ) { if ( 'user' === doc.Type ) emit( doc.resetPasswordToken, null ); }"
