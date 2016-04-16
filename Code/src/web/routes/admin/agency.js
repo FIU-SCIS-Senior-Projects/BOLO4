@@ -8,6 +8,7 @@ var Promise             = require('promise');
 var config              = require('../../config');
 var agencyRepository    = new config.AgencyRepository();
 var agencyService       = new config.AgencyService( agencyRepository );
+var userService         = new config.UserService( new config.UserRepository(), agencyService);
 
 var formUtil            = require('../../lib/form-util');
 
@@ -87,7 +88,38 @@ module.exports.getList = function ( req, res ) {
     });
 };
 
+module.exports.activationAgency = function(req, res){
 
+    var agency = req.body.agency;
+    if(req.user.data.agencyName === agency.data.name){
+        req.flash(GFERR,"Error in agency deactivation: Root Administrator cannot deactivate his/her own agency ");
+        res.send({redirect: '/admin/agency'});
+    }
+    else
+    {
+        if (agency.data.isActive === 'true') {
+            agency.data.isActive = true;
+
+        }
+        else
+            agency.data.isActive = false;
+        agency.data.isActive = !(agency.data.isActive);
+        console.log(agency.data.isActive);
+        agencyService.updateAgency(agency, []).then(function (pData) {
+            if (agency.data.isActive === true) {
+                req.flash(GFMSG, 'Agency Activation successful.');
+            }
+            else {
+                req.flash(GFMSG, 'Agency Deactivation successful.');
+            }
+            res.send({redirect: '/admin/agency'});
+
+        }).catch(function (error) {
+            req.flash(GFERR, "Error in agency deactivation:" + error);
+            res.send({redirect: '/admin/agency'});
+        })
+    }
+};
 /**
  * Respond with a form to create an agency.
  */

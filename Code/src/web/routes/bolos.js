@@ -500,7 +500,6 @@ router.post( '/bolo/create', _bodyparser, function ( req, res, next ) {
 
 //update bolo status through thumbnail select menu
 router.post( '/bolo/update/:id', function ( req, res, next ) {
-    console.log("posted to bolo/update/:id");
     var bolo_id = req.params.id;
     var bolo_status = req.body.status;
     var data = {
@@ -517,7 +516,7 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
             data.bolo.status = bolo_status;
             var temp = moment().format( config.const.DATE_FORMAT);
             data.bolo.lastUpdatedOn = temp.toString();
-            console.log(data.bolo.lastUpdatedOn);
+            data.bolo.agencyName = req.user.agencyName;
             var att = [];
             boloService.updateBolo(data.bolo, att).then(function(bolo){
 
@@ -590,6 +589,7 @@ router.post( '/bolo/edit/:id', function ( req, res, next ) {
         boloDTO.lastUpdatedOn = moment().format( config.const.DATE_FORMAT );
         boloDTO.lastUpdatedBy.firstName = req.user.fname;
         boloDTO.lastUpdatedBy.lastName = req.user.lname;
+        boloDTO.agencyName = req.user.agencyName;
         if ( formDTO.fields.featured_image ) {
             var fi = formDTO.fields.featured_image;
             boloDTO.images.featured = fi.name;
