@@ -29,8 +29,6 @@ block admin-content
                     td  #{agency.state}
                     td  #{agency.zip}
                     td.hidden-xs #{agency.phone}
-                    if(agency.isActive === false)
-                        td.text-warning disabled
                     td: a( href=route + "/edit/" + agency.id role="button" )
                         span.glyphicon.glyphicon-cog( aria-hidden="true" )
 

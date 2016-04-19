@@ -31,25 +31,11 @@ passport.use( new LocalStrategy(
         userService.authenticate( username, password )
         .then( function ( account ) {
             if ( account ) {
-
-                    agencyService.getAgency(account.data.agency).then(function (agency) {
-                        if (agency.data.isActive === true) {
-                            return done(null, account);
-                        }
-                        else {
-                            return done(null, false, {
-                                'message': 'Agency has been Deactivated.Contact ' +
-                                'your Root Administrator for more information..'
-                            });
-                        }
-                    })
-
+                return done( null, account );
             }
-            else {
-                return done(null, false, {
-                    'message': 'Invalid login credentials.'
-                });
-            }
+            return done( null, false, {
+                'message': 'Invalid login credentials.'
+            });
         });
     }
 ));
