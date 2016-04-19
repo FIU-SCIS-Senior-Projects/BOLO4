@@ -49,6 +49,7 @@ router.get(  pre + '/:id/delete'            , users.getDelete );
 pre = '/admin/agency';
 router.use( SETNAV( 'admin-agency' ) );
 router.get(  pre                            , agency.getList );
+router.post( pre + '/activation'            , agency.activationAgency);
 router.get(  pre + '/create'                , agency.getCreateForm );
 router.post( pre + '/create'                , agency.postCreateForm );
 router.get(  pre + '/edit/:id'              , agency.getEditForm );
