@@ -616,7 +616,8 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
 });
 
 //update bolo status through thumbnail select menu
-router.post( '/bolo/update/:id', function ( req, res, next ) {
+router.post('/bolo/update/:id', function(req, res, next) {
+    console.log("posted to bolo/update/:id");
     var bolo_id = req.params.id;
     var bolo_status = req.body.status;
     var fname = req.user.fname;
@@ -637,7 +638,7 @@ router.post( '/bolo/update/:id', function ( req, res, next ) {
             data.bolo.status = bolo_status;
             var temp = moment().format(config.const.DATE_FORMAT);
             data.bolo.lastUpdatedOn = temp.toString();
-            data.bolo.agencyName = req.user.agencyName;
+            console.log(data.bolo.lastUpdatedOn);
             var att = [];
 
             data.bolo.record = data.bolo.record + 'Updated to "' + bolo_status + '" on ' + temp + '\nBy ' + fname + ' ' + lname + '\n' + 'From ' + agency + '\n\n';
@@ -715,7 +716,6 @@ router.post('/bolo/edit/:id', function(req, res, next) {
         boloDTO.lastUpdatedOn = moment().format(config.const.DATE_FORMAT);
         boloDTO.lastUpdatedBy.firstName = req.user.fname;
         boloDTO.lastUpdatedBy.lastName = req.user.lname;
-        boloDTO.agencyName = req.user.agencyName;
 
 
         boloDTO.record = boloDTO.record + 'Edited on ' + boloDTO.lastUpdatedOn + '\nBy ' + req.user.fname + ' ' + req.user.lname + '\nFrom ' + req.user.agencyName + '\n\n';
