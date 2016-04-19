@@ -27,6 +27,7 @@ config.UserRepository   = require( path.join( core, 'adapters/persistence/clouda
 
 config.EmailService     = require( path.join( core, 'service/email-service' ) );
 
+config.PDFService       = require( path.join( core, 'service/pdf-service' ) );
 config.CommonService    = require( path.join( core, 'service/common-service' ) );
 
 
