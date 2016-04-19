@@ -150,8 +150,6 @@ function getAllBoloData(id) {
         throw new Error('Error retrieving all BOLO info.');
     }).then(function(responses) {
 
-    }).then(function(responses) {
-
         console.log(responses);
         data.agency = responses[0];
         data.author = responses[1];
