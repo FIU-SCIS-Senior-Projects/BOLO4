@@ -202,7 +202,7 @@ var AGENCY_DESIGN_DOC = {
             "map": "function ( doc ) { if ( 'agency' === doc.Type ) emit( doc.name, null ); }"
         },
         "all_active": {
-            "map": "function ( doc ) { if ( 'agency' === doc.Type ) emit( doc.name, null ); }"
+            "map": "function ( doc ) { if ( 'agency' === doc.Type && true === doc.isActive) emit( doc.name, null ); }"
         },
         "revs": {
             "map": "function ( doc ) { if ( 'agency' === doc.Type ) emit( null, doc._rev ); }"
