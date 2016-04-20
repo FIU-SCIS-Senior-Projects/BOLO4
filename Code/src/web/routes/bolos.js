@@ -468,7 +468,7 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
 
         var boloDTO = boloService.formatDTO(formDTO.fields);
         var attDTOs = [];
-
+        var fi = {};
         boloDTO.createdOn = moment().format(config.const.DATE_FORMAT);
         boloDTO.createdOn = boloDTO.createdOn.toString();
         console.log("BOLO created on:" + boloDTO.createdOn);
@@ -484,10 +484,18 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
         boloDTO.status = 'New';
 
         if (formDTO.fields.featured_image) {
-            var fi = formDTO.fields.featured_image;
-            boloDTO.images.featured = fi.name;
-            attDTOs.push(renameFile(fi, 'featured'));
+             fi = formDTO.fields.featured_image;
         }
+        else {
+            var file_path = path.resolve('src/web/public/img/nopic.png');
+            fi = {
+                'name': 'nopic.png',
+                'content_type': 'image/png',
+                'path': file_path
+            };
+        }
+        boloDTO.images.featured = fi.name;
+        attDTOs.push(renameFile(fi, 'featured'));
 
         if (formDTO.fields['image_upload[]']) {
             formDTO.fields['image_upload[]'].forEach(function(imgDTO) {
@@ -505,9 +513,8 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
             preview.image = "none";
             preview.ranktitle = req.user.ranktitle;
             preview.sectunit = req.user.sectunit;
-            if (formDTO.fields.featured_image) {
-                preview.image = fi.path;
-            }
+            preview.image = fi.path;
+
             return Promise.all([preview, formDTO]);
         }
 
@@ -525,9 +532,8 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
             data.ranktitle = req.user.ranktitle;
             data.sectunit = req.user.sectunit;
             data.authName = req.user.fname + " " + req.user.lname;
-            if (formDTO.fields.featured_image) {
-                data.image = fi.path;
-            }
+            data.image = fi.path;
+
             return Promise.all([data, formDTO]);
         }
     }).then(function(pData) {
@@ -889,6 +895,7 @@ router.get('/bolo/details/pdf/:id' + '.pdf', function(req, res, next) {
         doc.image(someData.logo, 15, 15, {
             height: 100
         });
+        console.log(someData.shield.content_type);
         doc.image(someData.shield, 500, 15, {
             height: 100
         });
