@@ -282,6 +282,7 @@ a.thumbnail.active {
     max-width: 100%;
     height: auto;
 }
+
 .ui-dialog-titlebar-close{
     display: none;
 }
