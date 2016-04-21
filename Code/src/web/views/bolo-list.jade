@@ -16,7 +16,7 @@ block jumbo
                         for agency in agencies
                             a.btn.btn-default(href="/bolo/agency/"+agency.id name="agencyID" value=agency.id style=dimensions) #{agency.name}
                 div.col-xs-3
-                    a.dropbtn.pull-right(href="/bolo/create") Post BOLO
+                    a.dropbtn.btn.btn-default.pull-right(href="/bolo/create") Post BOLO
 
 block content
     include ./partials/global-alerts.jade
