@@ -35,7 +35,7 @@ block account-content
             td Agency
             td #{agency.name}
 
-    if ( ! /administrator/i.test( user.roleName() ) )
+    if ( ! /root/i.test( user.roleName() ) )
         .bs-callout.bs-callout-info
             p Please contact your Agency administrator for changes to your
                 | account details.
