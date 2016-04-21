@@ -838,6 +838,7 @@ router.get('/bolo/delete/:id', function(req, res, next) {
 // handle requests to view the details of a bolo
 router.get('/bolo/details/:id', function(req, res, next) {
     var data = {};
+    data.tier = req.user.tier;
 
     boloService.getBolo(req.params.id).then(function(bolo) {
         data.bolo = bolo;

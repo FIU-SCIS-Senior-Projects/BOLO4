@@ -11,7 +11,7 @@ block jumbo
         div.col-xs-2
            a.btn.btn-default.pull-right( href="/bolo/details/pdf/" + bolo.id + '.pdf' ) Generate PDF
         div
-        if(bolo.record)
+        if((bolo.record)&&(tier > 2))
            a.btn.btn-default.pull-right( href="/bolo/details/record/" + bolo.id) View Record
 
 
