@@ -4,40 +4,20 @@ extends layout
 block jumbo
     .jumbotron
         .container
-            div#wrapper.row
+            div
                 div.col-xs-2.col-md-8
                     p Active BOLOs
-                div.col-xs-2
-                    .dropdown
-                        button.dropbtn.pull-right(onclick='myFunction()') Filter by agency
-                          |   
-                          #myDropdown.dropdown-content
-                            a.btn.btn-default(href = "/bolo/", type="button") View all
-                            for agency in agencies
-                                a.btn.btn-default(href="/bolo/agency/" + agency.id, name = "agencyID", value = agency.id, type="button") #{agency.name}
-                div.col-xs-2
-                    a.dropbtn.pull-right(href="/bolo/create") Post BOLO
+                div.col-xs-1.dropdown
+                    button.dropbtn.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown") Filter By Agency
+                        span.caret
+                    ul.dropdown-menu
+                        -var dimensions = "width: 210px; margin: 0 auto;"
+                        a.btn.btn-default(href="/bolo/" style=dimensions) View all
+                        for agency in agencies
+                            a.btn.btn-default(href="/bolo/agency/"+agency.id name="agencyID" value=agency.id style=dimensions) #{agency.name}
+                div.col-xs-3
+                    a.dropbtn.btn.btn-default.pull-right(href="/bolo/create") Post BOLO
 
-            script.
-                function myFunction() {
-                    document.getElementById("myDropdown").classList.toggle("show");
-                }
-                   
-                window.onclick = function(event) {
-                  if (!event.target.matches('.dropbtn')) {
-
-                    var dropdowns = document.getElementsByClassName("dropdown-content");
-                    var i;
-                    for (i = 0; i < dropdowns.length; i++) {
-                      var openDropdown = dropdowns[i];
-                      if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                      }
-                    }
-                  }
-                }
-
-                    
 block content
     include ./partials/global-alerts.jade
 
