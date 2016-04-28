@@ -4,19 +4,22 @@ extends layout
 block jumbo
     .jumbotron
         .container
-            div#wrapper.row
-                div.col-xs-2.col-md-8
+            .row
+                div.col-xs-12
                     p Active BOLOs
-                div.col-xs-2
-                    .dropdown
-                        button.dropbtn.pull-right(onclick='myFunction()') Filter by agency
-                          |   
-                          #myDropdown.dropdown-content
-                            a.btn.btn-default(href = "/bolo/", type="button") View all
-                            for agency in agencies
-                                a.btn.btn-default(href="/bolo/agency/" + agency.id, name = "agencyID", value = agency.id, type="button") #{agency.name}
-                div.col-xs-2
-                    a.dropbtn.pull-right(href="/bolo/create") Post BOLO
+            .row
+                .col-xs-14.col-md-6
+                    .pull-left
+                        a.btn.btn-default(href="/bolo/create") Post BOLO
+                .col-xs-14.col-md-6
+                    .pull-right
+                        .dropdown
+                            button.dropbtn.btn.btn-default(onclick='myFunction()') Filter by agency
+                                #myDropdown.dropdown-content
+                                    a.btn.btn-default(href = "/bolo/", type="button") View all
+                                    for agency in agencies
+                                        a.btn.btn-default(href="/bolo/agency/" + agency.id, name = "agencyID", value = agency.id, type="button") #{agency.name}
+
 
             script.
                 function myFunction() {

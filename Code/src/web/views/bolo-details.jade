@@ -5,14 +5,17 @@ extends layout
 block jumbo
   .jumbotron
     .container
-      div#wrapper.row
-        div.col-xs-2.col-md-8
+      .row
+        div.col-xs-12
            p BOLO Details
-        div.col-xs-2
-           a.btn.btn-default.pull-right( href="/bolo/details/pdf/" + bolo.id + '.pdf' ) Generate PDF
-        div
-        if(bolo.record)
-           a.btn.btn-default.pull-right( href="/bolo/details/record/" + bolo.id) View Record
+      .row
+          .col-xs-14.col-md-6
+              .pull-left
+                  a.btn.btn-default( href="/bolo/details/pdf/" + bolo.id + '.pdf' ) Generate PDF
+          .col-xs-14.col-md-6
+              .pull-right
+                  if(bolo.record)
+                      a.btn.btn-default.pull-right( href="/bolo/details/record/" + bolo.id) View Record
 
 
 block content
