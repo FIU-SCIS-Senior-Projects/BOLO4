@@ -2,14 +2,14 @@ extends admin-layout
 include includes/mixins
 
 block jumbo-desc
-    div#wrapper.row
-        div.col-xs-2.col-md-10
+    div.row
+        div.col-xs-12
             p Admin Portal: User Directory
-        div.col-xs-2.dropdown
+        div.col-xs-12.dropdown
             button.btn.btn-default.dropdown-toggle(type = "button" data-toggle="dropdown") Sort
                 span.caret
             ul.dropdown-menu
-                -var dimensions = "width: 210px; margin: 0 auto;"
+                -var dimensions = "width: 100%; margin: auto;"
                 -var route = "/admin/users/sorted/"
                 -var option1 = "agency"
                 -var option2 = "lname"
