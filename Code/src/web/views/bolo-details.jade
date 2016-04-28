@@ -6,16 +6,16 @@ block jumbo
   .jumbotron
     .container
       .row
- +       div.col-xs-12
+         div.col-xs-12
            p BOLO Details
       .row
- +       .col-xs-14.col-md-6
+         .col-xs-14.col-md-6
             .pull-left
               a.btn.btn-default.pull-right( href="/bolo/details/pdf/" + bolo.id + '.pdf' ) Generate PDF
          .col-xs-14.col-md-6
             .pull-right
-            if((bolo.record)&&(tier > 2))
-              a.btn.btn-default.pull-right( href="/bolo/details/record/" + bolo.id) View Record
+              if((bolo.record)&&(tier > 2))
+                a.btn.btn-default.pull-right( href="/bolo/details/record/" + bolo.id) View Record
 
 
 block content
