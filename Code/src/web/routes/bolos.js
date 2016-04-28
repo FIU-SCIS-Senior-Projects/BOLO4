@@ -545,9 +545,8 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
             res.redirect('/bolo');
         }
         if (pData[1].fields.option === "pdf") {
-            console.log("IN THE PDF PREVIEW!!!!!");
             agencyService.getAgency(pData[0].agency).then(function(response) {
-                console.log("CHECK 1");
+                
                 pData[0].agency_name = response.data.name;
                 pData[0].agency_address = response.data.address;
                 pData[0].agency_city = response.data.city;
@@ -561,7 +560,7 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
 
                 /** @todo must handle when featured image is empty **/
                 if (pData[0].image === "none") {
-                    console.log("IMAGE === NONE REACHED!!!");
+            
                     doc.image("src/web/public/img/nopic.png", 15, 150, {
                         height: 200
                     });
@@ -584,7 +583,6 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
                         height: 100
                     });
                     doc.end();
-                    console.log("CHECK: DOC.END()");
                     res.contentType("application/pdf");
                     doc.pipe(res);
                 });
@@ -848,6 +846,7 @@ router.get('/bolo/delete/:id', function(req, res, next) {
 // handle requests to view the details of a bolo
 router.get('/bolo/details/:id', function(req, res, next) {
     var data = {};
+    data.tier = req.user.tier;
 
     boloService.getBolo(req.params.id).then(function(bolo) {
         data.bolo = bolo;

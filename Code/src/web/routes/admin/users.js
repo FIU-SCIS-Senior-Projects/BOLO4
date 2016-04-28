@@ -79,6 +79,8 @@ module.exports.postCreateForm = function ( req, res ) {
             formDTO.fields.password, formDTO.fields.confirm
         );
 
+        data.username = formDTO.fields.username;
+
         /** @todo validate the rest of the form **/
 
         if ( validationErrors ) {
@@ -88,7 +90,11 @@ module.exports.postCreateForm = function ( req, res ) {
 
         if(formFields === false){
           req.flash( FERR, 'Error saving new user, please try again. Every field is required.' );
-          res.redirect('back');
+          agencyService.getAgencies().then( function ( agencies ) {
+                data.agencies = agencies;
+                data.user = req.user;
+                res.render( 'user-create-form', data );
+          }).catch( next );
           throw new FormError();
         }
 
@@ -138,7 +144,6 @@ module.exports.getList = function ( req, res ) {
     var sort = 'username';
     userService.getUsers(sort).then( function ( users ) {
         data.users = users.filter( function ( oneUser ) {
-          console.log(oneUser.id !== req.user.id && (oneUser.agency === req.user.agency || req.user.tier === 4));
             return oneUser.id !== req.user.id && req.user.tier === 4 || (oneUser.agency === req.user.agency && oneUser.tier < 4 );
         });
         res.render( 'user-list', data);
