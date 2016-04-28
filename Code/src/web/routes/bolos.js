@@ -767,7 +767,8 @@ router.get('/bolo/archive/:id', function(req, res, next) {
         }
     }).then(function(response) {
         req.flash(GFMSG, 'Successfully archived BOLO.');
-        res.redirect('/bolo/archive');
+        setTimeout(function () {
+        res.redirect('/bolo')}, 3000);
     }).catch(function(error) {
         if (!/unauthorized/i.test(error.message)) throw error;
 
@@ -797,7 +798,8 @@ router.get('/bolo/restore/:id', function(req, res, next) {
         }
     }).then(function(response) {
         req.flash(GFMSG, 'Successfully restored BOLO.');
-        res.redirect('/bolo');
+        setTimeout(function () {
+        res.redirect('/bolo/archive')}, 3000);
     }).catch(function(error) {
         if (!/unauthorized/i.test(error.message)) throw error;
 
