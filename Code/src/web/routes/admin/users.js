@@ -70,6 +70,7 @@ module.exports.getCreateForm = function ( req, res, next ) {
 module.exports.postCreateForm = function ( req, res ) {
     var data = {
         'roles': userService.getRoleNames(),
+        'form_errors': req.flash( 'form-errors' )
     };
 
     parseFormData( req ).then( function ( formDTO ) {
@@ -79,7 +80,13 @@ module.exports.postCreateForm = function ( req, res ) {
             formDTO.fields.password, formDTO.fields.confirm
         );
 
-        data.username = formDTO.fields.username;
+        data.user1 = formDTO.fields.username;
+        data.email1 = formDTO.fields.email;
+        data.fname1 = formDTO.fields.fname;
+        data.lname1 = formDTO.fields.lname;
+        data.badge1 = formDTO.fields.badge;
+        data.rank1 = formDTO.fields.sectunit;
+        data.unit1 = formDTO.fields.ranktitle;
 
         /** @todo validate the rest of the form **/
 
@@ -90,11 +97,6 @@ module.exports.postCreateForm = function ( req, res ) {
 
         if(formFields === false){
           req.flash( FERR, 'Error saving new user, please try again. Every field is required.' );
-          agencyService.getAgencies().then( function ( agencies ) {
-                data.agencies = agencies;
-                data.user = req.user;
-                res.render( 'user-create-form', data );
-          }).catch( next );
           throw new FormError();
         }
 
@@ -117,7 +119,11 @@ module.exports.postCreateForm = function ( req, res ) {
     })
     .catch( function ( error ) {
         if ( 'FormError' !== error.name ) throw error;
-        res.redirect( 'back' );
+        agencyService.getAgencies().then( function ( agencies ) {
+                data.agencies = agencies;
+                data.user = req.user;
+                res.render( 'user-create-form', data );
+        });
     })
     .catch( function ( error ) {
         if ( ! /already registered/i.test( error.message ) ) throw error;
