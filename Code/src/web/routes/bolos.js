@@ -345,11 +345,11 @@ router.post('/bolo/archive/purge', function(req, res) {
                 });
             }
         }).catch(function() {
-            req.flash(GFERR, "error in purge process, please try again");
-            res.send({
-                redirect: '/bolo/archive'
-            });
+        req.flash(GFERR, "error in purge process, please try again");
+        res.send({
+            redirect: '/bolo/archive'
         });
+    });
 });
 
 router.get('/bolo/search/results', function(req, res) {
@@ -484,7 +484,7 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
         boloDTO.status = 'New';
 
         if (formDTO.fields.featured_image) {
-             fi = formDTO.fields.featured_image;
+            fi = formDTO.fields.featured_image;
         }
         else {
             var file_path = path.resolve('src/web/public/img/nopic.png');
@@ -546,7 +546,7 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
         }
         if (pData[1].fields.option === "pdf") {
             agencyService.getAgency(pData[0].agency).then(function(response) {
-                
+
                 pData[0].agency_name = response.data.name;
                 pData[0].agency_address = response.data.address;
                 pData[0].agency_city = response.data.city;
@@ -560,7 +560,7 @@ router.post('/bolo/create', _bodyparser, function(req, res, next) {
 
                 /** @todo must handle when featured image is empty **/
                 if (pData[0].image === "none") {
-            
+
                     doc.image("src/web/public/img/nopic.png", 15, 150, {
                         height: 200
                     });
@@ -767,7 +767,8 @@ router.get('/bolo/archive/:id', function(req, res, next) {
         }
     }).then(function(response) {
         req.flash(GFMSG, 'Successfully archived BOLO.');
-        res.redirect('/bolo/archive');
+        setTimeout(function () {
+            res.redirect('/bolo')}, 3000);
     }).catch(function(error) {
         if (!/unauthorized/i.test(error.message)) throw error;
 
@@ -797,7 +798,8 @@ router.get('/bolo/restore/:id', function(req, res, next) {
         }
     }).then(function(response) {
         req.flash(GFMSG, 'Successfully restored BOLO.');
-        res.redirect('/bolo');
+        setTimeout(function () {
+            res.redirect('/bolo/archive')}, 3000);
     }).catch(function(error) {
         if (!/unauthorized/i.test(error.message)) throw error;
 
