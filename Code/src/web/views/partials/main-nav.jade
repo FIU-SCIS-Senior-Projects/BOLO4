@@ -19,9 +19,8 @@ mixin dropdown_menu ( label )
     if userLoggedIn
         ul.nav.navbar-nav
             li: a( href="/bolo" ) Home
-            +dropdown_menu( 'BOLO Menu' )
-                li: a( href="/bolo/create" ) New BOLO
-                li: a( href="/bolo/archive" ) Archived BOLOs
+            li: a( href="/bolo/create" ) CREATE BOLO
+            li: a( href="/bolo/archive" ) Archive
             li: a( href="/agency" ) Agency Directory
             li: a( href="/bolo/search" ) Search
             if (tier === 'ROOT' || tier === 'ADMINISTRATOR')

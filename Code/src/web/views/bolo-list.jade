@@ -4,8 +4,8 @@ extends layout
 block jumbo
     .jumbotron
         .container
-            div
-                div.col-xs-2.col-md-8
+            div#wrapper
+                div.col-xs-1.col-md-10
                     p Active BOLOs
                 div.col-xs-1.dropdown
                     button.dropbtn.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown") Filter By Agency
@@ -15,8 +15,6 @@ block jumbo
                         a.btn.btn-default(href="/bolo/" style=dimensions) View all
                         for agency in agencies
                             a.btn.btn-default(href="/bolo/agency/"+agency.id name="agencyID" value=agency.id style=dimensions) #{agency.name}
-                div.col-xs-3
-                    a.dropbtn.btn.btn-default.pull-right(href="/bolo/create") Post BOLO
 
 block content
     include ./partials/global-alerts.jade
