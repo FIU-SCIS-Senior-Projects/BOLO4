@@ -47,8 +47,3 @@ input[type="file"] {
 .table tr.no-border td {
     border-top: none;
 }
-
-.jumbotron{
-  background-color: #030b2f;
-  color:white;
-}
